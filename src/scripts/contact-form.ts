@@ -1,3 +1,5 @@
+import { SITE } from '../lib/constants';
+
 interface ContactResponse {
   ok: boolean;
   message?: string;
@@ -16,6 +18,11 @@ export function initContactForm(): void {
   const submitBtn = form.querySelector<HTMLButtonElement>('[data-submit]');
   const statusEl = form.querySelector<HTMLElement>('[data-form-status]');
   const successPanel = document.querySelector<HTMLElement>('[data-form-success]');
+
+  // Anti-bot time-trap (see src/pages/api/contact.ts): records when the
+  // form actually became interactive in this browser, not build time.
+  const timestampField = form.querySelector<HTMLInputElement>('input[name="ts"]');
+  if (timestampField) timestampField.value = String(Date.now());
 
   const params = new URLSearchParams(window.location.search);
   const projet = params.get('projet');
@@ -66,13 +73,11 @@ export function initContactForm(): void {
       } else {
         setStatus(
           data.message ??
-            'Une erreur est survenue. Écrivez-nous directement à contact@studiovm.fr, nous reviendrons vers vous rapidement.'
+            `Une erreur est survenue. Écrivez-nous directement à ${SITE.email}, nous reviendrons vers vous rapidement.`
         );
       }
     } catch {
-      setStatus(
-        "Impossible d'envoyer votre message pour le moment. Écrivez-nous directement à contact@studiovm.fr."
-      );
+      setStatus(`Impossible d'envoyer votre message pour le moment. Écrivez-nous directement à ${SITE.email}.`);
     } finally {
       submitBtn?.removeAttribute('disabled');
       submitBtn?.removeAttribute('data-loading');

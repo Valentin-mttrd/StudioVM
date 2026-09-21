@@ -1,16 +1,15 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
-import node from '@astrojs/node';
-
 import mdx from '@astrojs/mdx';
+import netlify from '@astrojs/netlify';
 
 // Whole site is prerendered to static HTML (see `export const prerender`
-// only ever set to `false` on src/pages/api/contact.ts). The Node adapter
-// is only here so that one endpoint can run on demand; swap for
-// @astrojs/vercel or @astrojs/netlify if deploying to those platforms.
+// only ever set to `false` on src/pages/api/contact.ts) and served from
+// Netlify's CDN; the Netlify adapter turns that one route into a Netlify
+// Function. Swap for @astrojs/node or @astrojs/vercel if hosting moves.
 export default defineConfig({
-  site: 'https://www.studiovm.fr',
+  site: 'https://www.studiovm-design.fr',
   trailingSlash: 'never',
   integrations: [
     sitemap({
@@ -18,7 +17,7 @@ export default defineConfig({
     }),
     mdx(),
   ],
-  adapter: node({ mode: 'standalone' }),
+  adapter: netlify(),
   vite: {
     plugins: [tailwindcss()],
   },

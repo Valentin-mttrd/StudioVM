@@ -40,6 +40,7 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
               <label for="societe_web">Ne pas remplir ce champ</label>
               <input type="text" id="societe_web" name="societe_web" tabindex="-1" autocomplete="off" />
             </div>
+            <input type="hidden" name="ts" value="" />
 
             <p class="-mb-2 font-body text-xs text-graphite">
               Champs obligatoires <span aria-hidden="true">*</span>
@@ -48,22 +49,22 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
             <div class="grid grid-cols-1 gap-7 sm:grid-cols-2">
               <div>
                 <label for="nom" class={labelClass}>Nom <span aria-hidden="true">*</span></label>
-                <input type="text" id="nom" name="nom" required autocomplete="name" class:list={[inputClass, 'mt-2']} />
+                <input type="text" id="nom" name="nom" required maxlength="200" autocomplete="name" class:list={[inputClass, 'mt-2']} />
               </div>
               <div>
                 <label for="entreprise" class={labelClass}>Entreprise <span class="font-normal text-graphite">(facultatif)</span></label>
-                <input type="text" id="entreprise" name="entreprise" autocomplete="organization" class:list={[inputClass, 'mt-2']} />
+                <input type="text" id="entreprise" name="entreprise" maxlength="200" autocomplete="organization" class:list={[inputClass, 'mt-2']} />
               </div>
             </div>
 
             <div class="grid grid-cols-1 gap-7 sm:grid-cols-2">
               <div>
                 <label for="email" class={labelClass}>Email <span aria-hidden="true">*</span></label>
-                <input type="email" id="email" name="email" required autocomplete="email" class:list={[inputClass, 'mt-2']} />
+                <input type="email" id="email" name="email" required maxlength="254" autocomplete="email" class:list={[inputClass, 'mt-2']} />
               </div>
               <div>
                 <label for="telephone" class={labelClass}>Téléphone <span class="font-normal text-graphite">(facultatif)</span></label>
-                <input type="tel" id="telephone" name="telephone" autocomplete="tel" class:list={[inputClass, 'mt-2']} />
+                <input type="tel" id="telephone" name="telephone" maxlength="40" autocomplete="tel" class:list={[inputClass, 'mt-2']} />
               </div>
             </div>
 
@@ -97,6 +98,7 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
                 id="description"
                 name="description"
                 required
+                maxlength="5000"
                 rows="6"
                 class:list={[inputClass, 'mt-2 resize-y']}
                 placeholder="Contexte, objectifs, délais envisagés…"

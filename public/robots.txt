@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.studiovm.fr/sitemap-index.xml
+Sitemap: https://www.studiovm-design.fr/sitemap-index.xml
