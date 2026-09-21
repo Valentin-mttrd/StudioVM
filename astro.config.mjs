@@ -17,7 +17,11 @@ export default defineConfig({
     }),
     mdx(),
   ],
-  adapter: netlify(),
+  // The whole site is static, so images can be optimized once at build time
+  // instead of on every request — this also keeps local builds and previews
+  // identical to what's actually deployed (Netlify's Image CDN endpoint used
+  // by the default `imageCDN: true` only exists once live on Netlify).
+  adapter: netlify({ imageCDN: false }),
   vite: {
     plugins: [tailwindcss()],
   },

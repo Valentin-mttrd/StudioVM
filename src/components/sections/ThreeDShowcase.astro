@@ -1,9 +1,11 @@
 ---
+import { Image } from 'astro:assets';
 import Section from '../ui/Section.astro';
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Button from '../ui/Button.astro';
-import AbstractCover from '../portfolio/AbstractCover.astro';
+import planImage from '../../assets/showcase/entree-jardin-plan.webp';
+import renduImage from '../../assets/showcase/entree-jardin-rendu.webp';
 ---
 <Section tone="ink" id="visualisation-3d">
   <Container>
@@ -31,14 +33,26 @@ import AbstractCover from '../portfolio/AbstractCover.astro';
       data-reveal-delay="120"
     >
       <div class="absolute inset-0">
-        <AbstractCover kind="plan" tone="anthracite" class="h-full w-full" />
+        <Image
+          src={planImage}
+          alt="Esquisse en plan d'un aménagement extérieur : entrée végétalisée, pergola et cheminement"
+          class="h-full w-full object-cover"
+          widths={[640, 960, 1400]}
+          sizes="100vw"
+        />
         <span class="absolute left-6 top-6 font-body text-xs font-semibold uppercase tracking-[0.2em] text-mist">
           Plan
         </span>
       </div>
 
       <div class="absolute inset-0" data-compare-after>
-        <AbstractCover kind="3d" tone="ink" class="h-full w-full" />
+        <Image
+          src={renduImage}
+          alt="Rendu 3D réaliste du même aménagement extérieur : entrée végétalisée, pergola et cheminement"
+          class="h-full w-full object-cover"
+          widths={[640, 960, 1400]}
+          sizes="100vw"
+        />
         <span class="absolute right-6 top-6 font-body text-xs font-semibold uppercase tracking-[0.2em] text-mist">
           3D
         </span>
