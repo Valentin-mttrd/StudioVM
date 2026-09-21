@@ -33,8 +33,9 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
           <a
             href={link.href}
             class:list={[
-              'font-body text-sm font-medium uppercase tracking-wide text-paper/85 transition-colors duration-500 hover:text-paper group-data-[solid=true]/nav:text-ink/75 group-data-[solid=true]/nav:hover:text-ink',
-              currentPath === link.href && 'text-paper group-data-[solid=true]/nav:text-ink',
+              'relative font-body text-sm font-medium uppercase tracking-wide text-paper/85 transition-colors duration-500 hover:text-paper group-data-[solid=true]/nav:text-ink/75 group-data-[solid=true]/nav:hover:text-ink',
+              currentPath === link.href &&
+                'text-paper group-data-[solid=true]/nav:text-ink after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:bg-current',
             ]}
             aria-current={currentPath === link.href ? 'page' : undefined}
           >
@@ -78,9 +79,14 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
         NAV_LINKS.map((link) => (
           <a
             href={link.href}
-            class="border-b border-paper/15 py-4 font-display text-3xl font-semibold tracking-tight sm:text-4xl"
+            aria-current={currentPath === link.href ? 'page' : undefined}
+            class:list={[
+              'flex items-center gap-3 border-b border-paper/15 py-4 font-display text-3xl font-semibold tracking-tight sm:text-4xl',
+              currentPath === link.href && 'text-mist',
+            ]}
           >
             {link.label}
+            {currentPath === link.href && <span class="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />}
           </a>
         ))
       }

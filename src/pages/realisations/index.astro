@@ -89,17 +89,19 @@ const filters = [
 
         {
           !hasCategory('3d') && (
-            <div
-              class="flex aspect-[4/3] flex-col items-start justify-end rounded-sm border border-dashed border-mist p-6"
-              data-project-card
-              data-category="3d"
-              data-reveal
-              data-reveal-group="portfolio"
-            >
-              <p class="font-display text-lg font-semibold text-anthracite/60">Projets 3D à venir</p>
-              <p class="mt-2 font-body text-sm leading-relaxed text-anthracite/50">
-                De nouvelles visualisations seront ajoutées ici prochainement.
-              </p>
+            <div class="flex flex-col" data-project-card data-category="3d" data-reveal data-reveal-group="portfolio">
+              <div class="flex aspect-[4/3] items-center justify-center rounded-sm border border-dashed border-mist">
+                <span class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite/70">Bientôt</span>
+              </div>
+              <div class="mt-5">
+                <h2 class="font-display text-lg font-semibold leading-snug text-anthracite/60">Projets 3D à venir</h2>
+                <p class="mt-2 font-body text-sm leading-relaxed text-anthracite/50">
+                  De nouvelles visualisations seront ajoutées ici prochainement.
+                </p>
+                <div class="mt-4 flex items-center gap-3">
+                  <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite">3D</span>
+                </div>
+              </div>
             </div>
           )
         }

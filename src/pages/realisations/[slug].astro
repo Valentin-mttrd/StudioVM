@@ -81,7 +81,7 @@ const relatedService = getService(category as ServiceId);
       </div>
 
       <aside class="lg:col-span-3 lg:col-start-10">
-        <div class="sticky top-32 flex flex-col gap-10">
+        <div class="flex flex-col gap-10 lg:sticky lg:top-32">
           {
             highlights.length > 0 && (
               <div>
@@ -100,7 +100,7 @@ const relatedService = getService(category as ServiceId);
 
           <div>
             <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">
-              Un projet similaire ?
+              Un projet similaire&nbsp;?
             </p>
             <Button href={relatedService.cta.href} variant="text" class="mt-4 w-fit">
               {relatedService.cta.label}
