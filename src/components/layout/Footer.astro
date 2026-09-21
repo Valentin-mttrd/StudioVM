@@ -1,0 +1,89 @@
+---
+import Container from '../ui/Container.astro';
+import Logo from '../ui/Logo.astro';
+import Button from '../ui/Button.astro';
+import { NAV_LINKS, PRIMARY_CTA, FOOTER_LEGAL_LINKS } from '../../data/nav';
+import { SERVICES } from '../../data/services';
+import { SITE } from '../../lib/constants';
+
+const year = new Date().getFullYear();
+---
+<footer class="bg-ink text-paper">
+  <Container class="border-b border-paper/10 py-20 sm:py-24">
+    <div class="flex flex-col items-start justify-between gap-10 lg:flex-row lg:items-end">
+      <h2 class="max-w-2xl text-display-md" data-reveal>Un projet en tête ? Parlons-en.</h2>
+      <Button href={PRIMARY_CTA.href} variant="solid" invert data-reveal data-reveal-delay="120">
+        {PRIMARY_CTA.label}
+      </Button>
+    </div>
+  </Container>
+
+  <Container class="grid grid-cols-2 gap-x-8 gap-y-14 py-16 sm:py-20 lg:grid-cols-12">
+    <div class="col-span-2 lg:col-span-4">
+      <Logo variant="full" tone="light" markClass="h-7" class="text-lg" />
+      <p class="mt-6 max-w-xs font-body text-sm leading-relaxed text-mist">{SITE.tagline}</p>
+    </div>
+
+    <nav class="col-span-1 lg:col-span-2 lg:col-start-7" aria-label="Expertises">
+      <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-ash">Expertises</p>
+      <ul class="mt-5 space-y-3">
+        {
+          SERVICES.map((s) => (
+            <li>
+              <a href={`/services#${s.id}`} class="font-body text-sm text-mist transition-colors duration-200 hover:text-paper">
+                {s.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <nav class="col-span-1 lg:col-span-2" aria-label="Navigation">
+      <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-ash">Navigation</p>
+      <ul class="mt-5 space-y-3">
+        {
+          NAV_LINKS.map((l) => (
+            <li>
+              <a href={l.href} class="font-body text-sm text-mist transition-colors duration-200 hover:text-paper">
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href="/contact" class="font-body text-sm text-mist transition-colors duration-200 hover:text-paper">
+            Contact
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="col-span-2 lg:col-span-3">
+      <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-ash">Contact</p>
+      <ul class="mt-5 space-y-3 font-body text-sm text-mist">
+        <li>
+          <a href={`mailto:${SITE.email}`} class="transition-colors duration-200 hover:text-paper">
+            {SITE.email}
+          </a>
+        </li>
+        <li>{SITE.locality}</li>
+      </ul>
+    </div>
+  </Container>
+
+  <Container class="flex flex-col-reverse items-start gap-4 border-t border-paper/10 py-8 sm:flex-row sm:items-center sm:justify-between">
+    <p class="font-body text-xs text-ash">© {year} {SITE.name}. Tous droits réservés.</p>
+    <ul class="flex flex-wrap gap-x-6 gap-y-2">
+      {
+        FOOTER_LEGAL_LINKS.map((l) => (
+          <li>
+            <a href={l.href} class="font-body text-xs text-ash transition-colors duration-200 hover:text-mist">
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </Container>
+</footer>

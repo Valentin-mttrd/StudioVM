@@ -1,0 +1,31 @@
+---
+import Container from '../ui/Container.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  description?: string;
+}
+
+const { eyebrow, title, description } = Astro.props;
+---
+<section class="relative overflow-hidden bg-ink pb-20 pt-40 text-paper sm:pb-24 sm:pt-48">
+  <div
+    class="pointer-events-none absolute inset-0 opacity-[0.04]"
+    aria-hidden="true"
+    style="background-image: linear-gradient(to right, var(--color-mist) 1px, transparent 1px), linear-gradient(to bottom, var(--color-mist) 1px, transparent 1px); background-size: 56px 56px;"
+  >
+  </div>
+  <Container class="relative">
+    <Eyebrow invert>{eyebrow}</Eyebrow>
+    <h1 class="mt-5 max-w-3xl text-display-lg text-paper" data-reveal>{title}</h1>
+    {
+      description && (
+        <p class="mt-6 max-w-2xl font-body text-lg leading-relaxed text-mist" data-reveal data-reveal-delay="100">
+          {description}
+        </p>
+      )
+    }
+  </Container>
+</section>

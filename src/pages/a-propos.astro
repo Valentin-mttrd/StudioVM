@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/sections/PageHeader.astro';
+import Section from '../components/ui/Section.astro';
+import Container from '../components/ui/Container.astro';
+import Logo from '../components/ui/Logo.astro';
+import { SITE } from '../lib/constants';
+import { breadcrumbSchema } from '../lib/seo';
+
+const steps = ['Comprendre', 'Concevoir', 'Développer', 'Rendre utile'];
+---
+<Layout
+  title="À propos"
+  description="Studio VM réunit conception, technologie et visualisation dans une même approche. Basé à Lorient, en Bretagne."
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'À propos', path: '/a-propos' }])]}
+>
+  <PageHeader
+    eyebrow="À propos"
+    title="Réunir conception, technologie et visualisation."
+  />
+
+  <Section tone="paper">
+    <Container>
+      <div class="max-w-3xl">
+        <p class="text-display-sm" data-reveal>
+          Studio VM est né de la volonté de réunir conception, technologie et visualisation dans
+          une même approche.
+        </p>
+        <p class="mt-8 font-body text-lg leading-relaxed text-anthracite/80" data-reveal data-reveal-delay="80">
+          Plutôt que de séparer design, développement et image, Studio VM les traite comme un
+          seul et même travail : celui de comprendre un besoin, puis de le rendre concret.
+        </p>
+      </div>
+
+      <div class="mt-16 flex flex-wrap items-center gap-x-3 gap-y-4 border-t border-mist pt-10 sm:gap-x-5" data-reveal data-reveal-delay="140">
+        {
+          steps.map((step, index) => (
+            <>
+              <span class="font-display text-lg font-semibold sm:text-xl">{step}</span>
+              {index < steps.length - 1 && (
+                <span class="font-body text-graphite" aria-hidden="true">
+                  →
+                </span>
+              )}
+            </>
+          ))
+        }
+      </div>
+    </Container>
+  </Section>
+
+  <Section tone="sand">
+    <Container>
+      <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+        <div class="flex aspect-[4/3] items-center justify-center rounded-sm bg-ink lg:col-span-5" data-reveal>
+          <Logo variant="mark" tone="light" markClass="h-20 sm:h-24" />
+        </div>
+
+        <div class="lg:col-span-7">
+          <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">Fondateur</p>
+          <h2 class="mt-4 text-display-md" data-reveal>
+            {SITE.founder}
+          </h2>
+          <p class="mt-6 max-w-xl font-body text-lg leading-relaxed text-anthracite/80" data-reveal data-reveal-delay="80">
+            J'ai fondé Studio VM pour réunir, sous un même toit, ce qui est habituellement
+            séparé : la conception, le développement et la visualisation. L'objectif reste le
+            même sur chaque projet — comprendre le besoin, concevoir la solution, la développer,
+            et la rendre réellement utile.
+          </p>
+          <p class="mt-6 font-body text-sm uppercase tracking-wide text-graphite" data-reveal data-reveal-delay="120">
+            {SITE.locality}
+          </p>
+        </div>
+      </div>
+    </Container>
+  </Section>
+</Layout>

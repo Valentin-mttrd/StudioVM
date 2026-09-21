@@ -1,0 +1,142 @@
+---
+/**
+ * Original abstract compositions standing in for photography/screenshots
+ * we don't have yet (no stock photos, no fabricated client work — see
+ * project brief §26). Pure geometry in brand colors, one motif per
+ * discipline, reused for service panels, portfolio covers and empty states.
+ */
+type Kind = 'web' | 'applications' | '3d' | 'plan';
+
+interface Props {
+  kind: Kind;
+  tone?: 'sand' | 'anthracite' | 'ink';
+  flip?: boolean;
+  class?: string;
+}
+
+const { kind, tone = 'sand', flip = false, class: className = '' } = Astro.props;
+
+const toneClasses: Record<string, string> = {
+  sand: 'bg-sand text-ink',
+  anthracite: 'bg-anthracite text-paper',
+  ink: 'bg-ink text-paper',
+};
+---
+<div class:list={['relative overflow-hidden', toneClasses[tone], className]}>
+  <svg
+    viewBox="0 0 600 450"
+    class:list={['h-full w-full', flip && 'scale-x-[-1]']}
+    preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true"
+    focusable="false"
+  >
+    {
+      kind === 'web' && (
+        <g fill="none" stroke="currentColor">
+          <rect x="60" y="60" width="480" height="330" rx="2" stroke-width="1.5" opacity="0.35" />
+          <line x1="60" y1="112" x2="540" y2="112" stroke-width="1" opacity="0.25" />
+          <circle cx="84" cy="86" r="5" fill="currentColor" stroke="none" opacity="0.3" />
+          <circle cx="104" cy="86" r="5" fill="currentColor" stroke="none" opacity="0.3" />
+          <circle cx="124" cy="86" r="5" fill="currentColor" stroke="none" opacity="0.3" />
+          <rect x="84" y="136" width="280" height="130" fill="currentColor" stroke="none" opacity="0.12" />
+          <rect x="388" y="136" width="128" height="130" stroke-width="1.25" opacity="0.25" />
+          <rect x="84" y="290" width="136" height="70" fill="currentColor" stroke="none" opacity="0.14" />
+          <rect x="232" y="290" width="136" height="70" stroke-width="1.25" opacity="0.22" />
+          <rect x="380" y="290" width="136" height="70" stroke-width="1.25" opacity="0.22" />
+        </g>
+      )
+    }
+
+    {
+      kind === 'applications' && (
+        <g fill="none" stroke="currentColor">
+          <rect x="60" y="60" width="480" height="330" rx="2" stroke-width="1.5" opacity="0.35" />
+          <line x1="156" y1="60" x2="156" y2="390" stroke-width="1" opacity="0.25" />
+          <rect x="80" y="92" width="56" height="8" fill="currentColor" stroke="none" opacity="0.55" />
+          <rect x="80" y="128" width="56" height="8" fill="currentColor" stroke="none" opacity="0.22" />
+          <rect x="80" y="164" width="56" height="8" fill="currentColor" stroke="none" opacity="0.22" />
+          <rect x="80" y="200" width="40" height="8" fill="currentColor" stroke="none" opacity="0.22" />
+
+          <g stroke-width="1.25" opacity="0.28">
+            <rect x="176" y="88" width="100" height="64" />
+            <rect x="298" y="88" width="100" height="64" />
+            <rect x="420" y="88" width="100" height="64" />
+          </g>
+          <g fill="currentColor" stroke="none">
+            <rect x="192" y="122" width="44" height="9" opacity="0.45" />
+            <rect x="192" y="104" width="60" height="7" opacity="0.2" />
+            <rect x="314" y="122" width="44" height="9" opacity="0.45" />
+            <rect x="314" y="104" width="60" height="7" opacity="0.2" />
+            <rect x="436" y="122" width="44" height="9" opacity="0.45" />
+            <rect x="436" y="104" width="60" height="7" opacity="0.2" />
+          </g>
+
+          <rect x="176" y="176" width="240" height="150" stroke-width="1.25" opacity="0.22" />
+          <g stroke="none" fill="currentColor">
+            <rect x="196" y="266" width="26" height="40" opacity="0.18" />
+            <rect x="240" y="246" width="26" height="60" opacity="0.18" />
+            <rect x="284" y="286" width="26" height="20" opacity="0.18" />
+            <rect x="328" y="226" width="26" height="80" opacity="0.5" />
+            <rect x="372" y="256" width="26" height="50" opacity="0.18" />
+          </g>
+
+          <circle cx="478" cy="251" r="30" stroke-width="8" opacity="0.18" />
+          <circle
+            cx="478"
+            cy="251"
+            r="30"
+            stroke-width="8"
+            stroke-linecap="round"
+            opacity="0.6"
+            pathLength="100"
+            stroke-dasharray="42 100"
+            transform="rotate(-90 478 251)"
+          />
+        </g>
+      )
+    }
+
+    {
+      kind === '3d' && (
+        <g fill="currentColor" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round">
+          <polygon points="230,150 310,110 390,150 310,190" opacity="0.14" stroke-opacity="0.5" />
+          <polygon points="230,150 310,190 310,270 230,230" opacity="0.07" stroke-opacity="0.4" />
+          <polygon points="310,190 390,150 390,230 310,270" opacity="0.2" stroke-opacity="0.4" />
+
+          <polygon points="356,128 400,106 444,128 400,150" opacity="0.55" stroke-opacity="0.6" />
+          <polygon points="356,128 400,150 400,194 356,172" opacity="0.3" stroke-opacity="0.5" />
+          <polygon points="400,150 444,128 444,172 400,194" opacity="0.4" stroke-opacity="0.5" />
+
+          <line x1="120" y1="330" x2="480" y2="330" stroke-opacity="0.15" stroke-width="1" />
+          <line x1="150" y1="350" x2="450" y2="350" stroke-opacity="0.1" stroke-width="1" />
+        </g>
+      )
+    }
+
+    {
+      kind === 'plan' && (
+        <g fill="none" stroke="currentColor">
+          <rect x="100" y="80" width="400" height="280" stroke-width="2" opacity="0.55" />
+          <line x1="260" y1="80" x2="260" y2="230" stroke-width="2" opacity="0.45" />
+          <line x1="260" y1="230" x2="500" y2="230" stroke-width="2" opacity="0.45" />
+          <path d="M260,230 A40,40 0 0 1 300,270" stroke-width="1.25" opacity="0.4" />
+          <line x1="260" y1="230" x2="260" y2="270" stroke-width="1.25" opacity="0.4" />
+
+          <g stroke-width="2" opacity="0.55">
+            <line x1="150" y1="80" x2="150" y2="72" />
+            <line x1="172" y1="80" x2="172" y2="72" />
+            <line x1="330" y1="80" x2="330" y2="72" />
+            <line x1="352" y1="80" x2="352" y2="72" />
+          </g>
+
+          <g stroke-width="1" opacity="0.3">
+            <line x1="100" y1="392" x2="500" y2="392" />
+            <line x1="100" y1="386" x2="100" y2="398" />
+            <line x1="300" y1="386" x2="300" y2="398" />
+            <line x1="500" y1="386" x2="500" y2="398" />
+          </g>
+        </g>
+      )
+    }
+  </svg>
+</div>

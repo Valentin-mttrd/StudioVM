@@ -1,0 +1,94 @@
+---
+import Container from '../ui/Container.astro';
+import Button from '../ui/Button.astro';
+import Logo from '../ui/Logo.astro';
+import rawMark from '../../assets/logo/mark.svg?raw';
+
+const watermark = rawMark
+  .replace('<svg ', '<svg class="h-auto w-full" ')
+  .replace(/ width="[^"]*" height="[^"]*"/, '');
+---
+<section class="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink text-paper">
+  <!-- Decorative backdrop: brand mark watermark + fine technical grid. Purely visual, aria-hidden.
+       Oversized on the y-axis (-inset-y-12) so the JS scroll parallax (src/scripts/parallax.ts)
+       never reveals an edge; overflow-hidden on the section clips it back to bounds. -->
+  <div class="pointer-events-none absolute -inset-y-12 inset-x-0 select-none" data-parallax aria-hidden="true">
+    <div
+      class="absolute inset-0 opacity-[0.05]"
+      style="background-image: linear-gradient(to right, var(--color-mist) 1px, transparent 1px), linear-gradient(to bottom, var(--color-mist) 1px, transparent 1px); background-size: 56px 56px;"
+    >
+    </div>
+    <div
+      class="absolute -right-[18%] top-1/2 w-[64rem] max-w-none -translate-y-1/2 text-paper opacity-[0.06] sm:w-[78rem] lg:w-[92rem] motion-safe:animate-[drift_22s_ease-in-out_infinite]"
+      set:html={watermark}
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/40"></div>
+  </div>
+
+  <Container class="relative flex flex-1 flex-col justify-center py-32 sm:py-36">
+    <div class="flex items-center gap-3" data-reveal>
+      <Logo variant="mark" tone="light" markClass="h-4" />
+      <span class="h-3.5 w-px bg-paper/30" aria-hidden="true"></span>
+      <p class="font-body text-xs font-semibold uppercase tracking-[0.28em] text-mist">
+        Web · Applications · 3D
+      </p>
+    </div>
+
+    <h1
+      class="mt-8 max-w-5xl text-display-xl text-paper"
+      data-reveal
+      data-reveal-delay="80"
+    >
+      Des solutions digitales pour donner vie à vos projets.
+    </h1>
+
+    <span class="mt-8 block h-px w-16 bg-paper/30" aria-hidden="true" data-reveal data-reveal-delay="160"></span>
+
+    <p
+      class="mt-8 max-w-xl font-body text-lg leading-relaxed text-mist sm:text-xl"
+      data-reveal
+      data-reveal-delay="200"
+    >
+      Création de sites web, d'applications sur mesure et de visualisations 3D — pensées pour
+      votre activité.
+    </p>
+
+    <div class="mt-12 flex flex-wrap items-center gap-4" data-reveal data-reveal-delay="260">
+      <Button href="/services" variant="outline" invert>Découvrir nos services</Button>
+      <Button href="/contact" variant="solid" invert>Parler de votre projet</Button>
+    </div>
+  </Container>
+
+  <div class="relative pb-8">
+    <Container class="flex items-center gap-3 text-ash">
+      <span class="h-8 w-px bg-current motion-safe:animate-[scrollcue_2.4s_ease-in-out_infinite]" aria-hidden="true"></span>
+      <span class="font-body text-[0.7rem] font-semibold uppercase tracking-[0.28em]">Défiler</span>
+    </Container>
+  </div>
+</section>
+
+<style>
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translateY(-50%) translateX(0);
+    }
+    50% {
+      transform: translateY(-50%) translateX(-1.5%);
+    }
+  }
+
+  @keyframes scrollcue {
+    0%,
+    100% {
+      opacity: 0.25;
+      transform: scaleY(0.6);
+      transform-origin: top;
+    }
+    50% {
+      opacity: 1;
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+  }
+</style>

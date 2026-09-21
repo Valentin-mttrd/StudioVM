@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/sections/PageHeader.astro';
+import ServiceDetail from '../components/sections/ServiceDetail.astro';
+import Section from '../components/ui/Section.astro';
+import Container from '../components/ui/Container.astro';
+import { SERVICES } from '../data/services';
+import { breadcrumbSchema } from '../lib/seo';
+---
+<Layout
+  title="Sites web, applications sur mesure et visualisation 3D"
+  description="Studio VM conçoit des sites web professionnels, des applications métier sur mesure et des visualisations 3D réalistes. Basé à Lorient, en Bretagne."
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Services', path: '/services' }])]}
+>
+  <PageHeader
+    eyebrow="Services"
+    title="Des solutions concrètes pour des besoins réels."
+    description="Trois expertises, une seule vision : comprendre un besoin, concevoir la solution et la rendre réellement utile."
+  />
+
+  <ServiceDetail service={SERVICES[0]} tone="paper" coverTone="sand" />
+  <ServiceDetail service={SERVICES[1]} tone="sand" coverTone="anthracite" flip />
+  <ServiceDetail service={SERVICES[2]} tone="paper" coverTone="ink" />
+
+  <Section tone="ink" class="py-20 sm:py-24">
+    <Container class="text-center">
+      <h2 class="mx-auto max-w-2xl text-display-md text-paper" data-reveal>
+        Un besoin particulier ? Studio VM conçoit la solution adaptée à votre activité.
+      </h2>
+    </Container>
+  </Section>
+</Layout>

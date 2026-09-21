@@ -1,0 +1,61 @@
+---
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import Button from '../ui/Button.astro';
+import AbstractCover from '../portfolio/AbstractCover.astro';
+import type { Service } from '../../data/services';
+
+interface Props {
+  service: Service;
+  tone?: 'paper' | 'sand';
+  coverTone?: 'sand' | 'anthracite' | 'ink';
+  flip?: boolean;
+}
+
+const { service, tone = 'paper', coverTone = 'anthracite', flip = false } = Astro.props;
+---
+<Section tone={tone} id={service.id} class="scroll-mt-24">
+  <Container>
+    <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class:list={['lg:col-span-6', flip && 'lg:order-2']}>
+        <span class="font-display text-sm font-semibold text-graphite">{service.index}</span>
+        <h2 class="mt-4 text-display-lg" data-reveal>
+          {service.title}
+        </h2>
+        {
+          service.description.map((paragraph) => (
+            <p class="mt-5 font-body text-lg leading-relaxed text-anthracite/80">{paragraph}</p>
+          ))
+        }
+
+        <ul class="mt-8 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+          {
+            service.bullets.map((bullet) => (
+              <li class="flex items-center gap-2.5 font-body text-sm text-ink">
+                <span class="h-1 w-1 shrink-0 rounded-full bg-ink/60" aria-hidden="true" />
+                {bullet}
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="mt-8 flex flex-wrap gap-2">
+          {
+            service.audiences.map((audience) => (
+              <span class="rounded-sm border border-mist px-3 py-1.5 font-body text-xs uppercase tracking-wide text-graphite">
+                {audience}
+              </span>
+            ))
+          }
+        </div>
+
+        <Button href={service.cta.href} variant="solid" class="mt-10 w-fit">
+          {service.cta.label}
+        </Button>
+      </div>
+      <div class:list={['lg:col-span-6', flip && 'lg:order-1']} data-reveal data-reveal-delay="100">
+        <AbstractCover kind={service.id} tone={coverTone} flip={flip} class="aspect-[4/3] rounded-sm" />
+      </div>
+    </div>
+  </Container>
+</Section>

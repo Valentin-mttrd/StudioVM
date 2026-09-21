@@ -1,0 +1,109 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/sections/PageHeader.astro';
+import Section from '../../components/ui/Section.astro';
+import Container from '../../components/ui/Container.astro';
+import AbstractCover from '../../components/portfolio/AbstractCover.astro';
+import ArrowIcon from '../../components/icons/ArrowIcon.astro';
+import { STATUS_LABELS, CATEGORY_LABELS, COVER_TONES } from '../../lib/projects';
+import { breadcrumbSchema } from '../../lib/seo';
+
+const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const hasCategory = (category: string) => projects.some((project) => project.data.category === category);
+
+const filters = [
+  { value: 'all', label: 'Tout' },
+  { value: 'web', label: 'Web' },
+  { value: 'applications', label: 'Applications' },
+  { value: '3d', label: '3D' },
+];
+---
+<Layout
+  title="Réalisations"
+  description="Sites web, applications sur mesure et visualisations 3D conçus par Studio VM — projets réels, démonstrations et projets personnels."
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Réalisations', path: '/realisations' }])]}
+>
+  <PageHeader
+    eyebrow="Réalisations"
+    title="Ce que Studio VM peut concevoir pour vous."
+    description="Des projets réels, présentés tels qu'ils sont : démonstrations, projets personnels ou réalisations en cours. Aucun résultat ni client inventé."
+  />
+
+  <Section tone="paper">
+    <Container>
+      <div class="flex flex-wrap gap-3" data-filter-bar role="group" aria-label="Filtrer les réalisations par catégorie">
+        {
+          filters.map((filter) => (
+            <button
+              type="button"
+              data-filter={filter.value}
+              aria-pressed={filter.value === 'all' ? 'true' : 'false'}
+              class="rounded-sm border border-ink/20 px-4 py-2 font-body text-xs font-semibold uppercase tracking-wide text-ink transition-colors duration-200 aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper"
+            >
+              {filter.label}
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="mt-14 grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          projects.map((project) => (
+            <a
+              href={`/realisations/${project.id}`}
+              class="group flex flex-col"
+              data-project-card
+              data-category={project.data.category}
+              data-reveal
+              data-reveal-group="portfolio"
+            >
+              <div class="overflow-hidden rounded-sm">
+                <AbstractCover
+                  kind={project.data.category}
+                  tone={COVER_TONES[project.data.category]}
+                  flip={project.data.coverVariant % 2 === 0}
+                  class="aspect-[4/3] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                />
+              </div>
+              <div class="mt-5 flex items-start justify-between gap-3">
+                <h2 class="font-display text-lg font-semibold leading-snug">{project.data.title}</h2>
+                <ArrowIcon class="mt-1 h-4 w-4 shrink-0 text-graphite transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-ink" />
+              </div>
+              <p class="mt-2 font-body text-sm leading-relaxed text-anthracite/70">{project.data.summary}</p>
+              <div class="mt-4 flex items-center gap-3">
+                <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite">
+                  {CATEGORY_LABELS[project.data.category]}
+                </span>
+                <span class="h-1 w-1 rounded-full bg-graphite/50" aria-hidden="true" />
+                <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite">
+                  {STATUS_LABELS[project.data.status]}
+                </span>
+              </div>
+            </a>
+          ))
+        }
+
+        {
+          !hasCategory('3d') && (
+            <div
+              class="flex aspect-[4/3] flex-col items-start justify-end rounded-sm border border-dashed border-mist p-6"
+              data-project-card
+              data-category="3d"
+              data-reveal
+              data-reveal-group="portfolio"
+            >
+              <p class="font-display text-lg font-semibold text-anthracite/60">Projets 3D à venir</p>
+              <p class="mt-2 font-body text-sm leading-relaxed text-anthracite/50">
+                De nouvelles visualisations seront ajoutées ici prochainement.
+              </p>
+            </div>
+          )
+        }
+      </div>
+    </Container>
+  </Section>
+</Layout>

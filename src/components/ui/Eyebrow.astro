@@ -1,0 +1,19 @@
+---
+interface Props {
+  class?: string;
+  as?: string;
+  invert?: boolean;
+}
+const { class: className = '', as = 'p', invert = false } = Astro.props;
+const Tag = as as keyof HTMLElementTagNameMap;
+---
+<Tag
+  class:list={[
+    'flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.24em]',
+    invert ? 'text-ash' : 'text-graphite',
+    className,
+  ]}
+>
+  <span class="h-px w-8 bg-current/50" aria-hidden="true"></span>
+  <slot />
+</Tag>

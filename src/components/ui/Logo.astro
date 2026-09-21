@@ -1,0 +1,54 @@
+---
+import rawMark from '../../assets/logo/mark.svg?raw';
+
+type Variant = 'mark' | 'lockup' | 'full';
+/**
+ * 'nav' tracks the smart navbar's `data-solid` state via the `group/nav`
+ * ancestor so the wordmark stays legible both over a dark hero (transparent
+ * header) and once the header solidifies to a paper background.
+ */
+type Tone = 'dark' | 'light' | 'nav';
+
+interface Props {
+  variant?: Variant;
+  tone?: Tone;
+  class?: string;
+  markClass?: string;
+}
+
+const { variant = 'lockup', tone = 'dark', class: className = '', markClass = 'h-6' } = Astro.props;
+
+const markInline = rawMark
+  .replace('<svg ', '<svg class="h-full w-auto" ')
+  .replace(/ width="[^"]*" height="[^"]*"/, '');
+
+const toneClasses: Record<Tone, { text: string; muted: string }> = {
+  dark: { text: 'text-ink', muted: 'text-graphite' },
+  light: { text: 'text-paper', muted: 'text-mist' },
+  nav: {
+    text: 'text-paper group-data-[solid=true]/nav:text-ink',
+    muted: 'text-mist group-data-[solid=true]/nav:text-graphite',
+  },
+};
+
+const textColor = toneClasses[tone].text;
+const mutedColor = toneClasses[tone].muted;
+---
+<span class:list={['inline-flex items-center gap-3 transition-colors duration-500 ease-out', textColor, className]}>
+  <span class:list={['inline-block w-auto shrink-0', markClass]} set:html={markInline} />
+  {
+    variant !== 'mark' && (
+      <span class="flex flex-col justify-center leading-none">
+        <span class="font-display text-[1.05em] leading-none tracking-tight">
+          <span class="font-light">STUDIO</span>
+          <span class="ml-1 font-bold">VM</span>
+        </span>
+        {variant === 'full' && (
+          <span class={`mt-1.5 font-body text-[0.55em] font-medium uppercase tracking-[0.22em] ${mutedColor}`}>
+            Web · Applications · 3D
+          </span>
+        )}
+      </span>
+    )
+  }
+</span>

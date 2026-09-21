@@ -1,0 +1,129 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Section from '../../components/ui/Section.astro';
+import Container from '../../components/ui/Container.astro';
+import Button from '../../components/ui/Button.astro';
+import AbstractCover from '../../components/portfolio/AbstractCover.astro';
+import { STATUS_LABELS, CATEGORY_LABELS, COVER_TONES } from '../../lib/projects';
+import { breadcrumbSchema } from '../../lib/seo';
+import { getService, type ServiceId } from '../../data/services';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', ({ data }) => !data.draft);
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, category, status, summary, highlights } = project.data;
+
+const allProjects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const currentIndex = allProjects.findIndex((p) => p.id === project.id);
+const next = allProjects[(currentIndex + 1) % allProjects.length];
+
+const relatedService = getService(category as ServiceId);
+---
+<Layout
+  title={title}
+  description={summary}
+  structuredData={[
+    breadcrumbSchema([
+      { name: 'Accueil', path: '/' },
+      { name: 'Réalisations', path: '/realisations' },
+      { name: title, path: `/realisations/${project.id}` },
+    ]),
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: title,
+      description: summary,
+      creator: { '@type': 'Person', name: 'Valentin Mottard' },
+    },
+  ]}
+>
+  <header class="relative overflow-hidden bg-ink pb-16 pt-40 text-paper sm:pb-20 sm:pt-48">
+    <div
+      class="pointer-events-none absolute inset-0 opacity-[0.04]"
+      aria-hidden="true"
+      style="background-image: linear-gradient(to right, var(--color-mist) 1px, transparent 1px), linear-gradient(to bottom, var(--color-mist) 1px, transparent 1px); background-size: 56px 56px;"
+    />
+    <Container class="relative">
+      <a href="/realisations" class="font-body text-sm text-mist transition-colors hover:text-paper">
+        ← Toutes les réalisations
+      </a>
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <span class="rounded-sm border border-paper/25 px-3 py-1.5 font-body text-xs font-semibold uppercase tracking-[0.15em] text-mist">
+          {CATEGORY_LABELS[category]}
+        </span>
+        <span class="rounded-sm border border-paper/25 px-3 py-1.5 font-body text-xs font-semibold uppercase tracking-[0.15em] text-mist">
+          {STATUS_LABELS[status]}
+        </span>
+      </div>
+      <h1 class="mt-6 max-w-3xl text-display-lg text-paper" data-reveal>{title}</h1>
+      <p class="mt-6 max-w-2xl font-body text-lg leading-relaxed text-mist" data-reveal data-reveal-delay="100">
+        {summary}
+      </p>
+    </Container>
+  </header>
+
+  <Section tone="paper">
+    <Container class="grid grid-cols-1 gap-16 lg:grid-cols-12">
+      <div class="lg:col-span-8 lg:col-start-1">
+        <div class="prose-vm">
+          <Content />
+        </div>
+      </div>
+
+      <aside class="lg:col-span-3 lg:col-start-10">
+        <div class="sticky top-32 flex flex-col gap-10">
+          {
+            highlights.length > 0 && (
+              <div>
+                <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">Points clés</p>
+                <ul class="mt-4 flex flex-col gap-3">
+                  {highlights.map((point) => (
+                    <li class="flex items-start gap-2.5 font-body text-sm leading-relaxed text-anthracite/80">
+                      <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-ink/50" aria-hidden="true" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+
+          <div>
+            <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">
+              Un projet similaire ?
+            </p>
+            <Button href={relatedService.cta.href} variant="text" class="mt-4 w-fit">
+              {relatedService.cta.label}
+            </Button>
+          </div>
+        </div>
+      </aside>
+    </Container>
+  </Section>
+
+  <Section tone="sand">
+    <Container>
+      <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">Projet suivant</p>
+      <a href={`/realisations/${next.id}`} class="group mt-6 flex flex-col gap-8 sm:flex-row sm:items-center">
+        <div class="w-full overflow-hidden rounded-sm sm:w-64">
+          <AbstractCover
+            kind={next.data.category}
+            tone={COVER_TONES[next.data.category]}
+            class="aspect-[4/3] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          />
+        </div>
+        <h2 class="text-display-sm transition-colors group-hover:text-anthracite">{next.data.title}</h2>
+      </a>
+    </Container>
+  </Section>
+</Layout>

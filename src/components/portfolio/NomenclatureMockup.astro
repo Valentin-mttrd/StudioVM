@@ -1,0 +1,39 @@
+---
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+
+const rows = [
+  { need: 70, stock: 90, order: false },
+  { need: 55, stock: 30, order: true },
+  { need: 40, stock: 40, order: false },
+  { need: 80, stock: 20, order: true },
+];
+---
+<div class:list={['rounded-sm border border-mist bg-paper p-6 sm:p-8', className]}>
+  <div class="flex items-center justify-between gap-4 border-b border-mist pb-4">
+    <div class="h-2.5 w-32 shrink-0 rounded-full bg-ink/70 sm:w-40"></div>
+    <div class="flex gap-4 sm:gap-6">
+      <span class="font-body text-[0.6rem] uppercase tracking-wide text-graphite sm:text-[0.65rem]">Besoin</span>
+      <span class="font-body text-[0.6rem] uppercase tracking-wide text-graphite sm:text-[0.65rem]">Stock</span>
+      <span class="font-body text-[0.6rem] uppercase tracking-wide text-graphite sm:text-[0.65rem]">Statut</span>
+    </div>
+  </div>
+  <ul class="divide-y divide-mist">
+    {
+      rows.map((row) => (
+        <li class="flex items-center gap-4 py-4 sm:gap-6">
+          <span class="h-2 w-16 shrink-0 rounded-full bg-ink/25 sm:w-40" />
+          <span class="ml-auto h-1.5 w-14 shrink-0 overflow-hidden rounded-full bg-mist sm:w-16">
+            <span class="block h-full rounded-full bg-ink/60" style={`width:${row.need}%`} />
+          </span>
+          <span class="h-1.5 w-14 shrink-0 overflow-hidden rounded-full bg-mist sm:w-16">
+            <span class="block h-full rounded-full bg-ink/60" style={`width:${row.stock}%`} />
+          </span>
+          <span class:list={['h-2 w-2 shrink-0 rounded-full', row.order ? 'bg-accent' : 'bg-ink/20']} />
+        </li>
+      ))
+    }
+  </ul>
+</div>

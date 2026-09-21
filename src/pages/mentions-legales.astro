@@ -1,0 +1,61 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/sections/PageHeader.astro';
+import Section from '../components/ui/Section.astro';
+import Container from '../components/ui/Container.astro';
+import { SITE } from '../lib/constants';
+import { breadcrumbSchema } from '../lib/seo';
+---
+<Layout
+  title="Mentions légales"
+  description="Mentions légales du site Studio VM."
+  noindex
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Mentions légales', path: '/mentions-legales' }])]}
+>
+  <PageHeader eyebrow="Informations légales" title="Mentions légales" />
+
+  <Section tone="paper">
+    <Container>
+      <div class="prose-vm max-w-3xl">
+        <h2>Éditeur du site</h2>
+        <p>
+          Le site {SITE.url.replace('https://', '')} est édité par {SITE.founder}, {SITE.founderRole.toLowerCase()} de {SITE.name}, entreprise individuelle basée à {SITE.locality}.
+        </p>
+        <ul>
+          <li>Forme juridique : [forme juridique à compléter]</li>
+          <li>SIRET : [numéro SIRET à compléter]</li>
+          <li>Adresse : [adresse complète à compléter], {SITE.locality}</li>
+          <li>
+            Email : <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          </li>
+        </ul>
+
+        <h2>Directeur de la publication</h2>
+        <p>{SITE.founder}.</p>
+
+        <h2>Hébergement</h2>
+        <p>
+          Ce site est hébergé par [nom de l'hébergeur à compléter], [adresse de l'hébergeur à
+          compléter].
+        </p>
+
+        <h2>Propriété intellectuelle</h2>
+        <p>
+          L'ensemble des éléments présents sur ce site (textes, visuels, identité graphique,
+          logo) est la propriété de {SITE.name}, sauf mention contraire. Toute reproduction ou
+          représentation, totale ou partielle, sans autorisation préalable est interdite.
+        </p>
+
+        <h2>Données personnelles</h2>
+        <p>
+          Le traitement des données transmises via le formulaire de contact est détaillé dans la <a href="/politique-de-confidentialite">politique de confidentialité</a>.
+        </p>
+
+        <h2>Cookies</h2>
+        <p>
+          Ce site n'utilise pas de cookies de suivi publicitaire ou de mesure d'audience.
+        </p>
+      </div>
+    </Container>
+  </Section>
+</Layout>

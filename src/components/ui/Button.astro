@@ -1,0 +1,61 @@
+---
+import ArrowIcon from '../icons/ArrowIcon.astro';
+
+type Variant = 'solid' | 'outline' | 'text';
+
+interface Props {
+  href?: string;
+  variant?: Variant;
+  invert?: boolean;
+  class?: string;
+  type?: 'button' | 'submit';
+  arrow?: boolean;
+  disabled?: boolean;
+}
+
+const {
+  href,
+  variant = 'solid',
+  invert = false,
+  class: className = '',
+  type = 'button',
+  arrow = true,
+  disabled = false,
+  ...rest
+} = Astro.props;
+
+const Tag = href ? 'a' : 'button';
+
+const base =
+  'group relative inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-sm font-body text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-300 ease-out disabled:cursor-not-allowed disabled:opacity-40';
+
+const variants: Record<Variant, string> = {
+  solid: invert
+    ? 'bg-paper text-ink px-7 py-4 hover:bg-sand'
+    : 'bg-ink text-paper px-7 py-4 hover:bg-anthracite',
+  outline: invert
+    ? 'border border-paper/40 text-paper px-7 py-4 hover:border-paper hover:bg-paper/10'
+    : 'border border-ink/25 text-ink px-7 py-4 hover:border-ink hover:bg-ink/5',
+  text: `px-0 py-1 ${invert ? 'text-paper' : 'text-ink'}`,
+};
+
+const labelClasses =
+  variant === 'text'
+    ? 'relative after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out group-hover:after:scale-x-100'
+    : '';
+---
+<Tag
+  href={href}
+  type={!href ? type : undefined}
+  disabled={!href ? disabled : undefined}
+  aria-disabled={href && disabled ? 'true' : undefined}
+  class:list={[base, variants[variant], className]}
+  {...rest}
+>
+  <span class:list={[labelClasses]}>
+    <slot />
+  </span>
+  {arrow && (
+    <ArrowIcon class="h-3.5 w-3.5 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1" />
+  )}
+</Tag>

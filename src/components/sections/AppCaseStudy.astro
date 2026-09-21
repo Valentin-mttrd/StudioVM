@@ -1,0 +1,61 @@
+---
+import Section from '../ui/Section.astro';
+import Container from '../ui/Container.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Button from '../ui/Button.astro';
+import StockChantierMockup from '../portfolio/StockChantierMockup.astro';
+
+const features = [
+  { title: 'Gestion du stock', description: 'Suivi des quantités disponibles, en temps réel.' },
+  { title: 'Gestion des chantiers', description: 'Chaque chantier centralise son matériel et ses besoins.' },
+  { title: 'Mouvements de stock', description: 'Entrées, sorties et transferts tracés automatiquement.' },
+  { title: 'Nomenclatures', description: 'Des listes de matériel type, réutilisables par chantier.' },
+  { title: 'Calcul des besoins', description: 'Le nécessaire pour un chantier déterminé en un clic.' },
+  { title: 'Préparation de chantier', description: 'Une liste de préparation générée automatiquement.' },
+  { title: 'Historique', description: 'Un suivi complet et daté de toutes les opérations.' },
+  { title: 'Tableaux de bord', description: "Une vue d'ensemble claire de l'activité." },
+];
+---
+<Section tone="sand" id="etude-de-cas">
+  <Container>
+    <div class="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-8">
+      <div class="flex flex-col items-start lg:col-span-5">
+        <Eyebrow>Étude de cas — Applications</Eyebrow>
+        <h2 class="mt-5 text-display-lg" data-reveal>
+          Un processus métier complexe, devenu un outil simple.
+        </h2>
+        <p class="mt-6 font-body text-lg leading-relaxed text-anthracite/80" data-reveal data-reveal-delay="100">
+          Studio VM a conçu un outil de gestion de stock et de préparation de chantier pour
+          remplacer les fichiers dispersés et le suivi manuel par une plateforme centralisée et
+          automatisée.
+        </p>
+        <span
+          class="mt-6 inline-flex w-fit items-center gap-2 rounded-sm border border-ink/20 px-3 py-1.5 font-body text-xs font-semibold uppercase tracking-[0.15em] text-anthracite"
+          data-reveal
+          data-reveal-delay="150"
+        >
+          Démonstration
+        </span>
+
+        <Button href="/realisations/stock-chantier" variant="text" class="mt-10 w-fit" data-reveal data-reveal-delay="200">
+          Voir l'étude de cas complète
+        </Button>
+      </div>
+
+      <div class="lg:col-span-7 lg:pl-6" data-reveal data-reveal-delay="120">
+        <StockChantierMockup />
+      </div>
+    </div>
+
+    <ul class="mt-24 grid grid-cols-1 gap-x-8 gap-y-10 border-t border-ink/10 pt-14 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        features.map((feature) => (
+          <li data-reveal data-reveal-group="app-features">
+            <h3 class="font-display text-base font-semibold">{feature.title}</h3>
+            <p class="mt-2 font-body text-sm leading-relaxed text-anthracite/75">{feature.description}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Container>
+</Section>

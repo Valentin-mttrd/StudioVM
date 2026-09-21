@@ -1,0 +1,28 @@
+---
+import Section from '../ui/Section.astro';
+import Container from '../ui/Container.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import { DIFFERENTIATORS } from '../../data/differentiators';
+---
+<Section tone="ink">
+  <Container>
+    <Eyebrow invert>Pourquoi Studio VM</Eyebrow>
+    <h2 class="mt-5 max-w-2xl text-display-lg text-paper" data-reveal>
+      Une approche différente, pensée pour être utile.
+    </h2>
+
+    <div class="mt-16 grid grid-cols-1 gap-x-12 gap-y-14 sm:grid-cols-2">
+      {
+        DIFFERENTIATORS.map((item, index) => (
+          <div class="border-t border-paper/15 pt-6" data-reveal data-reveal-group="why">
+            <span class="font-display text-sm font-semibold text-ash">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <h3 class="mt-4 text-display-sm text-paper">{item.title}</h3>
+            <p class="mt-3 max-w-sm font-body text-base leading-relaxed text-mist">{item.description}</p>
+          </div>
+        ))
+      }
+    </div>
+  </Container>
+</Section>

@@ -1,0 +1,83 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Navbar from '../components/layout/Navbar.astro';
+import Footer from '../components/layout/Footer.astro';
+import { SITE, DEFAULT_OG_DESCRIPTION } from '../lib/constants';
+import { absoluteUrl, pageTitle, organizationSchema } from '../lib/seo';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  isHome?: boolean;
+  ogImage?: string;
+  noindex?: boolean;
+  structuredData?: object[];
+}
+
+const {
+  title,
+  description = DEFAULT_OG_DESCRIPTION,
+  isHome = false,
+  ogImage = '/og-image.jpg',
+  noindex = false,
+  structuredData = [],
+} = Astro.props;
+
+const canonicalUrl = absoluteUrl(Astro.url.pathname);
+const resolvedTitle = pageTitle(title, isHome);
+const schemas = [organizationSchema(), ...structuredData];
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0b0b0b" />
+
+    <title>{resolvedTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={resolvedTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={absoluteUrl(ogImage)} />
+    <meta property="og:locale" content="fr_FR" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={resolvedTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl(ogImage)} />
+
+    {
+      schemas.map((schema) => (
+        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+      ))
+    }
+
+    <ClientRouter />
+  </head>
+  <body>
+    <Navbar />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+
+    <script src="../scripts/main.ts"></script>
+  </body>
+</html>

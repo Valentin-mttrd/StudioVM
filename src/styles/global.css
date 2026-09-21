@@ -1,0 +1,203 @@
+@import "tailwindcss";
+@import "@fontsource-variable/montserrat/wght.css";
+@import "@fontsource-variable/manrope/wght.css";
+
+/* ==========================================================================
+   STUDIO VM — Design tokens
+   Single source of truth for color, type, spacing and motion.
+   Base palette is fixed by the brand system — do not introduce new hues.
+   ========================================================================== */
+@theme {
+  /* Color — brand palette (fixed) */
+  --color-ink: #0b0b0b;
+  --color-ink-raised: #151515;
+  --color-anthracite: #2a2a2a;
+  --color-graphite: #5c5c5c;
+  --color-ash: #a8a8a8;
+  --color-mist: #d9d9d9;
+  --color-sand: #ede7df;
+  --color-sand-soft: #f5f3ef;
+  --color-paper: #ffffff;
+  --color-accent: #46607a;
+  --color-accent-soft: #aebdc9;
+
+  /* Type */
+  --font-display: "Montserrat Variable", "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Manrope Variable", "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --text-display-xl: clamp(2.75rem, 2rem + 4.2vw, 6.75rem);
+  --text-display-xl--line-height: 0.98;
+  --text-display-xl--letter-spacing: -0.03em;
+  --text-display-xl--font-weight: 700;
+
+  --text-display-lg: clamp(2.25rem, 1.6rem + 3vw, 4.5rem);
+  --text-display-lg--line-height: 1.02;
+  --text-display-lg--letter-spacing: -0.025em;
+  --text-display-lg--font-weight: 700;
+
+  --text-display-md: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+  --text-display-md--line-height: 1.08;
+  --text-display-md--letter-spacing: -0.02em;
+  --text-display-md--font-weight: 600;
+
+  --text-display-sm: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  --text-display-sm--line-height: 1.15;
+  --text-display-sm--letter-spacing: -0.01em;
+  --text-display-sm--font-weight: 600;
+
+  /* Radius — near-flat, architectural. Sharp over soft. */
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+
+  /* Container */
+  --container-max: 90rem;
+
+  /* Easing */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+@layer base {
+  * {
+    @apply border-mist/60;
+  }
+
+  html {
+    @apply scroll-smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-paper text-ink font-body antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: var(--radius-xs);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  html.menu-open {
+    @apply overflow-hidden;
+  }
+}
+
+/* ==========================================================================
+   Smart navbar — see src/scripts/navbar.ts
+   ========================================================================== */
+@layer components {
+  [data-nav] {
+    transition:
+      transform 0.5s var(--ease-premium),
+      background-color 0.5s var(--ease-premium),
+      border-color 0.5s var(--ease-premium);
+  }
+
+  [data-nav][data-hidden='true'] {
+    transform: translateY(-100%);
+  }
+}
+
+/* ==========================================================================
+   Case study body — renders Markdown/MDX content collection entries
+   ========================================================================== */
+@layer components {
+  .prose-vm > :first-child {
+    margin-top: 0;
+  }
+
+  .prose-vm h2 {
+    @apply text-display-sm mt-16;
+  }
+
+  .prose-vm h3 {
+    @apply mt-10 font-display text-xl font-semibold;
+  }
+
+  .prose-vm p {
+    @apply mt-5 font-body text-lg leading-relaxed text-anthracite/80;
+  }
+
+  .prose-vm ul {
+    @apply mt-5 list-disc space-y-2 pl-5 font-body text-lg leading-relaxed text-anthracite/80;
+  }
+
+  .prose-vm a {
+    @apply underline decoration-graphite/50 underline-offset-2 transition-colors duration-200 hover:decoration-ink;
+  }
+
+  .prose-vm > div {
+    @apply my-14;
+  }
+}
+
+/* ==========================================================================
+   Compare slider (PLAN → 3D) — see src/scripts/compare-slider.ts
+   ========================================================================== */
+@layer components {
+  [data-compare] {
+    --reveal-pos: 50%;
+  }
+
+  [data-compare] [data-compare-after] {
+    clip-path: inset(0 0 0 var(--reveal-pos));
+  }
+
+  [data-compare] [data-compare-handle] {
+    left: var(--reveal-pos);
+  }
+}
+
+/* ==========================================================================
+   Reveal-on-scroll primitive — see src/scripts/reveal.ts
+   Progressive enhancement: content is fully visible with no JS.
+   ========================================================================== */
+@layer components {
+  html.js [data-reveal] {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+
+  html.js [data-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.9s var(--ease-premium), transform 0.9s var(--ease-premium);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.js [data-reveal] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

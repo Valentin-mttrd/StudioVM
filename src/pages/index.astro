@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/sections/Hero.astro';
+import ServicesOverview from '../components/sections/ServicesOverview.astro';
+import WhyStudioVM from '../components/sections/WhyStudioVM.astro';
+import AppCaseStudy from '../components/sections/AppCaseStudy.astro';
+import ThreeDShowcase from '../components/sections/ThreeDShowcase.astro';
+import ProcessSection from '../components/sections/ProcessSection.astro';
+import { DEFAULT_OG_DESCRIPTION } from '../lib/constants';
+---
+<Layout title="Studio VM — Web, Applications, 3D" description={DEFAULT_OG_DESCRIPTION} isHome>
+  <Hero />
+  <ServicesOverview />
+  <WhyStudioVM />
+  <AppCaseStudy />
+  <ThreeDShowcase />
+  <ProcessSection />
+</Layout>
