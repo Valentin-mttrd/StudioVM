@@ -4,8 +4,8 @@ import Section from '../ui/Section.astro';
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Button from '../ui/Button.astro';
-import planImage from '../../assets/showcase/entree-jardin-plan.webp';
-import renduImage from '../../assets/showcase/entree-jardin-rendu.webp';
+import planImage from '../../assets/showcase/entree-jardin-plan.jpg';
+import renduImage from '../../assets/showcase/entree-jardin-rendu.jpg';
 ---
 <Section tone="ink" id="visualisation-3d">
   <Container>
@@ -35,7 +35,7 @@ import renduImage from '../../assets/showcase/entree-jardin-rendu.webp';
       <div class="absolute inset-0">
         <Image
           src={planImage}
-          alt="Esquisse en plan d'un aménagement extérieur : entrée végétalisée, pergola et cheminement"
+          alt="Rendu 3D non texturé d'un aménagement extérieur : entrée végétalisée, pergola et cheminement"
           class="h-full w-full object-cover"
           widths={[640, 960, 1400]}
           sizes="100vw"
@@ -48,7 +48,7 @@ import renduImage from '../../assets/showcase/entree-jardin-rendu.webp';
       <div class="absolute inset-0" data-compare-after>
         <Image
           src={renduImage}
-          alt="Rendu 3D réaliste du même aménagement extérieur : entrée végétalisée, pergola et cheminement"
+          alt="Rendu 3D réaliste et texturé du même aménagement extérieur : entrée végétalisée, pergola et cheminement"
           class="h-full w-full object-cover"
           widths={[640, 960, 1400]}
           sizes="100vw"
