@@ -42,13 +42,27 @@ const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
                 En savoir plus
               </Button>
             </div>
-            <div class:list={['lg:col-span-7', index % 2 === 1 && 'lg:order-1']}>
-              <AbstractCover
-                kind={service.id}
-                tone={coverTones[service.id]}
-                flip={index % 2 === 1}
-                class="aspect-[4/3] rounded-sm"
-              />
+            <div class:list={['lg:col-span-7', service.id === 'web' && 'flex items-center', index % 2 === 1 && 'lg:order-1']}>
+              {service.id === 'web' ? (
+                <img
+                  src="/images/services/web-mockup.webp"
+                  alt="Aperçu d'un site vitrine sur ordinateur portable et smartphone, mis en scène dans un décor végétal"
+                  width="1536"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full rounded-sm"
+                  data-reveal
+                  data-reveal-delay="100"
+                />
+              ) : (
+                <AbstractCover
+                  kind={service.id}
+                  tone={coverTones[service.id]}
+                  flip={index % 2 === 1}
+                  class="aspect-[4/3] rounded-sm"
+                />
+              )}
             </div>
           </article>
         ))
