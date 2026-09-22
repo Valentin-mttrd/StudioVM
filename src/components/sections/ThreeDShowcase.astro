@@ -1,11 +1,16 @@
 ---
-import { Image } from 'astro:assets';
 import Section from '../ui/Section.astro';
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Button from '../ui/Button.astro';
-import planImage from '../../assets/showcase/entree-jardin-plan.jpg';
-import renduImage from '../../assets/showcase/entree-jardin-rendu.jpg';
+
+// Served as-is from /public (not run through astro:assets) so the provided
+// files are never re-encoded or re-compressed. object-left-bottom anchors
+// any object-cover crop to that corner so the Studio VM watermark baked
+// into both images (bottom-left) is never cut off, whichever way the
+// container's aspect ratio forces the crop at a given viewport width.
+const planImage = '/images/showcase/entree-jardin-plan.jpg';
+const renduImage = '/images/showcase/entree-jardin-rendu.jpg';
 ---
 <Section tone="ink" id="visualisation-3d">
   <Container>
@@ -33,12 +38,14 @@ import renduImage from '../../assets/showcase/entree-jardin-rendu.jpg';
       data-reveal-delay="120"
     >
       <div class="absolute inset-0">
-        <Image
+        <img
           src={planImage}
           alt="Rendu 3D non texturé d'un aménagement extérieur : entrée végétalisée, pergola et cheminement"
-          class="h-full w-full object-cover"
-          widths={[640, 960, 1400]}
-          sizes="100vw"
+          class="h-full w-full object-cover object-left-bottom"
+          width="2000"
+          height="1125"
+          loading="lazy"
+          decoding="async"
         />
         <span class="absolute left-6 top-6 font-body text-xs font-semibold uppercase tracking-[0.2em] text-mist">
           Plan
@@ -46,12 +53,14 @@ import renduImage from '../../assets/showcase/entree-jardin-rendu.jpg';
       </div>
 
       <div class="absolute inset-0" data-compare-after>
-        <Image
+        <img
           src={renduImage}
           alt="Rendu 3D réaliste et texturé du même aménagement extérieur : entrée végétalisée, pergola et cheminement"
-          class="h-full w-full object-cover"
-          widths={[640, 960, 1400]}
-          sizes="100vw"
+          class="h-full w-full object-cover object-left-bottom"
+          width="2000"
+          height="1125"
+          loading="lazy"
+          decoding="async"
         />
         <span class="absolute right-6 top-6 font-body text-xs font-semibold uppercase tracking-[0.2em] text-mist">
           3D
