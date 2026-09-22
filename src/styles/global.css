@@ -201,3 +201,39 @@
     }
   }
 }
+
+/* ==========================================================================
+   Applications dashboard preview — see src/components/portfolio/DashboardPreview.astro
+   and src/scripts/dashboard-preview.ts. Immobile by default; hover/tap on a
+   chart column moves the dot + guide and reveals the value tooltip.
+   ========================================================================== */
+@layer components {
+  [data-chart] [data-dot] {
+    opacity: 0;
+    transition: opacity 0.15s ease-out, r 0.15s ease-out;
+  }
+
+  [data-chart] [data-dot].is-active {
+    opacity: 1;
+  }
+
+  [data-chart] [data-guide] {
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+  }
+
+  [data-chart] [data-guide].is-guide-active {
+    opacity: 0.3;
+  }
+
+  [data-chart-tooltip] {
+    position: absolute;
+    transform: translate(-50%, calc(-100% - 7px));
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+  }
+
+  [data-chart-tooltip].is-active {
+    opacity: 1;
+  }
+}

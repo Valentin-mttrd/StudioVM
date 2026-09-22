@@ -1,0 +1,276 @@
+---
+/**
+ * Real, lightly-interactive dashboard UI standing in for the "Applications"
+ * service illustration — a demonstration of the kind of internal tool
+ * Studio VM builds for clients, not a photo or a static mockup. Data is
+ * fictional; the chart hover/tooltip wiring lives in
+ * src/scripts/dashboard-preview.ts (see initDashboardCharts).
+ */
+import DashboardIcon from '../icons/DashboardIcon.astro';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const VIEW_W = 320;
+const VIEW_H = 118;
+const PLOT_TOP = 6;
+const PLOT_BOTTOM = 96;
+const DOMAIN_MIN = 12000;
+const DOMAIN_MAX = 26000;
+
+const CHART_DATA = [
+  { month: 'Avr', value: 14200 },
+  { month: 'Mai', value: 16800 },
+  { month: 'Jun', value: 15400 },
+  { month: 'Jul', value: 19200 },
+  { month: 'Aoû', value: 21000 },
+  { month: 'Sep', value: 24850 },
+];
+
+const round1 = (n: number) => Math.round(n * 10) / 10;
+
+const points = CHART_DATA.map((d, i) => {
+  const x = round1(10 + i * ((VIEW_W - 20) / (CHART_DATA.length - 1)));
+  const ratio = (d.value - DOMAIN_MIN) / (DOMAIN_MAX - DOMAIN_MIN);
+  const y = round1(PLOT_BOTTOM - ratio * (PLOT_BOTTOM - PLOT_TOP));
+  return { ...d, x, y };
+});
+
+function smoothPath(pts: typeof points): string {
+  let d = `M${pts[0].x},${pts[0].y}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const mx = round1((pts[i].x + pts[i + 1].x) / 2);
+    const my = round1((pts[i].y + pts[i + 1].y) / 2);
+    d += ` Q${pts[i].x},${pts[i].y} ${mx},${my}`;
+  }
+  const prev = pts[pts.length - 2];
+  const last = pts[pts.length - 1];
+  d += ` Q${prev.x},${prev.y} ${last.x},${last.y}`;
+  return d;
+}
+
+const linePath = smoothPath(points);
+const areaPath = `${linePath} L${points[points.length - 1].x},${PLOT_BOTTOM} L${points[0].x},${PLOT_BOTTOM} Z`;
+const zoneWidth = VIEW_W / points.length;
+const currency = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
+const formatEuros = (value: number) => `${currency.format(value)} €`;
+
+const kpis = [
+  { label: "Chiffre d'affaires", value: formatEuros(24850) },
+  { label: 'Chantiers actifs', value: '12' },
+  { label: 'Clients', value: '38' },
+  { label: 'Stock', value: '86 %' },
+];
+
+const navItems: { label: string; icon: 'overview' | 'sites' | 'stock' | 'clients' | 'automations'; active?: boolean }[] = [
+  { label: "Vue d'ensemble", icon: 'overview', active: true },
+  { label: 'Chantiers', icon: 'sites' },
+  { label: 'Stock', icon: 'stock' },
+  { label: 'Clients', icon: 'clients' },
+  { label: 'Automatisations', icon: 'automations' },
+];
+
+const projects = [
+  { name: 'Maison Keravel', label: 'Piscine & terrasse', progress: 75 },
+  { name: 'Projet Ar Mor', label: 'Aménagement extérieur', progress: 48 },
+  { name: 'Villa Horizon', label: 'Conception paysagère', progress: 92 },
+];
+
+const stock = [
+  { name: 'Palis ardoise', qty: 42 },
+  { name: 'Lames terrasse', qty: 128 },
+  { name: 'Dalles grès cérame', qty: 76 },
+];
+
+const activity = [
+  { label: 'Nouveau chantier créé', time: 'Il y a 2 h' },
+  { label: 'Devis envoyé', time: 'Il y a 5 h' },
+  { label: 'Stock mis à jour', time: 'Hier' },
+  { label: 'Client ajouté', time: 'Hier' },
+];
+
+const labelClasses = 'font-body text-[9px] font-semibold uppercase tracking-[0.1em] text-graphite @lg:text-[10px]';
+const panelClasses = 'rounded-xs border border-mist/70 p-2.5 @lg:p-3';
+---
+
+<div
+  class:list={['dash relative w-full overflow-hidden rounded-sm border border-mist bg-paper @container', className]}
+  data-reveal
+  data-reveal-delay="100"
+  aria-hidden="true"
+>
+  <div class="flex flex-col @lg:flex-row">
+    <aside class="hidden shrink-0 flex-col border-r border-mist/70 bg-sand-soft/70 px-3 py-4 @lg:flex @lg:w-[142px] @2xl:w-[156px] @2xl:px-4">
+      <div class="flex items-center gap-2">
+        <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-xs bg-ink font-display text-[10px] font-bold text-paper">S</span>
+        <span class="truncate font-display text-[11px] font-bold tracking-wide text-ink">STUDIO OS</span>
+      </div>
+      <nav class="mt-6 flex flex-col gap-0.5">
+        {
+          navItems.map((item) => (
+            <span
+              class:list={[
+                'flex items-center gap-2 rounded-xs px-2 py-1.5 font-body text-[11px] transition-colors duration-150',
+                item.active ? 'bg-paper font-semibold text-ink' : 'text-graphite hover:bg-paper/70 hover:text-ink',
+              ]}
+            >
+              <DashboardIcon name={item.icon} class="h-3.5 w-3.5 shrink-0" />
+              <span class="truncate">{item.label}</span>
+            </span>
+          ))
+        }
+      </nav>
+    </aside>
+
+    <div class="min-w-0 flex-1 px-3.5 py-3.5 @lg:px-5 @lg:py-4">
+      <div class="flex items-center justify-between gap-2">
+        <div class="min-w-0">
+          <p class="truncate font-body text-[10px] text-graphite @lg:text-[11px]">Bonjour Valentin</p>
+          <p class="truncate font-display text-[12.5px] font-semibold text-ink @lg:text-sm">
+            Voici un aperçu de votre activité.
+          </p>
+        </div>
+        <div class="flex shrink-0 items-center gap-1.5">
+          <span class="hidden h-6 w-6 items-center justify-center rounded-xs border border-mist/70 text-graphite transition-colors duration-150 hover:border-ink/30 hover:text-ink @lg:flex">
+            <DashboardIcon name="search" class="h-3 w-3" />
+          </span>
+          <span class="hidden h-6 w-6 items-center justify-center rounded-xs border border-mist/70 text-graphite transition-colors duration-150 hover:border-ink/30 hover:text-ink @lg:flex">
+            <DashboardIcon name="bell" class="h-3 w-3" />
+          </span>
+          <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink font-display text-[10px] font-semibold text-paper">
+            V
+          </span>
+        </div>
+      </div>
+
+      <div class="mt-3 grid grid-cols-2 gap-2 @lg:mt-4 @lg:grid-cols-4 @lg:gap-2.5">
+        {
+          kpis.map((kpi) => (
+            <div class="rounded-xs border border-mist/70 bg-sand-soft/60 px-2.5 py-2 transition-all duration-150 hover:-translate-y-0.5 hover:border-ink/25 @lg:px-3 @lg:py-2.5">
+              <p class="truncate font-body text-[8.5px] font-semibold uppercase tracking-[0.08em] text-graphite @lg:text-[9.5px]">
+                {kpi.label}
+              </p>
+              <p class="mt-1 truncate font-display text-[13px] font-bold text-ink @lg:text-base">{kpi.value}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="mt-2.5 grid grid-cols-1 gap-2.5 @lg:mt-3 @lg:grid-cols-[1.3fr_1fr]">
+        <div class={panelClasses}>
+          <p class={labelClasses}>Chiffre d'affaires</p>
+          <div class="relative mt-1.5">
+            <svg data-chart viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} class="block w-full" aria-hidden="true">
+              <g stroke="currentColor" class="text-mist" stroke-width="1">
+                <line x1="0" y1={PLOT_BOTTOM} x2={VIEW_W} y2={PLOT_BOTTOM} opacity="0.7" />
+                <line x1="0" y1={(PLOT_BOTTOM + PLOT_TOP) / 2} x2={VIEW_W} y2={(PLOT_BOTTOM + PLOT_TOP) / 2} opacity="0.35" />
+              </g>
+
+              <defs>
+                <linearGradient id="dash-area" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.16" />
+                  <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path d={areaPath} fill="url(#dash-area)" stroke="none" />
+              <path d={linePath} fill="none" stroke="var(--color-accent)" stroke-width="1.75" stroke-linecap="round" />
+
+              <line data-guide x1={points[points.length - 1].x} x2={points[points.length - 1].x} y1={PLOT_TOP - 2} y2={PLOT_BOTTOM} stroke="currentColor" class="text-ink" stroke-width="1" stroke-dasharray="2 2" />
+
+              {
+                points.map((p, i) => (
+                  <circle
+                    data-dot
+                    data-index={i}
+                    data-label={p.month}
+                    data-value={formatEuros(p.value)}
+                    cx={p.x}
+                    cy={p.y}
+                    r="3"
+                    fill="var(--color-ink)"
+                    class:list={[i === points.length - 1 && 'is-active']}
+                  />
+                ))
+              }
+
+              {
+                points.map((p, i) => (
+                  <rect
+                    data-zone
+                    data-index={i}
+                    x={i * zoneWidth}
+                    y="0"
+                    width={zoneWidth}
+                    height={VIEW_H}
+                    fill="transparent"
+                    class="cursor-pointer"
+                  />
+                ))
+              }
+            </svg>
+            <div
+              data-chart-tooltip
+              class="pointer-events-none absolute z-10 whitespace-nowrap rounded-xs bg-ink px-1.5 py-1 font-body text-[9px] font-medium leading-none text-paper shadow-sm"
+            />
+          </div>
+          <div class="mt-1 flex justify-between font-body text-[8px] text-ash @lg:text-[8.5px]">
+            {points.map((p) => <span>{p.month}</span>)}
+          </div>
+        </div>
+
+        <div class={panelClasses}>
+          <p class={labelClasses}>Chantiers en cours</p>
+          <div class="mt-2 flex flex-col gap-2">
+            {
+              projects.map((project) => (
+                <div class="rounded-xs px-1 py-0.5 transition-colors duration-150 hover:bg-sand-soft/70">
+                  <div class="flex items-baseline justify-between gap-2">
+                    <p class="truncate font-body text-[10.5px] font-semibold text-ink @lg:text-[11px]">{project.name}</p>
+                    <span class="shrink-0 font-body text-[9.5px] font-semibold text-graphite">{project.progress} %</span>
+                  </div>
+                  <p class="truncate font-body text-[9px] text-graphite">{project.label}</p>
+                  <div class="mt-1 h-1 overflow-hidden rounded-full bg-mist/50">
+                    <div class="h-full rounded-full bg-ink" style={`width:${project.progress}%`} />
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-2.5 hidden @2xl:grid @2xl:grid-cols-[1fr_1.15fr] @2xl:gap-2.5">
+        <div class={panelClasses}>
+          <p class={labelClasses}>Stock</p>
+          <div class="mt-2 flex flex-col divide-y divide-mist/50">
+            {
+              stock.map((item) => (
+                <div class="flex items-center justify-between gap-2 py-1.5 first:pt-0 last:pb-0">
+                  <span class="truncate font-body text-[11px] text-anthracite">{item.name}</span>
+                  <span class="shrink-0 font-body text-[11px] font-semibold text-ink">{item.qty} unités</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div class={panelClasses}>
+          <p class={labelClasses}>Activité récente</p>
+          <div class="mt-2 flex flex-col gap-2">
+            {
+              activity.map((event) => (
+                <div class="flex items-center gap-2">
+                  <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                  <span class="min-w-0 flex-1 truncate font-body text-[11px] text-anthracite">{event.label}</span>
+                  <span class="shrink-0 font-body text-[9px] text-ash">{event.time}</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

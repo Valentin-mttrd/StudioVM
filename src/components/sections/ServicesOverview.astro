@@ -4,15 +4,9 @@ import Section from '../ui/Section.astro';
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Button from '../ui/Button.astro';
-import AbstractCover from '../portfolio/AbstractCover.astro';
+import DashboardPreview from '../portfolio/DashboardPreview.astro';
 import webMockup from '../../assets/services/web-mockup.webp';
 import { SERVICES } from '../../data/services';
-
-const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
-  web: 'sand',
-  applications: 'anthracite',
-  '3d': 'ink',
-};
 ---
 <Section tone="paper" id="services-overview">
   <Container>
@@ -44,7 +38,7 @@ const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
                 En savoir plus
               </Button>
             </div>
-            <div class:list={['lg:col-span-7', (service.id === 'web' || service.id === '3d') && 'flex items-center', index % 2 === 1 && 'lg:order-1']}>
+            <div class:list={['flex items-center lg:col-span-7', index % 2 === 1 && 'lg:order-1']}>
               {service.id === 'web' ? (
                 <Image
                   src={webMockup}
@@ -66,12 +60,7 @@ const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
                   data-reveal-delay="100"
                 />
               ) : (
-                <AbstractCover
-                  kind={service.id}
-                  tone={coverTones[service.id]}
-                  flip={index % 2 === 1}
-                  class="aspect-[4/3] rounded-sm"
-                />
+                <DashboardPreview />
               )}
             </div>
           </article>
