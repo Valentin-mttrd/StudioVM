@@ -1,11 +1,9 @@
 ---
-import { Image } from 'astro:assets';
 import Section from '../ui/Section.astro';
 import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Button from '../ui/Button.astro';
 import AbstractCover from '../portfolio/AbstractCover.astro';
-import webMockup from '../../assets/services/web-mockup.png';
 import { SERVICES } from '../../data/services';
 
 const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
@@ -46,12 +44,13 @@ const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
             </div>
             <div class:list={['lg:col-span-7', service.id === 'web' && 'flex items-center', index % 2 === 1 && 'lg:order-1']}>
               {service.id === 'web' ? (
-                <Image
-                  src={webMockup}
-                  alt="Aperçu du site Studio VM affiché sur un ordinateur portable et un smartphone"
-                  widths={[640, 960, 1400]}
-                  sizes="(min-width: 1024px) 58vw, 100vw"
-                  quality={90}
+                <img
+                  src="/images/services/villa-piscine.webp"
+                  alt="Villa méditerranéenne avec piscine, terrasse en pierre et végétation méditerranéenne"
+                  width="1536"
+                  height="1024"
+                  loading="lazy"
+                  decoding="async"
                   class="w-full rounded-sm"
                   data-reveal
                   data-reveal-delay="100"
