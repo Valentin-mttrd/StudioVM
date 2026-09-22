@@ -5,7 +5,7 @@ import Container from '../ui/Container.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
 import Button from '../ui/Button.astro';
 import AbstractCover from '../portfolio/AbstractCover.astro';
-import webMockup from '../../assets/services/web-mockup.png';
+import webMockup from '../../assets/services/web-mockup.webp';
 import { SERVICES } from '../../data/services';
 
 const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
@@ -48,7 +48,7 @@ const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
               {service.id === 'web' ? (
                 <Image
                   src={webMockup}
-                  alt="Aperçu du site Studio VM affiché sur un ordinateur portable et un smartphone"
+                  alt="Illustration d'un site vitrine affiché sur un ordinateur portable et un smartphone"
                   widths={[640, 960, 1400]}
                   sizes="(min-width: 1024px) 58vw, 100vw"
                   quality={90}
