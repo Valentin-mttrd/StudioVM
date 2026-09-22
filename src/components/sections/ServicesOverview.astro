@@ -6,7 +6,6 @@ import Eyebrow from '../ui/Eyebrow.astro';
 import Button from '../ui/Button.astro';
 import AbstractCover from '../portfolio/AbstractCover.astro';
 import webMockup from '../../assets/services/web-mockup.webp';
-import render3d from '../../assets/services/3d-render.webp';
 import { SERVICES } from '../../data/services';
 
 const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
@@ -58,12 +57,10 @@ const coverTones: Record<string, 'sand' | 'anthracite' | 'ink'> = {
                   data-reveal-delay="100"
                 />
               ) : service.id === '3d' ? (
-                <Image
-                  src={render3d}
+                <img
+                  src="/images/services/3d-render.webp"
                   alt="Rendu 3D architectural d'une villa avec piscine et terrasse"
-                  widths={[640, 960, 1400]}
-                  sizes="(min-width: 1024px) 58vw, 100vw"
-                  quality={90}
+                  loading="lazy"
                   class="w-full rounded-sm"
                   data-reveal
                   data-reveal-delay="100"
