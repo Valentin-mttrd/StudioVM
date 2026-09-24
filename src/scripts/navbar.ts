@@ -148,6 +148,10 @@ function initMenu(header: HTMLElement, signal: AbortSignal, refresh: () => void)
   const menu = document.querySelector<HTMLElement>('[data-mobile-menu]');
   if (!toggle || !menu) return;
   const firstLink = menu.querySelector<HTMLAnchorElement>('a');
+  // While the menu covers the page, the page behind it leaves the tab order.
+  const setBackgroundInert = (inert: boolean) => {
+    document.querySelectorAll('main, footer').forEach((el) => el.toggleAttribute('inert', inert));
+  };
 
   const open = () => {
     // The water floods out from the button itself.
@@ -158,6 +162,7 @@ function initMenu(header: HTMLElement, signal: AbortSignal, refresh: () => void)
     toggle.setAttribute('aria-expanded', 'true');
     toggle.setAttribute('aria-label', 'Fermer le menu');
     menu.removeAttribute('inert');
+    setBackgroundInert(true);
     header.dataset.hidden = 'false';
     setScrollLocked(true);
     refresh();
@@ -170,6 +175,7 @@ function initMenu(header: HTMLElement, signal: AbortSignal, refresh: () => void)
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-label', 'Ouvrir le menu');
     menu.setAttribute('inert', '');
+    setBackgroundInert(false);
     setScrollLocked(false);
     refresh();
     if (restoreFocus) toggle.focus({ preventScroll: true });

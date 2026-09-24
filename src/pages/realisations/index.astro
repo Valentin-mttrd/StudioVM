@@ -43,7 +43,7 @@ const filters = [
               type="button"
               data-filter={filter.value}
               aria-pressed={filter.value === 'all' ? 'true' : 'false'}
-              class="chip chip-hover px-5 py-3 font-semibold uppercase tracking-[0.12em] text-ink transition-[background-color,color,box-shadow,transform] duration-300 aria-pressed:bg-ink aria-pressed:text-paper aria-pressed:shadow-[0_12px_24px_-12px_rgb(11_11_11/0.6)]"
+              class="chip chip-hover px-5 py-3 font-semibold uppercase tracking-[0.12em] text-ink transition-[background-color,color,box-shadow,transform] duration-300 aria-pressed:bg-ink aria-pressed:bg-none aria-pressed:text-paper aria-pressed:shadow-[0_12px_24px_-12px_rgb(11_11_11/0.6)]"
             >
               {filter.label}
             </button>
@@ -172,6 +172,20 @@ const filters = [
 <style>
   .portfolio-row {
     isolation: isolate;
+  }
+
+  /* Rows brought back by a filter surface in sequence. */
+  :global(li.is-surfacing) {
+    animation: surface-in 0.85s var(--ease-spring) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+
+  @keyframes surface-in {
+    from {
+      opacity: 0;
+      translate: 0 1.25rem;
+      filter: blur(6px);
+    }
   }
 
   /* Hovering a project row lets a tide of light water run in behind it. */

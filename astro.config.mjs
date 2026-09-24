@@ -13,7 +13,8 @@ export default defineConfig({
   trailingSlash: 'never',
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/mentions-legales') && !page.includes('/politique-de-confidentialite'),
+      filter: (page) =>
+        !page.includes('/mentions-legales') && !page.includes('/politique-de-confidentialite') && !page.includes('/404'),
     }),
     mdx(),
   ],

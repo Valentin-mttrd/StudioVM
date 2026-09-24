@@ -6,9 +6,11 @@ interface Props {
   class?: string;
   id?: string;
   bleed?: boolean;
+  /** Extra water treatment (src/scripts/liquid): 'calm' stills it for long reading. */
+  water?: 'calm';
 }
 
-const { tone = 'paper', class: className = '', id, bleed = false } = Astro.props;
+const { tone = 'paper', class: className = '', id, bleed = false, water } = Astro.props;
 
 const toneClasses: Record<Tone, string> = {
   paper: 'bg-paper text-ink',
@@ -20,6 +22,7 @@ const toneClasses: Record<Tone, string> = {
 <section
   id={id}
   data-tone={tone}
+  data-water={water}
   class:list={[
     'relative',
     !bleed && 'py-24 sm:py-28 lg:py-36',

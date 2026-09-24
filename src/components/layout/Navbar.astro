@@ -22,7 +22,7 @@ const isCurrent = (href: string) => currentPath === href || currentPath.startsWi
      data-over:  dark | light — the water currently under the capsule -->
 <header data-nav data-state="top" data-over="dark" data-hidden="false" class="fixed inset-x-0 top-0 z-50">
   <div class="nav-shell flex items-center justify-between gap-4 pl-6 pr-4 sm:pl-8 sm:pr-6 lg:pl-12 lg:pr-12" data-nav-shell>
-    <a href="/" class="relative z-10 shrink-0 rounded-full" aria-label={`${SITE.name} — Accueil`}>
+    <a href="/" class="nav-logo relative z-10 shrink-0 rounded-full" aria-label={`${SITE.name} — Accueil`}>
       <Logo variant="lockup" tone="inherit" markClass="h-6 lg:h-7" class="text-[0.95rem] lg:text-base" />
     </a>
 
@@ -102,12 +102,10 @@ const isCurrent = (href: string) => currentPath === href || currentPath.startsWi
       </a>
     </nav>
 
-    <div class="flex items-end justify-between gap-6" data-menu-item style={`--i:${NAV_LINKS.length + 1}`}>
-      <div class="flex flex-col gap-1.5 font-body text-sm text-mist">
-        <a href={`mailto:${SITE.email}`} class="w-fit">{SITE.email}</a>
-        <p>{SITE.locality}</p>
-      </div>
-      <p class="font-body text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ash">47°44′ N — 3°22′ O</p>
+    <div class="flex flex-col gap-1.5 font-body text-sm text-mist" data-menu-item style={`--i:${NAV_LINKS.length + 1}`}>
+      <a href={`mailto:${SITE.email}`} class="w-fit">{SITE.email}</a>
+      <p>{SITE.locality}</p>
+      <p class="mt-3 whitespace-nowrap font-body text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ash">47°44′ N — 3°22′ O</p>
     </div>
   </Container>
 </div>

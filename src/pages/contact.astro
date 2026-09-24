@@ -78,7 +78,7 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
                   projectTypes.map((type, index) => (
                     <label class="cursor-pointer">
                       <input type="radio" name="projet" value={type} required={index === 0} class="peer sr-only" />
-                      <span class="chip chip-hover px-5 py-3 text-sm text-ink transition-[background-color,color,box-shadow,transform] duration-300 peer-checked:bg-ink peer-checked:text-paper peer-checked:shadow-[0_12px_24px_-12px_rgb(11_11_11/0.6)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent">
+                      <span class="chip chip-hover px-5 py-3 text-sm text-ink transition-[background-color,color,box-shadow,transform] duration-300 peer-checked:bg-ink peer-checked:bg-none peer-checked:text-paper peer-checked:shadow-[0_12px_24px_-12px_rgb(11_11_11/0.6)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent">
                         {type}
                       </span>
                     </label>

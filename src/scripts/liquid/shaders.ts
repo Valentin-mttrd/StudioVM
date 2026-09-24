@@ -241,14 +241,15 @@ vec3 shadeDeep(vec2 p, float pageY, float bandTop, float kind, float tone, vec2 
   return base;
 }
 
-vec3 shadeShallow(vec2 p, float tone, vec2 refr, vec2 grad) {
+vec3 shadeShallow(vec2 p, float tone, float kind, vec2 refr, vec2 grad) {
   float t = uTime;
   bool sand = tone > 1.5;
   vec3 base = sand ? SAND : SHALLOW;
   vec3 lit = sand ? SAND_LIT : PAPER;
 
   vec2 q = (vec2(p.x, p.y + uScroll * 0.86) + refr * 2.2) / 150.0;
-  float c = caustic(q, t * 0.42, uCaustics);
+  // Long-form reading (data-water="calm"): the floor light is stilled.
+  float c = caustic(q, t * 0.42, uCaustics) * (kind > 3.5 ? 0.45 : 1.0);
 
   vec2 md = p - uMouse.xy;
   float glow = exp(-dot(md, md) / (2.0 * 300.0 * 300.0)) * uMouse.z;
@@ -319,7 +320,7 @@ void main() {
 
   vec3 col = deep > 0.5
     ? shadeDeep(p, pageY, B.x, B.w, tone, refr, grad)
-    : shadeShallow(p, tone, refr, grad);
+    : shadeShallow(p, tone, B.w, refr, grad);
 
   // Mirror image of the hero's floating villa, broken up by the swell.
   if (uReflOn > 0.01 && deep > 0.5) {

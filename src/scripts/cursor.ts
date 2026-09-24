@@ -228,5 +228,9 @@ export function initCursor(): void {
     if (hovered && !hovered.isConnected && hasPosition) resolve(document.elementFromPoint(pointerX, pointerY));
   });
   observer.observe(document.body, { childList: true, subtree: true });
-  document.addEventListener('astro:after-swap', () => observer.observe(document.body, { childList: true, subtree: true }));
+  document.addEventListener('astro:after-swap', () => {
+    // New <body> after a swap: drop the old one (and its whole page) first.
+    observer.disconnect();
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
 }

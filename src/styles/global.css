@@ -138,6 +138,12 @@
     scroll-behavior: auto;
   }
 
+  /* A thin, quiet scrollbar in the water's own colour. */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(70 96 122 / 0.55) transparent;
+  }
+
   body {
     @apply bg-paper text-ink font-body antialiased;
     overflow-x: hidden;
@@ -231,8 +237,24 @@
     background-color: transparent !important;
   }
 
+  /* No-WebGL stand-ins (flat tile grid, curved seam). With JS they stay
+     hidden until the engine has actually said it won't run — otherwise
+     they'd flash for the few frames before the water takes over — with a
+     failsafe in case the engine never reports at all. */
   .liquid-fallback {
     transition: opacity 0.9s var(--ease-out);
+  }
+
+  html.js:not([data-liquid-tier='off']) .liquid-fallback {
+    opacity: 0;
+  }
+
+  html.js:not(.liquid):not([data-liquid-tier='off']) .liquid-fallback {
+    animation: fallback-in 0.6s var(--ease-out) 2.5s forwards;
+  }
+
+  @keyframes fallback-in {
+    to { opacity: 1; }
   }
 
   html.liquid .liquid-fallback {
@@ -1122,6 +1144,13 @@
     opacity: 0.35;
   }
 
+  /* The mark answers a hover like a drop of water being touched. */
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .nav-logo:hover svg {
+      animation: jelly 0.75s var(--ease-out);
+    }
+  }
+
   .nav-cta {
     font-size: 0.75rem;
   }
@@ -1469,17 +1498,20 @@
 
   [data-kinetic].is-split .kin-c {
     opacity: 0;
-    translate: 0 0.5em;
+    translate: 0 var(--wy, 0.5em);
+    rotate: var(--wr, 0deg);
     filter: blur(12px);
   }
 
   [data-kinetic].is-in .kin-c {
     opacity: 1;
     translate: 0 0;
+    rotate: 0deg;
     filter: none;
     transition:
       opacity 0.9s var(--ease-out),
       translate 1.1s var(--ease-spring),
+      rotate 1.3s var(--ease-spring-soft),
       filter 1s var(--ease-out);
     transition-delay: calc(var(--d, 0) * 1ms);
   }

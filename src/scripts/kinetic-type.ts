@@ -68,6 +68,26 @@ function split(heading: HTMLElement, stagger: number, start: number): void {
   };
   walk(heading);
   heading.classList.add('is-split');
+  wavefront(heading, start);
+}
+
+// Re-time the entrance as a wave travelling across the whole headline: each
+// letter's delay follows its horizontal position (all lines at once, a
+// little later per line), and it starts sunk on a sine-shaped swell, tipped
+// slightly — so the words rise through a moving surface rather than
+// appearing one character at a time.
+function wavefront(heading: HTMLElement, start: number): void {
+  const glyphs = Array.from(heading.querySelectorAll<HTMLElement>('.kin-c'));
+  const width = heading.offsetWidth || 1;
+  const lineHeight = parseFloat(getComputedStyle(heading).lineHeight) || heading.offsetHeight || 1;
+  for (const glyph of glyphs) {
+    const x = glyph.offsetLeft + glyph.offsetWidth / 2;
+    const line = Math.round(glyph.offsetTop / lineHeight);
+    const u = x / width;
+    glyph.style.setProperty('--d', String(Math.round(start + u * 620 + line * 110)));
+    glyph.style.setProperty('--wy', `${(0.55 + Math.sin(u * 9 + line * 1.7) * 0.22).toFixed(3)}em`);
+    glyph.style.setProperty('--wr', `${(Math.cos(u * 9 + line * 1.7) * 5).toFixed(2)}deg`);
+  }
 }
 
 export function initKineticType(): void {

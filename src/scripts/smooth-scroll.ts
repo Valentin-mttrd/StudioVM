@@ -26,7 +26,9 @@ export function initSmoothScroll(): void {
       lenis = new LenisCtor({
         lerp: 0.095,
         wheelMultiplier: 0.95,
-        anchors: true,
+        // In-page anchors keep the browser's native jump: it also moves
+        // keyboard focus (skip link), which Lenis's animated version doesn't.
+        anchors: false,
         stopInertiaOnNavigate: true,
         autoRaf: false,
       });

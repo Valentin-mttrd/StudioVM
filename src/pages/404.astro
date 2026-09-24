@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Container from '../components/ui/Container.astro';
+import Button from '../components/ui/Button.astro';
+---
+<Layout title="Page introuvable" description="Cette page n'existe pas ou plus sur le site de Studio VM." noindex>
+  <section
+    data-tone="ink"
+    data-water="hero"
+    data-kinetic-zone
+    class="relative flex min-h-[100svh] items-center overflow-hidden bg-ink pb-20 pt-36 text-paper"
+  >
+    <Container class="relative">
+      <p class="lost-code font-display font-extralight leading-none" aria-hidden="true">404</p>
+      <p class="mt-6 font-body text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-ash" data-reveal data-reveal-fast>Erreur 404</p>
+      <h1 class="relative mt-5 max-w-5xl text-display-lg text-paper [&_strong]:block" data-kinetic data-kinetic-delay="120" data-kinetic-stagger="12">
+        Cette page n'existe pas <strong>ou plus.</strong>
+      </h1>
+      <p class="mt-7 max-w-xl font-body text-lg font-light leading-relaxed text-mist" data-reveal data-reveal-delay="350">
+        Le lien est peut-être erroné, ou la page a été déplacée. Le reste du site, lui, est bien là.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3 sm:gap-4" data-reveal data-reveal-fast data-reveal-delay="450">
+        <Button href="/" variant="solid" invert data-magnetic="0.3">Retour à l'accueil</Button>
+        <Button href="/contact" variant="outline" invert>Nous contacter</Button>
+      </div>
+    </Container>
+  </section>
+</Layout>
+
+<style>
+  /* The numerals are a glass tank with water sloshing inside. */
+  .lost-code {
+    font-size: clamp(6rem, 17vw, 15rem);
+    letter-spacing: -0.07em;
+    margin-left: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(219 225 231 / 0.28);
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200' preserveAspectRatio='none'%3E%3Cpath d='M0 118 C 70 98 130 98 200 118 S 330 138 400 118 V200 H0Z' fill='%23aebdc9' fill-opacity='0.3'/%3E%3C/svg%3E")
+      0 0 / 400px 100% repeat-x;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lost-code {
+      animation: slosh 6s linear infinite;
+    }
+  }
+
+  @keyframes slosh {
+    to {
+      background-position: 400px 0;
+    }
+  }
+</style>

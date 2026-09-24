@@ -10,7 +10,7 @@ import { DISPLAY_FS, FULLSCREEN_VS, PARTICLE_FS, PARTICLE_VS, SIM_FS } from './s
 // Lazy-loaded (see ./index.ts) so none of this ships until WebGL is usable.
 
 const TONE_ID: Record<string, number> = { ink: 0, paper: 1, sand: 2, anthracite: 3 };
-const KIND_ID: Record<string, number> = { hero: 1, header: 2, abyss: 3 };
+const KIND_ID: Record<string, number> = { hero: 1, header: 2, abyss: 3, calm: 4 };
 const MAX_BANDS = 8;
 const MAX_DROPS = 8;
 const SIM_HZ = 90;
@@ -213,7 +213,9 @@ class Engine implements LiquidEngine {
     this.findReflection();
 
     canvas.addEventListener('webglcontextlost', this.onContextLost);
-    this.unsubscribeTick = onTick(this.tick);
+    // Early phase: the engine reads layout (reflection rect) before the
+    // rest of the site writes styles this frame.
+    this.unsubscribeTick = onTick(this.tick, { early: true });
   }
 
   // ---------------------------------------------------------------- public
