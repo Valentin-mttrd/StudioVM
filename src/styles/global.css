@@ -25,9 +25,9 @@
   --font-display: "Montserrat Variable", "Montserrat", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Manrope Variable", "Manrope", ui-sans-serif, system-ui, sans-serif;
 
-  --text-display-xl: clamp(2.75rem, 2rem + 4.2vw, 6.75rem);
-  --text-display-xl--line-height: 0.98;
-  --text-display-xl--letter-spacing: -0.03em;
+  --text-display-xl: clamp(2.75rem, 1.9rem + 4.4vw, 7.25rem);
+  --text-display-xl--line-height: 0.96;
+  --text-display-xl--letter-spacing: -0.035em;
   --text-display-xl--font-weight: 700;
 
   --text-display-lg: clamp(2.25rem, 1.6rem + 3vw, 4.5rem);
@@ -198,6 +198,29 @@
 }
 
 /* ==========================================================================
+   Portfolio cursor preview — see src/scripts/portfolio-preview.ts and
+   realisations/index.astro. Desktop/fine-pointer enhancement only.
+   ========================================================================== */
+@layer components {
+  [data-portfolio-preview] {
+    opacity: 0;
+    transition: opacity 0.25s var(--ease-out);
+  }
+
+  [data-portfolio-preview].is-active {
+    opacity: 1;
+  }
+
+  [data-preview-panel] {
+    opacity: 0;
+  }
+
+  [data-preview-panel].is-active {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
    Compare slider (PLAN → 3D) — see src/scripts/compare-slider.ts
    ========================================================================== */
 @layer components {
@@ -246,6 +269,102 @@
 
   html.js [data-reveal][data-reveal-fast].is-visible {
     transition: opacity var(--duration-moderate) var(--ease-premium), transform var(--duration-moderate) var(--ease-premium);
+  }
+
+  /* Scale — for media that should feel like it's settling into place
+     (imagery, floating panels), not sliding up off a shelf. */
+  html.js [data-reveal][data-reveal-mode='scale'] {
+    transform: scale(0.94);
+  }
+
+  html.js [data-reveal][data-reveal-mode='scale'].is-visible {
+    transform: scale(1);
+    transition: opacity 1s var(--ease-premium), transform 1s var(--ease-premium);
+  }
+
+  /* Clip — a mask wipes away rather than the element fading through it.
+     The [data-reveal] element itself MUST NOT be the one that gets
+     clip-path'd: a target clipped to inset(0 0 100% 0) has zero visible
+     area, and Chromium's IntersectionObserver correctly reports zero
+     intersection for that — regardless of its actual position — which
+     means it can never observe itself becoming visible (confirmed while
+     building this: the element just sat clipped forever). So the outer
+     [data-reveal] node stays a plain, always-fully-rendered observation
+     target, and a nested .reveal-clip-target child carries the real
+     mask-wipe effect. */
+  html.js [data-reveal][data-reveal-mode='clip'] {
+    opacity: 1;
+    transform: none;
+  }
+
+  html.js [data-reveal-mode='clip'] > .reveal-clip-target {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  html.js [data-reveal][data-reveal-mode='clip'].is-visible > .reveal-clip-target {
+    clip-path: inset(0 0 0% 0);
+    transition: clip-path 1.1s var(--ease-in-out);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.js [data-reveal][data-reveal-mode='scale'] {
+      transform: none;
+    }
+
+    html.js [data-reveal-mode='clip'] > .reveal-clip-target {
+      clip-path: none;
+    }
+  }
+}
+
+/* ==========================================================================
+   Tilt cards — see src/scripts/tilt-card.ts. Rests at a slight static angle
+   (propped up like a real object) and straightens toward the cursor on
+   hover. Static tilt only (no JS) also flattens under reduced motion, since
+   a permanent 3D skew is still a depth effect some users would rather skip.
+   ========================================================================== */
+@layer components {
+  /* Matches [data-reveal]'s own `html.js [data-reveal]` specificity so this
+     doesn't lose the cascade on elements carrying both attributes (the
+     reveal's resting transform would otherwise win the tie). */
+  html.js [data-tilt] {
+    transform: perspective(2200px) rotateX(2.5deg) rotateY(-4deg);
+    transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+  }
+
+  [data-tilt].is-hovering {
+    box-shadow: 0 40px 80px -20px rgba(11, 11, 11, 0.35);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.js [data-tilt] {
+      transform: none;
+    }
+  }
+}
+
+/* ==========================================================================
+   Live-status pulse — small ambient signal (dashboard preview, elsewhere as
+   needed) that something is "running", not a call to action. One element,
+   used sparingly; see emil-design-eng's frequency rule.
+   ========================================================================== */
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    .live-dot {
+      animation: live-pulse 2.4s var(--ease-in-out) infinite;
+    }
+  }
+
+  @keyframes live-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.75);
+    }
   }
 }
 

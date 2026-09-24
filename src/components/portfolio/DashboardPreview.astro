@@ -96,10 +96,27 @@ const labelClasses = 'font-body text-[9px] font-semibold uppercase tracking-[0.1
 const panelClasses = 'rounded-xs border border-mist/70 p-2.5 @lg:p-3';
 ---
 
+<!--
+  Reveal and tilt/clip live on two different elements on purpose (both
+  confirmed as real bugs while building this, not theoretical):
+  1. A card with a perspective()-bearing 3D transform stops hit-testing
+     correctly at its own visual center (elementFromPoint returns its
+     parent instead) — fixed by having src/scripts/tilt-card.ts listen on
+     the parent, not the tilted element itself.
+  2. The [data-reveal] target must never carry its own clip-path: a target
+     clipped to inset(0 0 100% 0) has zero visible area, and Chromium's
+     IntersectionObserver correctly reports zero intersection for that —
+     so it can never observe itself becoming visible (a permanent
+     deadlock, confirmed directly against a fresh observer). The outer div
+     here stays a plain, always-fully-rendered observation target; the
+     .reveal-clip-target class on the inner card is what actually gets
+     clipped, per the [data-reveal-mode='clip'] rules in global.css.
+-->
+<div class:list={['w-full', className]} data-reveal data-reveal-mode="clip" data-reveal-delay="100">
 <div
-  class:list={['dash relative w-full overflow-hidden rounded-sm border border-mist bg-paper @container', className]}
-  data-reveal
-  data-reveal-delay="100"
+  class="dash reveal-clip-target relative w-full overflow-hidden rounded-sm border border-mist bg-paper shadow-xl shadow-ink/10 @container"
+  data-tilt
+  data-tilt-max="2.5"
   aria-hidden="true"
 >
   <div class="flex flex-col @lg:flex-row">
@@ -123,6 +140,11 @@ const panelClasses = 'rounded-xs border border-mist/70 p-2.5 @lg:p-3';
           ))
         }
       </nav>
+
+      <div class="mt-auto flex items-center gap-1.5 pt-4">
+        <span class="live-dot h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+        <span class="font-body text-[9px] font-semibold uppercase tracking-[0.12em] text-graphite">En direct</span>
+      </div>
     </aside>
 
     <div class="min-w-0 flex-1 px-3.5 py-3.5 @lg:px-5 @lg:py-4">
@@ -137,8 +159,17 @@ const panelClasses = 'rounded-xs border border-mist/70 p-2.5 @lg:p-3';
           <span class="hidden h-6 w-6 items-center justify-center rounded-xs border border-mist/70 text-graphite transition-colors duration-150 hover:border-ink/30 hover:text-ink @lg:flex">
             <DashboardIcon name="search" class="h-3 w-3" />
           </span>
-          <span class="hidden h-6 w-6 items-center justify-center rounded-xs border border-mist/70 text-graphite transition-colors duration-150 hover:border-ink/30 hover:text-ink @lg:flex">
+          <span class="group/bell relative hidden h-6 w-6 items-center justify-center rounded-xs border border-mist/70 text-graphite transition-colors duration-150 hover:border-ink/30 hover:text-ink @lg:flex">
             <DashboardIcon name="bell" class="h-3 w-3" />
+            <span class="absolute -right-1 -top-1 flex h-3 w-3 items-center justify-center rounded-full bg-accent text-[7px] font-bold text-paper">
+              2
+            </span>
+            <div class="pointer-events-none absolute right-0 top-full z-20 mt-2 w-40 -translate-y-1 rounded-xs border border-mist bg-paper p-2 opacity-0 shadow-lg transition-[opacity,transform] duration-150 ease-out group-hover/bell:translate-y-0 group-hover/bell:opacity-100">
+              <p class="font-body text-[9px] font-semibold text-ink">Devis accepté</p>
+              <p class="mt-0.5 truncate font-body text-[8.5px] text-graphite">Villa Horizon · il y a 1 h</p>
+              <p class="mt-1.5 font-body text-[9px] font-semibold text-ink">Stock faible</p>
+              <p class="mt-0.5 truncate font-body text-[8.5px] text-graphite">Dalles grès cérame</p>
+            </div>
           </span>
           <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink font-display text-[10px] font-semibold text-paper">
             V
@@ -248,7 +279,7 @@ const panelClasses = 'rounded-xs border border-mist/70 p-2.5 @lg:p-3';
           <div class="mt-2 flex flex-col divide-y divide-mist/50">
             {
               stock.map((item) => (
-                <div class="flex items-center justify-between gap-2 py-1.5 first:pt-0 last:pb-0">
+                <div class="flex items-center justify-between gap-2 rounded-xs px-1 py-1.5 transition-colors duration-150 first:pt-0 last:pb-0 hover:bg-sand-soft/70">
                   <span class="truncate font-body text-[11px] text-anthracite">{item.name}</span>
                   <span class="shrink-0 font-body text-[11px] font-semibold text-ink">{item.qty} unités</span>
                 </div>
@@ -273,4 +304,5 @@ const panelClasses = 'rounded-xs border border-mist/70 p-2.5 @lg:p-3';
       </div>
     </div>
   </div>
+</div>
 </div>

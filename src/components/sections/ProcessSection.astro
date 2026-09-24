@@ -9,8 +9,14 @@ import { PROCESS_STEPS } from '../../data/process';
     <Eyebrow>Notre méthode</Eyebrow>
     <h2 class="mt-5 max-w-2xl text-display-lg" data-reveal>De l'idée à la solution.</h2>
 
-    <ol class="relative mt-20 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+    <ol class="relative mt-20 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4" data-process>
       <div class="absolute inset-x-0 top-6 hidden h-px bg-mist lg:block" aria-hidden="true"></div>
+      <div
+        class="absolute inset-x-0 top-6 hidden h-px origin-left scale-x-0 bg-ink lg:block"
+        data-process-fill
+        aria-hidden="true"
+      >
+      </div>
       {
         PROCESS_STEPS.map((step) => (
           <li class="relative flex flex-col" data-reveal data-reveal-group="process">

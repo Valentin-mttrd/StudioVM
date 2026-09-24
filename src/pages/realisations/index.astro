@@ -50,61 +50,115 @@ const filters = [
         }
       </div>
 
-      <div class="mt-14 grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
-        {
-          projects.map((project) => (
-            <a
-              href={`/realisations/${project.id}`}
-              class="group flex flex-col"
-              data-project-card
-              data-category={project.data.category}
-              data-reveal
-              data-reveal-group="portfolio"
-            >
-              <div class="overflow-hidden rounded-sm">
-                <AbstractCover
-                  kind={project.data.category}
-                  tone={COVER_TONES[project.data.category]}
-                  flip={project.data.coverVariant % 2 === 0}
-                  class="aspect-[4/3] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                />
-              </div>
-              <div class="mt-5 flex items-start justify-between gap-3">
-                <h2 class="font-display text-lg font-semibold leading-snug">{project.data.title}</h2>
-                <ArrowIcon class="mt-1 h-4 w-4 shrink-0 text-graphite transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-ink" />
-              </div>
-              <p class="mt-2 font-body text-sm leading-relaxed text-anthracite/70">{project.data.summary}</p>
-              <div class="mt-4 flex items-center gap-3">
-                <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite">
-                  {CATEGORY_LABELS[project.data.category]}
-                </span>
-                <span class="h-1 w-1 rounded-full bg-graphite/50" aria-hidden="true" />
-                <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite">
-                  {STATUS_LABELS[project.data.status]}
-                </span>
-              </div>
-            </a>
-          ))
-        }
+      <div class="relative mt-14" data-portfolio-list>
+        <ul class="flex flex-col divide-y divide-mist border-t border-mist">
+          {
+            projects.map((project, index) => (
+              <li>
+                <a
+                  href={`/realisations/${project.id}`}
+                  class="group flex items-center gap-5 py-7 sm:gap-8 sm:py-9"
+                  data-project-card
+                  data-category={project.data.category}
+                  data-portfolio-row
+                  data-preview-target={project.id}
+                  data-reveal
+                  data-reveal-group="portfolio"
+                >
+                  <span class="hidden shrink-0 font-display text-sm font-semibold text-graphite sm:block">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
 
-        {
-          !hasCategory('3d') && (
-            <div class="flex flex-col" data-project-card data-category="3d" data-reveal data-reveal-group="portfolio">
-              <div class="flex aspect-[4/3] items-center justify-center rounded-sm border border-dashed border-mist">
-                <span class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite/70">Bientôt</span>
-              </div>
-              <div class="mt-5">
-                <h2 class="font-display text-lg font-semibold leading-snug text-anthracite/60">Projets 3D à venir</h2>
-                <p class="mt-2 font-body text-sm leading-relaxed text-anthracite/50">
-                  De nouvelles visualisations seront ajoutées ici prochainement.
-                </p>
-                <div class="mt-4 flex items-center gap-3">
-                  <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite">3D</span>
+                  <div class="h-16 w-20 shrink-0 overflow-hidden rounded-xs lg:hidden">
+                    <AbstractCover
+                      kind={project.data.category}
+                      tone={COVER_TONES[project.data.category]}
+                      flip={project.data.coverVariant % 2 === 0}
+                      class="aspect-[4/3]"
+                    />
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <h2 class="truncate font-display text-2xl font-semibold leading-snug transition-transform duration-500 ease-out sm:text-3xl lg:translate-x-0 lg:group-hover:translate-x-3 lg:text-4xl">
+                      {project.data.title}
+                    </h2>
+                    <div class="mt-2 flex items-center gap-3">
+                      <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite">
+                        {CATEGORY_LABELS[project.data.category]}
+                      </span>
+                      <span class="h-1 w-1 rounded-full bg-graphite/50" aria-hidden="true" />
+                      <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite">
+                        {STATUS_LABELS[project.data.status]}
+                      </span>
+                    </div>
+                    <p class="mt-2 hidden max-w-xl font-body text-sm leading-relaxed text-anthracite/70 lg:block">
+                      {project.data.summary}
+                    </p>
+                  </div>
+
+                  <span class="flex shrink-0 items-center gap-2 font-body text-xs font-semibold uppercase tracking-wide text-graphite transition-colors duration-200 group-hover:text-ink">
+                    <span class="hidden sm:inline">Voir le projet</span>
+                    <ArrowIcon class="h-4 w-4 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1" />
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+
+          {
+            !hasCategory('3d') && (
+              <li>
+                <div class="flex items-center gap-5 py-7 sm:gap-8 sm:py-9" data-project-card data-category="3d" data-reveal data-reveal-group="portfolio">
+                  <span class="hidden shrink-0 font-display text-sm font-semibold text-graphite/50 sm:block">
+                    {String(projects.length + 1).padStart(2, '0')}
+                  </span>
+                  <div class="flex h-16 w-20 shrink-0 items-center justify-center rounded-xs border border-dashed border-mist lg:hidden">
+                    <span class="font-body text-[9px] font-semibold uppercase tracking-wide text-graphite/70">Bientôt</span>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <h2 class="truncate font-display text-2xl font-semibold leading-snug text-anthracite/50 sm:text-3xl lg:text-4xl">
+                      Projets 3D à venir
+                    </h2>
+                    <div class="mt-2 flex items-center gap-3">
+                      <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite/70">3D</span>
+                    </div>
+                    <p class="mt-2 hidden max-w-xl font-body text-sm leading-relaxed text-anthracite/50 lg:block">
+                      De nouvelles visualisations seront ajoutées ici prochainement.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )
-        }
+              </li>
+            )
+          }
+        </ul>
+
+        <!-- Desktop/fine-pointer enhancement only: follows the cursor and
+             cross-fades between each project's cover as you hover a row.
+             Mobile keeps the inline thumbnail above — this never gates
+             access to the image, it just adds to it. -->
+        <div
+          data-portfolio-preview
+          class="pointer-events-none fixed left-0 top-0 z-40 hidden w-64 lg:block xl:w-72"
+          aria-hidden="true"
+        >
+          <div class="relative aspect-[4/3] overflow-hidden rounded-sm shadow-2xl shadow-ink/30">
+            {
+              projects.map((project) => (
+                <div
+                  data-preview-panel={project.id}
+                  class="absolute inset-0 transition-opacity duration-300 ease-out"
+                >
+                  <AbstractCover
+                    kind={project.data.category}
+                    tone={COVER_TONES[project.data.category]}
+                    flip={project.data.coverVariant % 2 === 0}
+                    class="h-full w-full"
+                  />
+                </div>
+              ))
+            }
+          </div>
+        </div>
       </div>
     </Container>
   </Section>

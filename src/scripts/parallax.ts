@@ -2,33 +2,51 @@ let controller: AbortController | null = null;
 
 export function initHeroParallax(): void {
   const section = document.querySelector<HTMLElement>('[data-hero]');
-  const layer = document.querySelector<HTMLElement>('[data-parallax]');
-  if (!layer) return;
+  const grid = document.querySelector<HTMLElement>('[data-parallax]');
+  const object = document.querySelector<HTMLElement>('[data-parallax-object]');
+  if (!grid && !object) return;
 
   controller?.abort();
 
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    layer.style.transform = '';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) {
+    if (grid) grid.style.transform = '';
+    if (object) object.style.transform = '';
     return;
   }
 
   controller = new AbortController();
   const { signal } = controller;
 
-  let scrollY = 0;
+  let scrollT = 0;
   let scrollTicking = false;
-  let mouseX = 0;
-  let mouseY = 0;
-  let targetX = 0;
-  let targetY = 0;
+  let gridMouseX = 0;
+  let gridMouseY = 0;
+  let gridTargetX = 0;
+  let gridTargetY = 0;
+  let objMouseX = 0;
+  let objMouseY = 0;
+  let objTiltX = 0;
+  let objTiltY = 0;
+  let objTargetX = 0;
+  let objTargetY = 0;
+  let objTargetTiltX = 0;
+  let objTargetTiltY = 0;
   let settling = false;
 
   const render = () => {
-    layer.style.transform = `translate3d(${mouseX.toFixed(2)}px, ${(scrollY + mouseY).toFixed(2)}px, 0)`;
+    if (grid) {
+      const gridScroll = Math.min(scrollT * 0.08, 48);
+      grid.style.transform = `translate3d(${gridMouseX.toFixed(2)}px, ${(gridScroll + gridMouseY).toFixed(2)}px, 0)`;
+    }
+    if (object) {
+      const objScroll = -Math.min(scrollT * 0.14, 90);
+      object.style.transform = `translate3d(${objMouseX.toFixed(2)}px, ${(objScroll + objMouseY).toFixed(2)}px, 0) rotateX(${objTiltX.toFixed(2)}deg) rotateY(${objTiltY.toFixed(2)}deg)`;
+    }
   };
 
   const updateScroll = () => {
-    scrollY = Math.min(window.scrollY * 0.08, 48);
+    scrollT = window.scrollY;
     render();
     scrollTicking = false;
   };
@@ -45,18 +63,31 @@ export function initHeroParallax(): void {
     { passive: true, signal }
   );
 
-  // Decorative-only: the watermark drifts a few pixels toward the cursor,
-  // eased with a lerp so it settles like a spring instead of snapping to
-  // the pointer. Desktop pointers only — touch has no hover, and this adds
-  // nothing functional worth reproducing there.
+  // Decorative-only, desktop pointers only: the background grid drifts a
+  // little toward the cursor, the floating 3D render drifts more and tilts
+  // slightly — two layers separating at different speeds is what reads as
+  // depth rather than a single flat plane. Both lerp toward their targets
+  // so they settle like a spring instead of snapping to the pointer.
   const canTrackPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   const settle = () => {
-    mouseX += (targetX - mouseX) * 0.08;
-    mouseY += (targetY - mouseY) * 0.08;
+    gridMouseX += (gridTargetX - gridMouseX) * 0.08;
+    gridMouseY += (gridTargetY - gridMouseY) * 0.08;
+    objMouseX += (objTargetX - objMouseX) * 0.09;
+    objMouseY += (objTargetY - objMouseY) * 0.09;
+    objTiltX += (objTargetTiltX - objTiltX) * 0.09;
+    objTiltY += (objTargetTiltY - objTiltY) * 0.09;
     render();
 
-    if (Math.abs(targetX - mouseX) > 0.05 || Math.abs(targetY - mouseY) > 0.05) {
+    const settled =
+      Math.abs(gridTargetX - gridMouseX) < 0.05 &&
+      Math.abs(gridTargetY - gridMouseY) < 0.05 &&
+      Math.abs(objTargetX - objMouseX) < 0.05 &&
+      Math.abs(objTargetY - objMouseY) < 0.05 &&
+      Math.abs(objTargetTiltX - objTiltX) < 0.05 &&
+      Math.abs(objTargetTiltY - objTiltY) < 0.05;
+
+    if (!settled) {
       requestAnimationFrame(settle);
     } else {
       settling = false;
@@ -70,8 +101,13 @@ export function initHeroParallax(): void {
         const rect = section.getBoundingClientRect();
         const relX = (event.clientX - rect.left) / rect.width - 0.5;
         const relY = (event.clientY - rect.top) / rect.height - 0.5;
-        targetX = relX * 14;
-        targetY = relY * 8;
+
+        gridTargetX = relX * 14;
+        gridTargetY = relY * 8;
+        objTargetX = relX * -22;
+        objTargetY = relY * -14;
+        objTargetTiltY = relX * 8;
+        objTargetTiltX = relY * -6;
 
         if (!settling) {
           settling = true;
@@ -84,8 +120,12 @@ export function initHeroParallax(): void {
     section.addEventListener(
       'pointerleave',
       () => {
-        targetX = 0;
-        targetY = 0;
+        gridTargetX = 0;
+        gridTargetY = 0;
+        objTargetX = 0;
+        objTargetY = 0;
+        objTargetTiltX = 0;
+        objTargetTiltY = 0;
         if (!settling) {
           settling = true;
           requestAnimationFrame(settle);

@@ -2,88 +2,108 @@
 import Container from '../ui/Container.astro';
 import Button from '../ui/Button.astro';
 import Logo from '../ui/Logo.astro';
-import rawMark from '../../assets/logo/mark.svg?raw';
-
-const watermark = rawMark
-  .replace('<svg ', '<svg class="h-auto w-full" ')
-  .replace(/ width="[^"]*" height="[^"]*"/, '');
 ---
 <section data-hero class="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink text-paper">
-  <!-- Decorative backdrop: brand mark watermark + fine technical grid. Purely visual, aria-hidden.
-       Oversized on the y-axis (-inset-y-12) so the JS scroll parallax (src/scripts/parallax.ts)
-       never reveals an edge; overflow-hidden on the section clips it back to bounds. -->
+  <!-- Decorative backdrop: fine technical grid, oversized on the y-axis
+       (-inset-y-12) so the scroll/mouse parallax in src/scripts/parallax.ts
+       never reveals an edge; overflow-hidden on the section clips it back. -->
   <div class="pointer-events-none absolute -inset-y-12 inset-x-0 select-none" data-parallax aria-hidden="true">
     <div
       class="absolute inset-0 opacity-[0.05]"
       style="background-image: linear-gradient(to right, var(--color-mist) 1px, transparent 1px), linear-gradient(to bottom, var(--color-mist) 1px, transparent 1px); background-size: 56px 56px;"
     >
     </div>
-    <div
-      class="absolute -right-[18%] top-1/2 w-[64rem] max-w-none -translate-y-1/2 text-paper opacity-[0.06] sm:w-[78rem] lg:w-[92rem] motion-safe:animate-[drift_22s_ease-in-out_infinite]"
-      set:html={watermark}
-    />
     <div class="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink/40"></div>
   </div>
 
-  <Container class="relative flex flex-1 flex-col justify-center py-32 sm:py-36">
-    <div class="flex items-center gap-3" data-reveal data-reveal-fast>
-      <Logo variant="mark" tone="light" markClass="h-4" />
-      <span class="h-3.5 w-px bg-paper/30" aria-hidden="true"></span>
-      <p class="font-body text-xs font-semibold uppercase tracking-[0.28em] text-mist">
-        Web · Applications · 3D
+  <Container
+    class="relative z-[1] grid flex-1 grid-cols-1 items-center gap-8 py-24 sm:py-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,32rem)]"
+  >
+    <div class="max-w-3xl">
+      <div class="flex items-center gap-3" data-reveal data-reveal-fast>
+        <Logo variant="mark" tone="light" markClass="h-4" />
+        <span class="h-3.5 w-px bg-paper/30" aria-hidden="true"></span>
+        <p class="font-body text-xs font-semibold uppercase tracking-[0.28em] text-mist">
+          Web · Applications · 3D
+        </p>
+      </div>
+
+      <h1 class="mt-8 text-display-xl" data-reveal>
+        <span class="block overflow-hidden">
+          <span class="hero-line-inner block text-paper">Des solutions digitales</span>
+        </span>
+        <span class="block overflow-hidden">
+          <span class="hero-line-inner block text-mist">pour donner vie</span>
+        </span>
+        <span class="block overflow-hidden">
+          <span class="hero-line-inner block text-paper">à vos projets.</span>
+        </span>
+      </h1>
+
+      <span
+        class="mt-6 block h-px w-16 bg-paper/30"
+        aria-hidden="true"
+        data-reveal
+        data-reveal-fast
+        data-reveal-delay="500"
+      ></span>
+
+      <p
+        class="mt-6 max-w-xl font-body text-lg leading-relaxed text-mist sm:text-xl"
+        data-reveal
+        data-reveal-fast
+        data-reveal-delay="560"
+      >
+        Création de sites web, d'applications sur mesure et de visualisations 3D — pensées pour
+        votre activité.
       </p>
+
+      <div class="mt-10 flex flex-wrap items-center gap-4" data-reveal data-reveal-fast data-reveal-delay="620">
+        <Button href="/contact" variant="solid" invert data-magnetic="0.3">Parler de votre projet</Button>
+        <Button href="/services" variant="outline" invert>Découvrir nos services</Button>
+      </div>
     </div>
 
-    <h1
-      class="mt-8 max-w-5xl text-display-xl text-paper"
-      data-reveal
-      data-reveal-delay="80"
-    >
-      Des solutions digitales pour donner vie à vos projets.
-    </h1>
-
-    <span
-      class="mt-8 block h-px w-16 bg-paper/30"
-      aria-hidden="true"
-      data-reveal
-      data-reveal-fast
-      data-reveal-delay="160"
-    ></span>
-
-    <p
-      class="mt-8 max-w-xl font-body text-lg leading-relaxed text-mist sm:text-xl"
-      data-reveal
-      data-reveal-delay="200"
-    >
-      Création de sites web, d'applications sur mesure et de visualisations 3D — pensées pour
-      votre activité.
-    </p>
-
-    <div class="mt-12 flex flex-wrap items-center gap-4" data-reveal data-reveal-fast data-reveal-delay="260">
-      <Button href="/services" variant="outline" invert>Découvrir nos services</Button>
-      <Button href="/contact" variant="solid" invert>Parler de votre projet</Button>
+    <!-- The one concrete visual in the hero: a real 3D render, not a stock
+         photo or an abstract shape. Grid-placed so it can never collide with
+         the text column at any width; the [1.15] scale + overflow-visible
+         lets it bleed past its own track toward the section edge for an
+         immersive feel, clipped back to bounds by overflow-hidden above. -->
+    <div class="pointer-events-none relative hidden h-full [perspective:1400px] lg:block" aria-hidden="true">
+      <div data-parallax-object class="flex h-full w-[115%] items-center justify-center will-change-transform">
+        <div class="hero-object-float w-full max-w-md xl:max-w-lg">
+          <img
+            src="/images/services/3d-render.webp"
+            alt=""
+            width="2000"
+            height="1125"
+            loading="eager"
+            fetchpriority="high"
+            class="w-full drop-shadow-[0_50px_90px_rgba(0,0,0,0.55)]"
+          />
+        </div>
+      </div>
     </div>
   </Container>
 
-  <div class="relative pb-8">
+  <div class="relative z-10 pb-6 sm:pb-8">
     <Container class="flex items-center gap-3 text-ash">
       <span class="h-8 w-px bg-current motion-safe:animate-[scrollcue_2.4s_ease-in-out_infinite]" aria-hidden="true"></span>
       <span class="font-body text-[0.7rem] font-semibold uppercase tracking-[0.28em]">Défiler</span>
     </Container>
   </div>
+
+  <!-- Curved base: the ink panel eases into the paper section below instead
+       of cutting off in a hard rectangle. Fill matches the very next
+       section's background, so the seam reads as continuous. -->
+  <div class="pointer-events-none absolute inset-x-0 bottom-0 text-paper" aria-hidden="true">
+    <svg viewBox="0 0 1440 72" preserveAspectRatio="none" class="h-10 w-full sm:h-14">
+      <path d="M0,0 C 360,72 1080,72 1440,0 L1440,72 L0,72 Z" fill="currentColor" />
+    </svg>
+  </div>
 </section>
 
 <style>
-  @keyframes drift {
-    0%,
-    100% {
-      transform: translateY(-50%) translateX(0);
-    }
-    50% {
-      transform: translateY(-50%) translateX(-1.5%);
-    }
-  }
-
   @keyframes scrollcue {
     0%,
     100% {
@@ -96,5 +116,47 @@ const watermark = rawMark
       transform: scaleY(1);
       transform-origin: top;
     }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-object-float {
+      animation: hero-float 7s var(--ease-in-out) infinite;
+    }
+  }
+
+  @keyframes hero-float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -16px;
+    }
+  }
+
+  /* Headline: the h1 itself is always visible/unmoved — the per-line inner
+     spans do the work, wiping up out of their own overflow-hidden box.
+     Overrides the generic [data-reveal] fade+translate for this element
+     specifically (see global.css) so the two treatments don't compound. */
+  html.js h1[data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+
+  html.js h1[data-reveal] .hero-line-inner {
+    transform: translateY(110%);
+  }
+
+  html.js h1[data-reveal].is-visible .hero-line-inner {
+    transform: translateY(0);
+    transition: transform 1s var(--ease-in-out);
+  }
+
+  html.js h1[data-reveal].is-visible > *:nth-child(2) .hero-line-inner {
+    transition-delay: 90ms;
+  }
+
+  html.js h1[data-reveal].is-visible > *:nth-child(3) .hero-line-inner {
+    transition-delay: 180ms;
   }
 </style>
