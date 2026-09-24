@@ -103,18 +103,17 @@ const panelClasses = 'rounded-xs border border-mist/70 p-2.5 @lg:p-3';
      correctly at its own visual center (elementFromPoint returns its
      parent instead) — fixed by having src/scripts/tilt-card.ts listen on
      the parent, not the tilted element itself.
-  2. The [data-reveal] target must never carry its own clip-path: a target
-     clipped to inset(0 0 100% 0) has zero visible area, and Chromium's
+  2. The [data-reveal] target must never carry its own clip-path: a clipped
+     target has (near) zero visible area, and Chromium's
      IntersectionObserver correctly reports zero intersection for that —
-     so it can never observe itself becoming visible (a permanent
-     deadlock, confirmed directly against a fresh observer). The outer div
-     here stays a plain, always-fully-rendered observation target; the
-     .reveal-clip-target class on the inner card is what actually gets
-     clipped, per the [data-reveal-mode='clip'] rules in global.css.
+     so it could never observe itself becoming visible. The outer div here
+     stays a plain, always-fully-rendered observation target; the
+     .reveal-clip-target class on the inner card is what gets clipped, per
+     the [data-reveal-mode='drop'] rules in global.css.
 -->
-<div class:list={['w-full', className]} data-reveal data-reveal-mode="clip" data-reveal-delay="100">
+<div class:list={['w-full', className]} data-reveal data-reveal-mode="drop" data-reveal-delay="100" style="--drop-radius: 18px">
 <div
-  class="dash reveal-clip-target relative w-full overflow-hidden rounded-sm border border-mist bg-paper shadow-xl shadow-ink/10 @container"
+  class="dash reveal-clip-target relative w-full overflow-hidden rounded-[18px] border border-ink/10 bg-paper shadow-[0_40px_80px_-36px_rgba(18,21,24,0.45)] @container"
   data-tilt
   data-tilt-max="2.5"
   aria-hidden="true"

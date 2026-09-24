@@ -1,6 +1,17 @@
 ---
 import ArrowIcon from '../icons/ArrowIcon.astro';
+import { splitLabel } from '../../lib/split';
 
+/**
+ * Liquid button. See global.css (".lbtn", ".tlink") for every state and
+ * src/scripts/liquid-button.ts for the pointer physics.
+ *
+ *   solid    filled capsule — primary action
+ *   outline  glass capsule  — secondary action
+ *   text     inline link whose underline turns to a flowing wave
+ *
+ * Add data-magnetic (optionally ="0.3") to let the pointer pull it.
+ */
 type Variant = 'solid' | 'outline' | 'text';
 
 interface Props {
@@ -11,6 +22,7 @@ interface Props {
   type?: 'button' | 'submit';
   arrow?: boolean;
   disabled?: boolean;
+  [key: string]: unknown;
 }
 
 const {
@@ -25,49 +37,76 @@ const {
 } = Astro.props;
 
 const Tag = href ? 'a' : 'button';
-
-const base =
-  'btn-motion group relative inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-sm font-body text-sm font-semibold uppercase tracking-[0.08em] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 disabled:data-[loading=true]:cursor-progress disabled:data-[loading=true]:opacity-100';
-
-const variants: Record<Variant, string> = {
-  solid: invert
-    ? 'bg-paper text-ink px-7 py-4 hover:bg-sand'
-    : 'bg-ink text-paper px-7 py-4 hover:bg-anthracite',
-  outline: invert
-    ? 'border border-paper/40 text-paper px-7 py-4 hover:border-paper hover:bg-paper/10'
-    : 'border border-ink/25 text-ink px-7 py-4 hover:border-ink hover:bg-ink/5',
-  text: `px-0 py-1 ${invert ? 'text-paper' : 'text-ink'}`,
-};
-
-const labelClasses =
-  variant === 'text'
-    ? 'relative after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-300 after:ease-out group-hover:after:scale-x-100'
-    : '';
+const html = await Astro.slots.render('default');
+// Letter-split labels roll on hover; the visible letters ARE the accessible
+// text (the rolling copy is CSS generated content with empty alt text), so
+// screen readers and crawlers get the label exactly once.
+const words = variant === 'text' ? null : splitLabel(html);
+let index = 0;
 ---
-<Tag
-  href={href}
-  type={!href ? type : undefined}
-  disabled={!href ? disabled : undefined}
-  aria-disabled={href && disabled ? 'true' : undefined}
-  class:list={[base, variants[variant], className]}
-  {...rest}
->
-  <span
-    class:list={[labelClasses, 'transition-opacity duration-150 ease-out group-data-[loading=true]:opacity-70']}
-  >
-    <slot />
-  </span>
-  {arrow && (
-    <ArrowIcon class="h-3.5 w-3.5 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 group-data-[loading=true]:hidden" />
-  )}
-  <svg
-    class="hidden h-3.5 w-3.5 shrink-0 animate-spin group-data-[loading=true]:block"
-    viewBox="0 0 16 16"
-    fill="none"
-    aria-hidden="true"
-    focusable="false"
-  >
-    <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" opacity="0.25" />
-    <path d="M14.5 8a6.5 6.5 0 0 0-6.5-6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-  </svg>
-</Tag>
+{
+  variant === 'text' ? (
+    <Tag
+      href={href}
+      type={!href ? type : undefined}
+      disabled={!href ? disabled : undefined}
+      aria-disabled={href && disabled ? 'true' : undefined}
+      class:list={['tlink', invert ? 'text-paper' : 'text-ink', className]}
+      {...rest}
+    >
+      <span set:html={html} />
+      {arrow && (
+        <span class="tlink__icon" aria-hidden="true">
+          <ArrowIcon class="h-3.5 w-3.5 shrink-0" />
+        </span>
+      )}
+      <span class="tlink__line" aria-hidden="true" />
+    </Tag>
+  ) : (
+    <Tag
+      href={href}
+      type={!href ? type : undefined}
+      disabled={!href ? disabled : undefined}
+      aria-disabled={href && disabled ? 'true' : undefined}
+      class:list={['lbtn', `lbtn--${variant}`, invert && 'lbtn--invert', className]}
+      data-liquid-btn
+      {...rest}
+    >
+      <span class="lbtn__body">
+        <span class="lbtn__blob" aria-hidden="true" />
+        <span class="lbtn__sheen" aria-hidden="true" />
+        <span class="lbtn__wave" aria-hidden="true" />
+        <span class="lbtn__ring" aria-hidden="true" />
+        <span class="lbtn__label">
+          {words ? (
+            words.map((word, wordIndex) => (
+              <>
+                <span class="lbtn__w">
+                  {word.map((char) => (
+                    <span class="lbtn__c" data-c={char} style={`--i:${index++}`}>
+                      {char}
+                    </span>
+                  ))}
+                </span>
+                {wordIndex < words.length - 1 && ' '}
+              </>
+            ))
+          ) : (
+            <Fragment set:html={html} />
+          )}
+        </span>
+        {arrow && (
+          <span class="lbtn__icon" aria-hidden="true">
+            <ArrowIcon class="h-3.5 w-3.5 shrink-0" />
+            <ArrowIcon class="h-3.5 w-3.5 shrink-0" />
+          </span>
+        )}
+        <span class="lbtn__bubbles" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+      </span>
+    </Tag>
+  )
+}

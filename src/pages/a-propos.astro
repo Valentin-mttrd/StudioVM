@@ -17,57 +17,61 @@ const steps = ['Comprendre', 'Concevoir', 'Développer', 'Rendre utile'];
   <PageHeader
     eyebrow="À propos"
     title="Réunir conception, technologie et visualisation."
+    emphasis="et visualisation."
   />
 
   <Section tone="paper">
     <Container>
-      <div class="max-w-3xl">
-        <p class="text-display-sm" data-reveal>
-          Studio VM est né de la volonté de réunir conception, technologie et visualisation dans
+      <div class="max-w-4xl">
+        <p class="text-display-md" data-reveal data-reveal-mode="wave">
+          Studio VM est né de la volonté de réunir <strong>conception, technologie et visualisation</strong> dans
           une même approche.
         </p>
-        <p class="mt-8 font-body text-lg leading-relaxed text-anthracite/80" data-reveal data-reveal-delay="80">
+        <p class="mt-10 max-w-2xl font-body text-lg font-light leading-relaxed text-anthracite/80" data-reveal data-reveal-delay="80">
           Plutôt que de séparer design, développement et image, Studio VM les traite comme un
           seul et même travail&nbsp;: celui de comprendre un besoin, puis de le rendre concret.
         </p>
       </div>
 
-      <div class="mt-16 flex flex-wrap items-center gap-x-3 gap-y-4 border-t border-mist pt-10 sm:gap-x-5" data-reveal data-reveal-delay="140">
+      <!-- One continuous current: each step flows into the next. -->
+      <ol class="mt-20 grid grid-cols-2 gap-3 border-t border-ink/10 pt-12 sm:grid-cols-4" data-reveal data-reveal-mode="rise" data-reveal-delay="140">
         {
           steps.map((step, index) => (
-            <>
-              <span class="font-display text-lg font-semibold sm:text-xl">{step}</span>
-              {index < steps.length - 1 && (
-                <span class="font-body text-graphite" aria-hidden="true">
-                  →
-                </span>
-              )}
-            </>
+            <li class="glass-light glass-hover glass-lift flex flex-col gap-8 rounded-[20px] p-6" data-sheen>
+              <span class="font-display text-xs font-semibold text-accent">{String(index + 1).padStart(2, '0')}</span>
+              <span class="font-display text-xl font-light tracking-tight sm:text-2xl">{step}</span>
+            </li>
           ))
         }
-      </div>
+      </ol>
     </Container>
   </Section>
 
   <Section tone="sand">
     <Container>
-      <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
-        <div class="flex aspect-[4/3] items-center justify-center rounded-sm bg-ink lg:col-span-5" data-reveal>
-          <Logo variant="mark" tone="light" markClass="h-20 sm:h-24" />
+      <div class="grid grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-16">
+        <div class="lg:col-span-5" data-fluid>
+          <div data-reveal data-reveal-mode="drop" style="--drop-radius: var(--radius-lens)">
+            <div class="founder-pool reveal-clip-target relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lens bg-deep">
+              <span class="founder-pool__light" aria-hidden="true"></span>
+              <Logo variant="mark" tone="light" markClass="h-20 sm:h-24" class="relative" />
+            </div>
+          </div>
         </div>
 
         <div class="lg:col-span-7">
-          <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">Fondateur</p>
-          <h2 class="mt-4 text-display-md" data-reveal>
+          <p class="font-body text-xs font-semibold uppercase tracking-[0.24em] text-graphite" data-reveal data-reveal-fast>Fondateur</p>
+          <h2 class="mt-5 text-display-md" data-reveal data-reveal-mode="wave">
             {SITE.founder}
           </h2>
-          <p class="mt-6 max-w-xl font-body text-lg leading-relaxed text-anthracite/80" data-reveal data-reveal-delay="80">
+          <p class="mt-7 max-w-xl font-body text-lg font-light leading-relaxed text-anthracite/80" data-reveal data-reveal-delay="80">
             J'ai fondé Studio VM pour réunir, sous un même toit, ce qui est habituellement
             séparé&nbsp;: la conception, le développement et la visualisation. L'objectif reste le
             même sur chaque projet — comprendre le besoin, concevoir la solution, la développer,
             et la rendre réellement utile.
           </p>
-          <p class="mt-6 font-body text-sm uppercase tracking-wide text-graphite" data-reveal data-reveal-delay="120">
+          <p class="chip mt-8 uppercase tracking-[0.16em]" data-reveal data-reveal-fast data-reveal-delay="120">
+            <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>
             {SITE.locality}
           </p>
         </div>
@@ -75,3 +79,28 @@ const steps = ['Comprendre', 'Concevoir', 'Développer', 'Rendre utile'];
     </Container>
   </Section>
 </Layout>
+
+<style>
+  /* A small pool of deep water around the mark, lit from above. */
+  .founder-pool {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), inset 0 0 0 1px rgb(255 255 255 / 0.06), 0 50px 90px -46px rgb(18 21 24 / 0.7);
+  }
+
+  .founder-pool__light {
+    position: absolute;
+    inset: -30%;
+    background:
+      radial-gradient(40% 30% at 30% 20%, rgb(174 189 201 / 0.22), transparent 70%),
+      radial-gradient(35% 28% at 75% 85%, rgb(70 96 122 / 0.35), transparent 70%);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .founder-pool__light {
+      animation: pool-light 16s var(--ease-in-out) infinite alternate;
+    }
+  }
+
+  @keyframes pool-light {
+    to { rotate: 25deg; scale: 1.1; }
+  }
+</style>

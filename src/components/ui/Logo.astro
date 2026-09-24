@@ -7,7 +7,7 @@ type Variant = 'mark' | 'lockup' | 'full';
  * ancestor so the wordmark stays legible both over a dark hero (transparent
  * header) and once the header solidifies to a paper background.
  */
-type Tone = 'dark' | 'light' | 'nav';
+type Tone = 'dark' | 'light' | 'nav' | 'inherit';
 
 interface Props {
   variant?: Variant;
@@ -29,6 +29,9 @@ const toneClasses: Record<Tone, { text: string; muted: string }> = {
     text: 'text-paper group-data-[solid=true]/nav:text-ink',
     muted: 'text-mist group-data-[solid=true]/nav:text-graphite',
   },
+  // Follows the parent's colour — the floating nav recolours itself to the
+  // water underneath it, and the logo simply goes along.
+  inherit: { text: '', muted: 'opacity-70' },
 };
 
 const textColor = toneClasses[tone].text;

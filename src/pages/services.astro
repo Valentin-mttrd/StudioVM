@@ -4,6 +4,7 @@ import PageHeader from '../components/sections/PageHeader.astro';
 import ServiceDetail from '../components/sections/ServiceDetail.astro';
 import Section from '../components/ui/Section.astro';
 import Container from '../components/ui/Container.astro';
+import Button from '../components/ui/Button.astro';
 import { SERVICES } from '../data/services';
 import { breadcrumbSchema } from '../lib/seo';
 ---
@@ -15,6 +16,7 @@ import { breadcrumbSchema } from '../lib/seo';
   <PageHeader
     eyebrow="Services"
     title="Des solutions concrètes pour des besoins réels."
+    emphasis="des besoins réels."
     description="Trois expertises, une seule vision : comprendre un besoin, concevoir la solution et la rendre réellement utile."
   />
 
@@ -22,11 +24,14 @@ import { breadcrumbSchema } from '../lib/seo';
   <ServiceDetail service={SERVICES[1]} tone="sand" coverTone="anthracite" flip />
   <ServiceDetail service={SERVICES[2]} tone="paper" coverTone="ink" />
 
-  <Section tone="ink" class="py-20 sm:py-24">
-    <Container class="text-center">
-      <h2 class="mx-auto max-w-2xl text-display-md text-paper" data-reveal>
-        Un besoin particulier&nbsp;? Studio VM conçoit la solution adaptée à votre activité.
+  <Section tone="ink" class="py-24 sm:py-28">
+    <Container class="flex flex-col items-center text-center">
+      <h2 class="mx-auto max-w-3xl text-display-md text-paper" data-reveal data-reveal-mode="wave">
+        Un besoin particulier&nbsp;? <strong>Studio VM conçoit la solution adaptée à votre activité.</strong>
       </h2>
+      <div class="mt-10" data-reveal data-reveal-fast data-reveal-delay="150">
+        <Button href="/contact" variant="solid" invert data-magnetic="0.3">Parler de votre projet</Button>
+      </div>
     </Container>
   </Section>
 </Layout>

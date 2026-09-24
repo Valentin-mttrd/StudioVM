@@ -11,7 +11,7 @@ const { class: className = '' } = Astro.props;
 ---
 <div class:list={['relative lg:min-h-[30rem]', className]}>
   <!-- Dashboard panel -->
-  <div class="relative z-10 rounded-sm border border-ink/10 bg-paper p-5 shadow-[0_30px_60px_-30px_rgba(11,11,11,0.25)] lg:absolute lg:left-0 lg:top-0 lg:w-[86%]">
+  <div class="relative z-10 rounded-[18px] border border-ink/10 bg-paper p-5 shadow-[0_40px_70px_-34px_rgba(18,21,24,0.35)] lg:absolute lg:left-0 lg:top-0 lg:w-[86%]">
     <div class="flex items-center justify-between">
       <div class="h-2.5 w-24 rounded-full bg-ink/70"></div>
       <div class="flex gap-1.5">
@@ -23,7 +23,7 @@ const { class: className = '' } = Astro.props;
     <div class="mt-5 grid grid-cols-3 gap-3">
       {
         ['Stock disponible', 'Chantiers actifs', 'Préparations'].map((label) => (
-          <div class="rounded-sm border border-mist p-3">
+          <div class="rounded-[10px] border border-mist p-3">
             <div class="h-1.5 w-full max-w-14 rounded-full bg-ink/15" />
             <div class="mt-3 h-3 w-10 rounded-full bg-ink/70" />
             <p class="mt-2 truncate font-body text-[0.6rem] uppercase tracking-wide text-graphite">{label}</p>
@@ -31,7 +31,7 @@ const { class: className = '' } = Astro.props;
         ))
       }
     </div>
-    <div class="mt-4 flex h-24 items-end gap-2 rounded-sm border border-mist p-3">
+    <div class="mt-4 flex h-24 items-end gap-2 rounded-[10px] border border-mist p-3">
       {
         [40, 70, 50, 90, 60, 80, 45].map((h, i) => (
           <span class:list={['w-full rounded-t-sm bg-ink', i === 3 ? 'opacity-70' : 'opacity-15']} style={`height:${h}%`} />
@@ -41,7 +41,7 @@ const { class: className = '' } = Astro.props;
   </div>
 
   <!-- Stock list panel -->
-  <div class="relative z-20 mt-4 w-[92%] rounded-sm border border-ink/10 bg-paper p-5 shadow-[0_30px_60px_-30px_rgba(11,11,11,0.3)] lg:absolute lg:left-[8%] lg:top-[48%] lg:mt-0 lg:w-[70%]">
+  <div class="relative z-20 mt-4 w-[92%] rounded-[18px] border border-ink/10 bg-paper p-5 shadow-[0_40px_70px_-34px_rgba(18,21,24,0.4)] lg:absolute lg:left-[8%] lg:top-[48%] lg:mt-0 lg:w-[70%]">
     <div class="flex items-center justify-between">
       <div class="h-2.5 w-28 rounded-full bg-ink/70"></div>
       <div class="h-2 w-12 rounded-full bg-ink/15"></div>
@@ -66,7 +66,7 @@ const { class: className = '' } = Astro.props;
   </div>
 
   <!-- Preparation checklist panel -->
-  <div class="relative z-30 -mt-6 ml-[14%] w-[80%] rounded-sm border border-ink/10 bg-ink p-5 text-paper shadow-[0_30px_60px_-30px_rgba(11,11,11,0.45)] lg:absolute lg:left-[30%] lg:top-[68%] lg:mt-0 lg:ml-0 lg:w-[62%]">
+  <div class="relative z-30 -mt-6 ml-[14%] w-[80%] rounded-[18px] border border-paper/10 bg-deep p-5 text-paper shadow-[0_40px_70px_-30px_rgba(18,21,24,0.6)] lg:absolute lg:left-[30%] lg:top-[68%] lg:mt-0 lg:ml-0 lg:w-[62%]">
     <div class="flex items-center justify-between">
       <div class="h-2.5 w-24 rounded-full bg-paper/80"></div>
       <div class="h-1.5 w-16 overflow-hidden rounded-full bg-paper/15">

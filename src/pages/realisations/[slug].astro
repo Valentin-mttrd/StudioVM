@@ -47,26 +47,28 @@ const relatedService = getService(category as ServiceId);
     },
   ]}
 >
-  <header class="relative overflow-hidden bg-ink pb-16 pt-40 text-paper sm:pb-20 sm:pt-48">
+  <header data-tone="ink" data-water="header" data-kinetic-zone class="relative overflow-hidden bg-ink pb-20 pt-40 text-paper sm:pb-24 sm:pt-48 lg:pt-52">
     <div
-      class="pointer-events-none absolute inset-0 opacity-[0.04]"
+      class="liquid-fallback pointer-events-none absolute inset-0 opacity-[0.04]"
       aria-hidden="true"
       style="background-image: linear-gradient(to right, var(--color-mist) 1px, transparent 1px), linear-gradient(to bottom, var(--color-mist) 1px, transparent 1px); background-size: 56px 56px;"
     />
     <Container class="relative">
-      <a href="/realisations" class="font-body text-sm text-mist transition-colors hover:text-paper">
-        ← Toutes les réalisations
+      <a href="/realisations" class="group inline-flex items-center gap-3 font-body text-sm text-mist transition-colors duration-300 hover:text-paper">
+        <span class="transition-[translate] duration-500 ease-[var(--ease-spring)] group-hover:-translate-x-1.5" aria-hidden="true">←</span>
+        Toutes les réalisations
       </a>
-      <div class="mt-6 flex flex-wrap items-center gap-3">
-        <span class="rounded-sm border border-paper/25 px-3 py-1.5 font-body text-xs font-semibold uppercase tracking-[0.15em] text-mist">
+      <div class="mt-8 flex flex-wrap items-center gap-2" data-reveal data-reveal-fast>
+        <span class="chip chip-dark font-semibold uppercase tracking-[0.18em]">
           {CATEGORY_LABELS[category]}
         </span>
-        <span class="rounded-sm border border-paper/25 px-3 py-1.5 font-body text-xs font-semibold uppercase tracking-[0.15em] text-mist">
+        <span class="chip chip-dark font-semibold uppercase tracking-[0.18em]">
+          <span class="live-dot h-1.5 w-1.5 rounded-full bg-accent-soft" aria-hidden="true"></span>
           {STATUS_LABELS[status]}
         </span>
       </div>
-      <h1 class="mt-6 max-w-3xl text-display-lg text-paper" data-reveal>{title}</h1>
-      <p class="mt-6 max-w-2xl font-body text-lg leading-relaxed text-mist" data-reveal data-reveal-delay="100">
+      <h1 class="relative mt-8 max-w-4xl text-display-lg text-paper" data-kinetic data-kinetic-delay="150" data-kinetic-stagger="14">{title}</h1>
+      <p class="mt-8 max-w-2xl font-body text-lg font-light leading-relaxed text-mist sm:text-xl" data-reveal data-reveal-delay="400">
         {summary}
       </p>
     </Container>
@@ -80,16 +82,16 @@ const relatedService = getService(category as ServiceId);
         </div>
       </div>
 
-      <aside class="lg:col-span-3 lg:col-start-10">
-        <div class="flex flex-col gap-10 lg:sticky lg:top-32">
+      <aside class="lg:col-span-4 lg:col-start-9 xl:col-span-3 xl:col-start-10">
+        <div class="glass-light flex flex-col gap-10 rounded-glass p-7 lg:sticky lg:top-32" data-sheen>
           {
             highlights.length > 0 && (
               <div>
                 <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">Points clés</p>
                 <ul class="mt-4 flex flex-col gap-3">
                   {highlights.map((point) => (
-                    <li class="flex items-start gap-2.5 font-body text-sm leading-relaxed text-anthracite/80">
-                      <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-ink/50" aria-hidden="true" />
+                    <li class="flex items-start gap-3 font-body text-sm leading-relaxed text-anthracite/80">
+                      <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-accent-soft to-accent" aria-hidden="true" />
                       {point}
                     </li>
                   ))}
@@ -114,15 +116,20 @@ const relatedService = getService(category as ServiceId);
   <Section tone="sand">
     <Container>
       <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">Projet suivant</p>
-      <a href={`/realisations/${next.id}`} class="group mt-6 flex flex-col gap-8 sm:flex-row sm:items-center">
-        <div class="w-full overflow-hidden rounded-sm sm:w-64">
+      <a href={`/realisations/${next.id}`} class="group mt-8 flex flex-col gap-8 sm:flex-row sm:items-center" data-cursor="view" data-cursor-label="Suivant">
+        <div class="glass-light w-full overflow-hidden rounded-glass p-1.5 sm:w-72">
           <AbstractCover
             kind={next.data.category}
             tone={COVER_TONES[next.data.category]}
-            class="aspect-[4/3] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            class="aspect-[4/3] rounded-[18px] transition-[scale] duration-700 ease-[var(--ease-spring)] group-hover:scale-[1.04]"
           />
         </div>
-        <h2 class="text-display-sm transition-colors group-hover:text-anthracite">{next.data.title}</h2>
+        <div>
+          <h2 class="text-display-md transition-[translate] duration-700 ease-[var(--ease-spring)] group-hover:translate-x-3">{next.data.title}</h2>
+          <span class="mt-4 inline-flex items-center gap-2 font-body text-xs font-semibold uppercase tracking-[0.16em] text-graphite">
+            Voir le projet <span aria-hidden="true" class="transition-[translate] duration-500 ease-[var(--ease-spring)] group-hover:translate-x-1">→</span>
+          </span>
+        </div>
       </a>
     </Container>
   </Section>

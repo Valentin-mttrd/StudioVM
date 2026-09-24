@@ -1,14 +1,22 @@
 @import "tailwindcss";
 @import "@fontsource-variable/montserrat/wght.css";
 @import "@fontsource-variable/manrope/wght.css";
+@import "lenis/dist/lenis.css";
 
 /* ==========================================================================
-   STUDIO VM — Design tokens
-   Single source of truth for color, type, spacing and motion.
-   Base palette is fixed by the brand system — do not introduce new hues.
+   STUDIO VM — Liquid design system
+   One concept drives every token below: the interface is made of water.
+   Architecture (grid, type, content) stays precise; everything the visitor
+   touches (buttons, glass, cursor, transitions) behaves like liquid —
+   soft radii, mass, springs, refraction.
+
+   Brand palette is fixed — no new hues. The "water" colours are computed
+   mixes of ink / anthracite / paper / sand with accent and accent-soft, the
+   same values the WebGL water uses (src/scripts/liquid/shaders.ts), so
+   HTML surfaces and the canvas behind them always agree.
    ========================================================================== */
 @theme {
-  /* Color — brand palette (fixed) */
+  /* Brand (fixed) */
   --color-ink: #0b0b0b;
   --color-ink-raised: #151515;
   --color-anthracite: #2a2a2a;
@@ -21,59 +29,94 @@
   --color-accent: #46607a;
   --color-accent-soft: #aebdc9;
 
-  /* Type */
+  /* Water — brand mixes (ink/paper/anthracite + accent/accent-soft) */
+  --color-abyss: #0f1012;      /* ink + 6% accent — the footer, the deepest point */
+  --color-deep: #121518;       /* ink + 12% accent — deep water */
+  --color-deep-lit: #181d23;   /* ink + 22% accent — deep water near the surface */
+  --color-tide: #26313d;       /* ink + 45% accent — the colour of moving water */
+  --color-current: #2f3438;    /* anthracite + 18% accent */
+  --color-glint: #dbe1e7;      /* paper + 45% accent-soft — light on water */
+  --color-shallow: #f2f4f6;    /* paper + 16% accent-soft — shallow water */
+  --color-foam: #f9fafb;       /* paper + 7% accent-soft */
+
+  /* Type — light display weights with bold emphasis, echoing the STUDIO / VM
+     wordmark. <strong> inside a display heading switches to the bold cut. */
   --font-display: "Montserrat Variable", "Montserrat", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Manrope Variable", "Manrope", ui-sans-serif, system-ui, sans-serif;
 
-  --text-display-xl: clamp(2.75rem, 1.9rem + 4.4vw, 7.25rem);
-  --text-display-xl--line-height: 0.96;
-  --text-display-xl--letter-spacing: -0.035em;
-  --text-display-xl--font-weight: 700;
+  --text-display-xl: clamp(3rem, 1.6rem + 5.6vw, 8.75rem);
+  --text-display-xl--line-height: 0.92;
+  --text-display-xl--letter-spacing: -0.045em;
+  --text-display-xl--font-weight: 300;
 
-  --text-display-lg: clamp(2.25rem, 1.6rem + 3vw, 4.5rem);
-  --text-display-lg--line-height: 1.02;
-  --text-display-lg--letter-spacing: -0.025em;
-  --text-display-lg--font-weight: 700;
+  --text-display-lg: clamp(2.35rem, 1.5rem + 3.5vw, 5.25rem);
+  --text-display-lg--line-height: 0.98;
+  --text-display-lg--letter-spacing: -0.038em;
+  --text-display-lg--font-weight: 300;
 
-  --text-display-md: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
-  --text-display-md--line-height: 1.08;
-  --text-display-md--letter-spacing: -0.02em;
-  --text-display-md--font-weight: 600;
+  --text-display-md: clamp(1.85rem, 1.35rem + 2vw, 3.25rem);
+  --text-display-md--line-height: 1.04;
+  --text-display-md--letter-spacing: -0.03em;
+  --text-display-md--font-weight: 300;
 
-  --text-display-sm: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  --text-display-sm: clamp(1.3rem, 1.15rem + 0.7vw, 1.7rem);
   --text-display-sm--line-height: 1.15;
-  --text-display-sm--letter-spacing: -0.01em;
-  --text-display-sm--font-weight: 600;
+  --text-display-sm--letter-spacing: -0.015em;
+  --text-display-sm--font-weight: 500;
 
-  /* Radius — near-flat, architectural. Sharp over soft. */
+  /* Radius — architecture sharp, liquid soft */
   --radius-xs: 1px;
   --radius-sm: 2px;
   --radius-md: 3px;
+  --radius-drop: 14px;   /* chips, fields, small glass */
+  --radius-glass: 24px;  /* cards, panels, media */
+  --radius-lens: 36px;   /* large immersive panels */
 
-  /* Container */
   --container-max: 90rem;
 
   /* ==========================================================================
-     Motion — one system, three tiers. Every transition in the codebase should
-     round to one of these durations, paired with the easing that matches its
-     nature (entering/exiting vs. moving vs. a plain hover/color swap).
+     Motion — every animation on the site uses one of these.
 
-       micro interaction   (button press, checkbox)      → --duration-instant
-       standard interaction (hover, dropdown, tooltip)    → --duration-fast / --duration-base
-       important transition (page-level reveal, drawer)   → --duration-moderate / slower, case-by-case
+       --ease-out          entering / appearing (fast start, soft landing)
+       --ease-in-out       moving / morphing something already on screen
+       --ease-spring       things with mass settling (reveals, the veil, labels)
+       --ease-spring-soft  deliberate wobble: liquid blobs, jelly presses
+       --ease-spring-firm  UI that must feel precise but alive (hover lifts)
 
-     Easing: --ease-out for anything entering/appearing (starts fast, feels
-     responsive — never ease-in on UI). --ease-in-out for things moving or
-     morphing while already on screen.
+     The spring curves are real damped-oscillator responses sampled into
+     linear() (ζ 0.6 / 0.48 / 0.8) — the same physics the JS springs in
+     src/scripts/liquid/spring.ts integrate, so CSS and JS motion match.
+     Durations pair with them: a spring's curve is only right at its own
+     natural duration.
      ========================================================================== */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-premium: var(--ease-out);
+  --ease-liquid: cubic-bezier(0.45, 0.05, 0.15, 1);
+  /* ~740ms, 9.5% overshoot */
+  --ease-spring: linear(0, 0.03, 0.108, 0.216, 0.34, 0.469, 0.594, 0.708, 0.809, 0.894, 0.962, 1.015, 1.052, 1.076, 1.09, 1.095, 1.093, 1.086, 1.076, 1.065, 1.052, 1.04, 1.029, 1.02, 1.011, 1.005, 0.999, 0.996, 0.993, 0.992, 0.991, 0.991, 0.992, 0.993, 0.994, 0.995, 0.996, 0.997, 0.998, 0.999, 1);
+  /* ~1080ms, 18% overshoot */
+  --ease-spring-soft: linear(0, 0.047, 0.166, 0.328, 0.507, 0.682, 0.839, 0.968, 1.065, 1.131, 1.167, 1.179, 1.172, 1.151, 1.122, 1.09, 1.059, 1.031, 1.007, 0.989, 0.977, 0.97, 0.968, 0.969, 0.973, 0.978, 0.983, 0.989, 0.994, 0.998, 1.002, 1.004, 1.005, 1.006, 1.006, 1.005, 1.004, 1.003, 1.002, 1.001, 1);
+  /* ~430ms, 1.5% overshoot */
+  --ease-spring-firm: linear(0, 0.017, 0.061, 0.124, 0.198, 0.279, 0.361, 0.442, 0.519, 0.591, 0.657, 0.717, 0.77, 0.816, 0.856, 0.889, 0.918, 0.941, 0.96, 0.976, 0.988, 0.997, 1.004, 1.008, 1.012, 1.014, 1.015, 1.015, 1.015, 1.014, 1.013, 1.012, 1.011, 1.01, 1.008, 1.007, 1.006, 1.005, 1.004, 1.003, 1);
 
   --duration-instant: 120ms;
   --duration-fast: 180ms;
   --duration-base: 240ms;
   --duration-moderate: 400ms;
+  --duration-firm: 430ms;   /* pairs with --ease-spring-firm */
+  --duration-flow: 740ms;   /* pairs with --ease-spring */
+  --duration-tide: 1080ms;  /* pairs with --ease-spring-soft */
+
+  --shadow-float: 0 40px 80px -32px rgb(11 11 11 / 0.45), 0 12px 24px -12px rgb(11 11 11 / 0.2);
+  --shadow-drop: 0 18px 40px -18px rgb(11 11 11 / 0.35);
+
+  --animate-drift: drift 14s var(--ease-in-out) infinite;
+}
+
+@keyframes drift {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -14px; }
 }
 
 /* ==========================================================================
@@ -88,6 +131,11 @@
     @apply scroll-smooth;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html.lenis {
+    scroll-behavior: auto;
   }
 
   body {
@@ -97,6 +145,13 @@
 
   h1, h2, h3, h4 {
     @apply font-display text-ink;
+  }
+
+  /* Light headline, bold emphasis — the wordmark's own contrast. */
+  :where(h1, h2, h3, p, blockquote) strong,
+  :where([class*='text-display']) strong {
+    font-weight: 650;
+    letter-spacing: -0.025em;
   }
 
   a {
@@ -112,6 +167,11 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
     border-radius: var(--radius-xs);
+  }
+
+  /* On deep water the accent alone is too dark to read as a ring. */
+  :where([data-tone='ink'], [data-tone='anthracite'], .veil, #mobile-menu) :focus-visible {
+    outline-color: var(--color-accent-soft);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -132,35 +192,1320 @@
 }
 
 /* ==========================================================================
-   Pressable elements — buttons, links styled as buttons, the nav CTA.
-   Color/background/border settle at a normal pace; the press itself (scale,
-   applied via active:scale-[…] utilities) must feel instant, so it gets its
-   own fast entry in the same transition list instead of inheriting the
-   slower color timing.
+   The liquid environment — src/scripts/liquid. A fixed WebGL canvas paints
+   every [data-tone] band as water. Sections only go transparent once
+   html.liquid is set, which the engine does after its first real frame —
+   without WebGL (or before it has drawn) every band keeps its solid colour.
    ========================================================================== */
-@layer components {
-  .btn-motion {
-    transition:
-      color var(--duration-base) var(--ease-out),
-      background-color var(--duration-base) var(--ease-out),
-      border-color var(--duration-base) var(--ease-out),
-      transform var(--duration-instant) var(--ease-out);
+@layer base {
+  .liquid-canvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100lvh;
+    pointer-events: none;
+  }
+
+  main,
+  footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  html.liquid {
+    background-color: var(--color-ink);
+  }
+
+  html.liquid body {
+    background-color: transparent;
+  }
+
+  [data-tone] {
+    transition: background-color 0.9s var(--ease-out);
+  }
+
+  html.liquid [data-tone] {
+    background-color: transparent !important;
+  }
+
+  .liquid-fallback {
+    transition: opacity 0.9s var(--ease-out);
+  }
+
+  html.liquid .liquid-fallback {
+    opacity: 0 !important;
+  }
+
+  /* Only visible with the water running: CSS-free of WebGL, these stay out. */
+  .liquid-only {
+    opacity: 0;
+    transition: opacity 0.9s var(--ease-out);
+  }
+
+  html.liquid .liquid-only {
+    opacity: 1;
   }
 }
 
 /* ==========================================================================
-   Smart navbar — see src/scripts/navbar.ts
+   Liquid glass. Not a frosted rectangle: a thick, slightly immersed lens —
+   a luminous rim that is brighter where light hits it (top-left) and at
+   the waterline (bottom), a specular that follows the pointer (--mx/--my,
+   set by src/scripts/sheen.ts on the hovered element only), and the living
+   water behind it refracted through the blur.
+
+   .glass        on deep water (light rim, pale tint)
+   .glass-light  on shallow water (white body, ink-tinted rim)
+   ========================================================================== */
+@layer components {
+  .glass,
+  .glass-light {
+    --mx: 30%;
+    --my: 0%;
+    --sheen: 0;
+    position: relative;
+    isolation: isolate;
+    border-radius: var(--radius-glass);
+    transition:
+      transform var(--duration-firm) var(--ease-spring-firm),
+      box-shadow var(--duration-moderate) var(--ease-out),
+      background-color var(--duration-moderate) var(--ease-out);
+  }
+
+  /* Backdrop blur is the costly part of glass (one extra render pass per
+     element, redone every frame the water behind it moves), so it is
+     spent where it shows: deep glass on medium+, light glass (mostly
+     opaque anyway) only on the high tier. */
+  html:not([data-liquid-tier='low']):not([data-liquid-tier='static']) .glass {
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
+  }
+
+  html[data-liquid-tier='high'] .glass-light {
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%);
+  }
+
+  .glass {
+    background:
+      radial-gradient(90% 120% at var(--mx) var(--my), rgb(255 255 255 / calc(0.05 + var(--sheen) * 0.09)), transparent 60%),
+      linear-gradient(165deg, rgb(219 225 231 / 0.1), rgb(219 225 231 / 0.03) 55%, rgb(174 189 201 / 0.06));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.12),
+      inset 0 -12px 24px -18px rgb(174 189 201 / 0.28),
+      0 30px 60px -34px rgb(0 0 0 / 0.7);
+  }
+
+  .glass-light {
+    background:
+      radial-gradient(90% 120% at var(--mx) var(--my), rgb(255 255 255 / calc(0.5 + var(--sheen) * 0.35)), transparent 62%),
+      linear-gradient(165deg, rgb(255 255 255 / 0.72), rgb(255 255 255 / 0.46) 60%, rgb(242 244 246 / 0.6));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.9),
+      inset 0 -10px 22px -16px rgb(70 96 122 / 0.12),
+      0 26px 56px -34px rgb(18 21 24 / 0.32);
+  }
+
+  /* The luminous rim: a 1px gradient ring cut out with a mask. */
+  .glass::before,
+  .glass-light::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  }
+
+  .glass::before {
+    background: linear-gradient(155deg, rgb(255 255 255 / 0.34), rgb(255 255 255 / 0.06) 32%, rgb(255 255 255 / 0.02) 62%, rgb(174 189 201 / 0.3));
+  }
+
+  .glass-light::before {
+    background: linear-gradient(155deg, rgb(255 255 255 / 1), rgb(11 11 11 / 0.06) 36%, rgb(11 11 11 / 0.04) 64%, rgb(70 96 122 / 0.22));
+  }
+
+  .glass-hover:hover {
+    --sheen: 1;
+  }
+
+  @media (hover: hover) {
+    .glass-lift:hover {
+      transform: translateY(-4px);
+    }
+    .glass.glass-lift:hover {
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.16),
+        inset 0 -12px 24px -18px rgb(174 189 201 / 0.36),
+        0 40px 70px -34px rgb(0 0 0 / 0.8);
+    }
+    .glass-light.glass-lift:hover {
+      box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 1),
+        inset 0 -10px 22px -16px rgb(70 96 122 / 0.16),
+        0 34px 64px -34px rgb(18 21 24 / 0.4);
+    }
+  }
+
+  /* Glass without WebGL behind it has nothing to refract: lean on a
+     slightly more opaque body so it still reads as a surface. */
+  html:not(.liquid) .glass {
+    background-color: rgb(255 255 255 / 0.03);
+  }
+
+  /* Water inside the glass: a liquid level with a travelling surface,
+     for panels that should read as "a glass filled with water". */
+  .glass-water {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: -1;
+    height: var(--level, 34%);
+    pointer-events: none;
+    background: linear-gradient(180deg, rgb(174 189 201 / 0.1), rgb(70 96 122 / 0.14));
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 24' preserveAspectRatio='none'%3E%3Cpath d='M0 12 C 30 4 90 4 120 12 S 210 20 240 12 V24 H0Z'/%3E%3C/svg%3E") 0 0 / 240px 14px repeat-x,
+      linear-gradient(#000 0 0) 0 13px / 100% 100% no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 24' preserveAspectRatio='none'%3E%3Cpath d='M0 12 C 30 4 90 4 120 12 S 210 20 240 12 V24 H0Z'/%3E%3C/svg%3E") 0 0 / 240px 14px repeat-x,
+      linear-gradient(#000 0 0) 0 13px / 100% 100% no-repeat;
+    transition: height var(--duration-tide) var(--ease-spring-soft);
+  }
+
+  .glass-water::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 14px;
+    background: linear-gradient(180deg, rgb(219 225 231 / 0.35), transparent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .glass-water {
+      animation: surface-travel 7s linear infinite;
+    }
+  }
+
+  @keyframes surface-travel {
+    to {
+      -webkit-mask-position: 240px 0, 0 13px;
+      mask-position: 240px 0, 0 13px;
+    }
+  }
+
+  /* Glass capsule chip (tags, audiences, filters). */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    padding: 0.5rem 0.95rem;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    color: rgb(42 42 42 / 0.82);
+    background: linear-gradient(165deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.5));
+    box-shadow: inset 0 0 0 1px rgb(11 11 11 / 0.07), inset 0 1px 0 rgb(255 255 255 / 0.9), 0 6px 14px -10px rgb(18 21 24 / 0.3);
+    transition: transform var(--duration-firm) var(--ease-spring-firm), box-shadow var(--duration-base) var(--ease-out), color var(--duration-base) var(--ease-out);
+  }
+
+  .chip-dark {
+    color: var(--color-mist);
+    background: linear-gradient(165deg, rgb(219 225 231 / 0.1), rgb(219 225 231 / 0.04));
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12), inset 0 1px 0 rgb(255 255 255 / 0.1);
+  }
+
+  @media (hover: hover) {
+    .chip-hover:hover {
+      transform: translateY(-2px);
+      color: var(--color-ink);
+      box-shadow: inset 0 0 0 1px rgb(11 11 11 / 0.12), inset 0 1px 0 rgb(255 255 255 / 1), 0 10px 18px -10px rgb(18 21 24 / 0.4);
+    }
+  }
+}
+
+/* ==========================================================================
+   Liquid buttons — src/components/ui/Button.astro + src/scripts/liquid-button.ts
+
+   default  capsule, resting
+   hover    liquid floods in from the exact point the pointer entered,
+            the label rolls letter by letter, a specular follows the
+            pointer, the whole button leans magnetically (spring)
+   active   compresses like something soft (instant), then springs back
+            with overshoot on release; drops a ripple into the water
+   focus    liquid focus ring
+   loading  a wave runs through the capsule, label dims, aria-busy
+   leave    the liquid drains out toward the point the pointer left by
+   ========================================================================== */
+@layer components {
+  .lbtn {
+    --blob: var(--color-tide);
+    position: relative;
+    display: inline-flex;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    user-select: none;
+    outline-offset: 5px;
+    border-radius: 999px;
+  }
+
+  .lbtn:focus-visible {
+    outline: 2px solid currentColor;
+    border-radius: 999px;
+  }
+
+  .lbtn__body {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.1rem 1.55rem 1.1rem 1.8rem;
+    border-radius: inherit;
+    overflow: hidden;
+    transition:
+      scale var(--duration-tide) var(--ease-spring-soft),
+      color 0.35s var(--ease-out),
+      background-color 0.35s var(--ease-out),
+      box-shadow 0.5s var(--ease-out);
+  }
+
+  .lbtn:active .lbtn__body {
+    scale: 0.94;
+    transition-duration: var(--duration-instant), 0.35s, 0.35s, 0.5s;
+    transition-timing-function: var(--ease-out);
+  }
+
+  .lbtn__blob {
+    position: absolute;
+    left: var(--ex, 50%);
+    top: var(--ey, 50%);
+    z-index: -1;
+    width: calc(var(--bw, 260px) * 2.35);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    scale: 0;
+    rotate: -40deg;
+    border-radius: 44% 56% 52% 48% / 51% 45% 55% 49%;
+    background: var(--blob);
+    pointer-events: none;
+    transition:
+      scale 0.75s var(--ease-out),
+      rotate 1.2s var(--ease-out);
+  }
+
+  .lbtn__sheen {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(90px circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / 0.32), transparent 70%);
+    transition: opacity 0.4s var(--ease-out);
+  }
+
+  .lbtn__ring {
+    position: absolute;
+    left: var(--px, 50%);
+    top: var(--py, 50%);
+    z-index: -1;
+    width: 12px;
+    aspect-ratio: 1;
+    margin: -6px 0 0 -6px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .lbtn__ring.is-on {
+    animation: press-ring 0.7s var(--ease-out) forwards;
+  }
+
+  @keyframes press-ring {
+    0% { opacity: 0.55; scale: 0.4; }
+    100% { opacity: 0; scale: 14; }
+  }
+
+  /* inline-block (not flex): the spaces between words are real text
+     nodes and flex layout would swallow them. */
+  .lbtn__label {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    padding-block: 0.14em;
+    margin-block: -0.14em;
+    white-space: nowrap;
+    vertical-align: top;
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+
+  .lbtn__w {
+    display: inline-block;
+  }
+
+  .lbtn__c {
+    position: relative;
+    display: inline-block;
+    transition: translate 0.6s var(--ease-spring);
+    transition-delay: calc(var(--i, 0) * 14ms);
+  }
+
+  .lbtn__c::after {
+    content: attr(data-c);
+    content: attr(data-c) / '';
+    position: absolute;
+    left: 0;
+    top: 125%;
+  }
+
+  /* Two arrows in one slot: on hover the first swims out to the right as
+     its twin arrives from the left. */
+  .lbtn__icon {
+    position: relative;
+    display: inline-grid;
+    overflow: hidden;
+    padding: 2px;
+    margin: -2px;
+  }
+
+  .lbtn__icon svg {
+    grid-area: 1 / 1;
+    transition: translate var(--duration-flow) var(--ease-spring);
+  }
+
+  .lbtn__icon svg + svg {
+    translate: -160% 0;
+  }
+
+  .lbtn__wave {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    opacity: 0;
+    pointer-events: none;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 20 C 15 12 45 12 60 20 S 105 28 120 20 V40 H0Z'/%3E%3C/svg%3E") 0 100% / 120px 70% repeat-x;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' preserveAspectRatio='none'%3E%3Cpath d='M0 20 C 15 12 45 12 60 20 S 105 28 120 20 V40 H0Z'/%3E%3C/svg%3E") 0 100% / 120px 70% repeat-x;
+    transition: opacity var(--duration-moderate) var(--ease-out);
+  }
+
+  .lbtn__bubbles {
+    display: none;
+    gap: 3px;
+    align-items: center;
+  }
+
+  .lbtn__bubbles i {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: bubble 1.1s var(--ease-in-out) infinite;
+  }
+
+  .lbtn__bubbles i:nth-child(2) { animation-delay: 0.15s; }
+  .lbtn__bubbles i:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bubble {
+    0%, 100% { translate: 0 2px; opacity: 0.35; }
+    50% { translate: 0 -3px; opacity: 1; }
+  }
+
+  @keyframes wave-run {
+    to {
+      -webkit-mask-position: 120px 100%;
+      mask-position: 120px 100%;
+    }
+  }
+
+  /* Variants ------------------------------------------------------------- */
+  .lbtn--solid .lbtn__body {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    box-shadow: 0 14px 30px -16px rgb(11 11 11 / 0.55);
+  }
+
+  .lbtn--solid.lbtn--invert .lbtn__body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.7), inset 0 -2px 6px rgb(70 96 122 / 0.12);
+  }
+
+  .lbtn--solid.lbtn--invert {
+    --blob: var(--color-glint);
+  }
+
+  .lbtn--outline .lbtn__body {
+    color: var(--color-ink);
+    background: linear-gradient(165deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.3));
+    box-shadow: inset 0 0 0 1px rgb(11 11 11 / 0.14), inset 0 1px 0 rgb(255 255 255 / 0.8);
+  }
+
+  html:is([data-liquid-tier='high'], [data-liquid-tier='medium']) .lbtn--outline .lbtn__body {
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  .lbtn--outline {
+    --blob: var(--color-ink);
+  }
+
+  .lbtn--outline.lbtn--invert .lbtn__body {
+    color: var(--color-paper);
+    background: linear-gradient(165deg, rgb(219 225 231 / 0.12), rgb(219 225 231 / 0.03));
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.26), inset 0 1px 0 rgb(255 255 255 / 0.14);
+  }
+
+  .lbtn--outline.lbtn--invert {
+    --blob: var(--color-paper);
+  }
+
+  @media (hover: hover) {
+    .lbtn.is-hover .lbtn__blob {
+      scale: 1;
+      rotate: 30deg;
+      transition:
+        scale 0.9s var(--ease-out),
+        rotate 1.4s var(--ease-out);
+    }
+
+    .lbtn.is-hover .lbtn__sheen {
+      opacity: 1;
+    }
+
+    .lbtn.is-hover .lbtn__c {
+      translate: 0 -125%;
+    }
+
+    .lbtn.is-hover .lbtn__icon svg {
+      translate: 160% 0;
+      transition-delay: 40ms;
+    }
+
+    .lbtn.is-hover .lbtn__icon svg + svg {
+      translate: 0 0;
+      transition-delay: 110ms;
+    }
+
+    .lbtn--outline.is-hover .lbtn__body {
+      color: var(--color-paper);
+    }
+
+    .lbtn--outline.lbtn--invert.is-hover .lbtn__body {
+      color: var(--color-ink);
+    }
+
+    .lbtn--solid.lbtn--invert.is-hover .lbtn__body {
+      box-shadow: 0 24px 50px -18px rgb(0 0 0 / 0.75), 0 0 0 6px rgb(219 225 231 / 0.08);
+    }
+
+    .lbtn--solid:not(.lbtn--invert).is-hover .lbtn__body {
+      box-shadow: 0 22px 44px -18px rgb(38 49 61 / 0.7);
+    }
+  }
+
+  /* Keyboard focus floods the capsule from its centre. */
+  .lbtn:focus-visible .lbtn__blob {
+    scale: 1;
+  }
+
+  .lbtn--outline:focus-visible .lbtn__body {
+    color: var(--color-paper);
+  }
+
+  .lbtn--outline.lbtn--invert:focus-visible .lbtn__body {
+    color: var(--color-ink);
+  }
+
+  /* Jelly: a soft body answering the pointer's arrival. */
+  .lbtn.is-wobble .lbtn__body {
+    animation: jelly 0.75s var(--ease-out);
+  }
+
+  @keyframes jelly {
+    0% { scale: 1 1; }
+    28% { scale: 1.05 0.93; }
+    52% { scale: 0.98 1.03; }
+    74% { scale: 1.01 0.99; }
+    100% { scale: 1 1; }
+  }
+
+  /* Loading */
+  .lbtn[data-loading='true'] .lbtn__label {
+    opacity: 0.55;
+  }
+
+  .lbtn[data-loading='true'] .lbtn__wave {
+    opacity: 0.14;
+    animation: wave-run 1.4s linear infinite;
+  }
+
+  .lbtn[data-loading='true'] .lbtn__icon {
+    display: none;
+  }
+
+  .lbtn[data-loading='true'] .lbtn__bubbles {
+    display: inline-flex;
+  }
+
+  .lbtn:disabled,
+  .lbtn[aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+
+  .lbtn:disabled:not([data-loading='true']) .lbtn__body,
+  .lbtn[aria-disabled='true'] .lbtn__body {
+    opacity: 0.45;
+  }
+
+  .lbtn[data-loading='true'] {
+    cursor: progress;
+  }
+
+  /* Text link: its underline turns to liquid on hover — the straight line
+     drains away to the right while a travelling wave pours in from the
+     left. */
+  .tlink {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding-block: 0.45rem;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .tlink__line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.2rem;
+    height: 8px;
+    pointer-events: none;
+  }
+
+  .tlink__line::before,
+  .tlink__line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+  }
+
+  .tlink__line::before {
+    top: 50%;
+    height: 1px;
+    opacity: 0.45;
+    transform-origin: right;
+    transition: scale 0.55s var(--ease-in-out), opacity 0.3s var(--ease-out);
+  }
+
+  .tlink__line::after {
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 8'%3E%3Cpath d='M0 4 C 2 1.3 6 1.3 8 4 S 14 6.7 16 4' fill='none' stroke='%23000' stroke-width='1.3'/%3E%3C/svg%3E") 0 50% / 16px 8px repeat-x;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 8'%3E%3Cpath d='M0 4 C 2 1.3 6 1.3 8 4 S 14 6.7 16 4' fill='none' stroke='%23000' stroke-width='1.3'/%3E%3C/svg%3E") 0 50% / 16px 8px repeat-x;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.6s var(--ease-in-out);
+  }
+
+  .tlink__icon {
+    display: inline-flex;
+    transition: translate var(--duration-flow) var(--ease-spring);
+  }
+
+  @media (hover: hover) {
+    .tlink:hover .tlink__line::before {
+      scale: 0 1;
+    }
+
+    .tlink:hover .tlink__line::after {
+      clip-path: inset(0 0 0 0);
+      transition-delay: 0.12s;
+      animation: tlink-flow 0.9s linear infinite;
+    }
+
+    .tlink:hover .tlink__icon {
+      translate: 0.35rem 0;
+    }
+  }
+
+  .tlink:active .tlink__icon {
+    translate: 0.6rem 0;
+    transition-duration: var(--duration-instant);
+  }
+
+  @keyframes tlink-flow {
+    to {
+      -webkit-mask-position: 16px 50%;
+      mask-position: 16px 50%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lbtn.is-wobble .lbtn__body {
+      animation: none;
+    }
+    .lbtn .lbtn__c {
+      translate: none !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   Liquid cursor — src/scripts/cursor.ts. Fine pointers only, never under
+   reduced motion; the native cursor is hidden only once this one is live.
+   ========================================================================== */
+@layer components {
+  .cursor {
+    --fg: var(--color-paper);
+    --line: rgb(255 255 255 / 0.55);
+    --fill: rgb(219 225 231 / 0.1);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-out);
+    contain: layout style;
+  }
+
+  html.has-cursor .cursor.is-visible {
+    opacity: 1;
+  }
+
+  .cursor[data-over='light'] {
+    --fg: var(--color-ink);
+    --line: rgb(11 11 11 / 0.42);
+    --fill: rgb(70 96 122 / 0.08);
+  }
+
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none !important;
+  }
+
+  html.has-cursor :is(input:not([type='range']):not([type='radio']):not([type='checkbox']), textarea, select, [contenteditable='true']) {
+    cursor: text !important;
+  }
+
+  html.has-cursor select {
+    cursor: pointer !important;
+  }
+
+  .cursor__dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: var(--fg);
+    transition: opacity 0.25s var(--ease-out), background-color 0.4s var(--ease-out);
+    will-change: transform;
+  }
+
+  .cursor__ring {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--line);
+    background: radial-gradient(closest-side, transparent 55%, var(--fill));
+    transition:
+      box-shadow 0.4s var(--ease-out),
+      background-color 0.4s var(--ease-out),
+      -webkit-backdrop-filter 0.4s var(--ease-out),
+      backdrop-filter 0.4s var(--ease-out);
+    will-change: transform, width, height;
+  }
+
+  .cursor__label {
+    font-family: var(--font-body);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg);
+    opacity: 0;
+    scale: 0.6;
+    white-space: nowrap;
+    transition: opacity 0.25s var(--ease-out), scale 0.5s var(--ease-spring);
+  }
+
+  .cursor[data-state='link'] .cursor__ring {
+    box-shadow: inset 0 0 0 1px var(--line), 0 0 24px -6px var(--fill);
+    background-color: var(--fill);
+  }
+
+  .cursor[data-state='link'] .cursor__dot,
+  .cursor[data-state='view'] .cursor__dot,
+  .cursor[data-state='drag'] .cursor__dot,
+  .cursor[data-state='magnet'] .cursor__dot,
+  .cursor[data-state='text'] .cursor__dot,
+  .cursor[data-state='text'] .cursor__ring {
+    opacity: 0;
+  }
+
+  .cursor[data-state='view'] .cursor__ring,
+  .cursor[data-state='drag'] .cursor__ring {
+    background-color: rgb(219 225 231 / 0.16);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.5), 0 16px 30px -14px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(8px) saturate(160%);
+    backdrop-filter: blur(8px) saturate(160%);
+  }
+
+  .cursor[data-over='light'][data-state='view'] .cursor__ring,
+  .cursor[data-over='light'][data-state='drag'] .cursor__ring {
+    background-color: rgb(255 255 255 / 0.55);
+    box-shadow: inset 0 0 0 1px rgb(11 11 11 / 0.12), inset 0 1px 0 rgb(255 255 255 / 0.9), 0 16px 30px -14px rgb(18 21 24 / 0.35);
+  }
+
+  .cursor[data-state='view'] .cursor__label,
+  .cursor[data-state='drag'] .cursor__label {
+    opacity: 1;
+    scale: 1;
+  }
+
+  .cursor[data-state='magnet'] .cursor__ring {
+    box-shadow: inset 0 0 0 1px var(--line), 0 0 30px -8px var(--line);
+    background: transparent;
+  }
+}
+
+/* ==========================================================================
+   Page transition veil — src/scripts/page-transition.ts
+   ========================================================================== */
+@layer components {
+  .veil {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .veil.is-active {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .veil__svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .veil__edge {
+    fill: none;
+    stroke: var(--color-glint);
+    stroke-opacity: 0.4;
+    stroke-width: 1.25px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .veil__mark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 1.75rem;
+    translate: -50% -50%;
+    color: var(--color-glint);
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-out);
+  }
+
+  .veil.is-waiting .veil__mark {
+    opacity: 0.55;
+  }
+}
+
+/* ==========================================================================
+   Navigation — src/components/layout/Navbar.astro + src/scripts/navbar.ts
+   At the top of a page the header is part of the hero. Once you scroll it
+   condenses into a floating glass capsule whose colours follow the water
+   beneath it (data-over), with a liquid blob sliding between links and
+   the reading progress filling its rim.
    ========================================================================== */
 @layer components {
   [data-nav] {
-    transition:
-      transform 0.5s var(--ease-premium),
-      background-color 0.5s var(--ease-premium),
-      border-color 0.5s var(--ease-premium);
+    --nav-fg: var(--color-paper);
+    --nav-muted: rgb(255 255 255 / 0.72);
+    --nav-glass: rgb(18 21 24 / 0.5);
+    --nav-rim: rgb(255 255 255 / 0.14);
+    transition: translate 0.6s var(--ease-out);
+  }
+
+  [data-nav][data-over='light'] {
+    --nav-fg: var(--color-ink);
+    --nav-muted: rgb(11 11 11 / 0.64);
+    --nav-glass: rgb(255 255 255 / 0.62);
+    --nav-rim: rgb(11 11 11 / 0.08);
   }
 
   [data-nav][data-hidden='true'] {
-    transform: translateY(-100%);
+    translate: 0 -130%;
+  }
+
+  .nav-shell {
+    position: relative;
+    margin-inline: auto;
+    width: 100%;
+    max-width: 90rem;
+    height: 6rem;
+    margin-top: 0;
+    border-radius: 999px;
+    color: var(--nav-fg);
+    background-color: transparent;
+    box-shadow: inset 0 0 0 1px transparent;
+    transition:
+      max-width 0.75s var(--ease-spring),
+      height 0.75s var(--ease-spring),
+      margin-top 0.75s var(--ease-spring),
+      padding 0.75s var(--ease-spring),
+      color 0.5s var(--ease-out),
+      background-color 0.5s var(--ease-out),
+      box-shadow 0.5s var(--ease-out);
+  }
+
+  [data-nav][data-state='float'] .nav-shell {
+    max-width: min(68rem, calc(100% - 1.5rem));
+    height: 4rem;
+    margin-top: 0.75rem;
+    background-color: var(--nav-glass);
+    box-shadow:
+      inset 0 0 0 1px var(--nav-rim),
+      inset 0 1px 0 rgb(255 255 255 / 0.12),
+      0 24px 48px -28px rgb(0 0 0 / 0.5);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+  }
+
+  .nav-progress {
+    position: absolute;
+    left: 1.75rem;
+    right: 1.75rem;
+    bottom: 0;
+    height: 1px;
+    transform-origin: left;
+    scale: var(--progress, 0) 1;
+    background: linear-gradient(90deg, transparent, currentColor 30%, currentColor 70%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s var(--ease-out);
+  }
+
+  [data-nav][data-state='float'] .nav-progress {
+    opacity: 0.35;
+  }
+
+  .nav-cta {
+    font-size: 0.75rem;
+  }
+
+  .nav-cta .lbtn__body {
+    padding: 0.85rem 1.05rem 0.85rem 1.3rem;
+    gap: 0.6rem;
+  }
+
+  [data-nav][data-over='light'] .nav-cta {
+    --blob: var(--color-tide);
+  }
+
+  [data-nav][data-over='light'] .nav-cta .lbtn__body {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    box-shadow: 0 12px 26px -14px rgb(11 11 11 / 0.55);
+  }
+
+  [data-nav][data-state='float'] .nav-shell {
+    padding-left: 1.4rem;
+    padding-right: 0.55rem;
+  }
+
+  .nav-link {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    height: 2.5rem;
+    padding-inline: 1.05rem;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--nav-muted);
+    transition: color 0.35s var(--ease-out);
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current='page'] {
+    color: var(--nav-fg);
+  }
+
+  .nav-goo {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    filter: url(#goo);
+    opacity: 0.1;
+    transition: opacity 0.4s var(--ease-out);
+  }
+
+  [data-nav][data-over='light'] .nav-goo {
+    opacity: 0.07;
+  }
+
+  .nav-goo.is-empty {
+    opacity: 0;
+  }
+
+  .nav-blob {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 2.5rem;
+    margin-top: -1.25rem;
+    border-radius: 999px;
+    background: currentColor;
+    will-change: transform, width;
+  }
+
+  .sound-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    color: var(--nav-fg);
+    transition: background-color 0.3s var(--ease-out), scale var(--duration-firm) var(--ease-spring-firm);
+  }
+
+  .sound-toggle:hover {
+    background-color: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  .sound-toggle:active {
+    scale: 0.9;
+    transition-duration: var(--duration-instant);
+  }
+
+  .sound-toggle i {
+    display: block;
+    width: 2px;
+    height: 13px;
+    border-radius: 2px;
+    background: currentColor;
+    scale: 1 var(--rest, 0.4);
+    opacity: 0.5;
+    transition: scale 0.5s var(--ease-spring), opacity 0.3s var(--ease-out);
+  }
+
+  .sound-toggle i:nth-child(1) { --rest: 0.35; }
+  .sound-toggle i:nth-child(2) { --rest: 0.7; }
+  .sound-toggle i:nth-child(3) { --rest: 0.5; }
+  .sound-toggle i:nth-child(4) { --rest: 0.85; }
+
+  .sound-toggle:hover i {
+    opacity: 0.8;
+  }
+
+  .sound-toggle[aria-pressed='true'] i {
+    animation: eq 1.1s var(--ease-in-out) infinite;
+    opacity: 1;
+  }
+
+  .sound-toggle[aria-pressed='true'] i:nth-child(2) { animation-delay: -0.4s; animation-duration: 0.9s; }
+  .sound-toggle[aria-pressed='true'] i:nth-child(3) { animation-delay: -0.7s; animation-duration: 1.3s; }
+  .sound-toggle[aria-pressed='true'] i:nth-child(4) { animation-delay: -0.2s; animation-duration: 1s; }
+
+  @keyframes eq {
+    0%, 100% { scale: 1 0.3; }
+    50% { scale: 1 1; }
+  }
+
+  /* Mobile menu: water floods the screen from the menu button outward. */
+  #mobile-menu {
+    clip-path: circle(0px at var(--ox, calc(100% - 2.5rem)) var(--oy, 2.5rem));
+    visibility: hidden;
+    transition:
+      clip-path 0.7s var(--ease-in-out),
+      visibility 0s linear 0.7s;
+  }
+
+  html.menu-open #mobile-menu {
+    clip-path: circle(150vmax at var(--ox, calc(100% - 2.5rem)) var(--oy, 2.5rem));
+    visibility: visible;
+    transition:
+      clip-path 0.85s var(--ease-in-out),
+      visibility 0s;
+  }
+
+  #mobile-menu [data-menu-item] {
+    opacity: 0;
+    translate: 0 1.5rem;
+    filter: blur(6px);
+    transition: opacity 0.3s var(--ease-out), translate 0.3s var(--ease-out), filter 0.3s var(--ease-out);
+  }
+
+  html.menu-open #mobile-menu [data-menu-item] {
+    opacity: 1;
+    translate: 0 0;
+    filter: none;
+    transition:
+      opacity 0.7s var(--ease-out),
+      translate 0.9s var(--ease-spring),
+      filter 0.7s var(--ease-out);
+    transition-delay: calc(0.18s + var(--i, 0) * 55ms);
+  }
+}
+
+/* ==========================================================================
+   Reveals — src/scripts/reveal.ts. Things surface: they rise out of the
+   water with a little buoyancy (spring overshoot), coming into focus as
+   they break the surface. Progressive enhancement: with no JS (no html.js)
+   everything is simply visible.
+
+     default   surface      rise + focus + fade (text blocks)
+     fast      small items  shorter trip, no blur (badges, button rows)
+     wave      headings     uncovered by a travelling waterline
+     drop      media        a droplet spreading into the full frame
+     rise      glass cards  rise + fade only (a blur on a parent would
+                            break the card's own backdrop-filter)
+   ========================================================================== */
+@layer components {
+  html.js [data-reveal] {
+    opacity: 0;
+    translate: 0 1.9rem;
+    filter: blur(10px);
+  }
+
+  /* Failsafe: if the script bundle never boots (network error, blocked
+     JS), nothing may stay hidden. main.ts sets .js-ready on boot, which
+     removes this animation before it can fire. */
+  html.js:not(.js-ready) :is([data-reveal], [data-kinetic]) {
+    animation: reveal-failsafe 0.6s var(--ease-out) 3s forwards;
+  }
+
+  @keyframes reveal-failsafe {
+    to {
+      opacity: 1;
+      translate: none;
+      filter: none;
+      -webkit-mask: none;
+      mask: none;
+    }
+  }
+
+  html.js [data-reveal].is-visible {
+    opacity: 1;
+    translate: 0 0;
+    filter: none;
+    transition:
+      opacity 0.9s var(--ease-out),
+      translate 1s var(--ease-spring),
+      filter 0.9s var(--ease-out);
+  }
+
+  html.js [data-reveal][data-reveal-fast] {
+    translate: 0 0.75rem;
+    filter: none;
+  }
+
+  html.js [data-reveal][data-reveal-fast].is-visible {
+    translate: 0 0;
+    transition:
+      opacity var(--duration-moderate) var(--ease-out),
+      translate var(--duration-flow) var(--ease-spring);
+  }
+
+  html.js [data-reveal][data-reveal-mode='rise'] {
+    filter: none;
+    translate: 0 2.5rem;
+  }
+
+  html.js [data-reveal][data-reveal-mode='rise'].is-visible {
+    translate: 0 0;
+    transition:
+      opacity 0.8s var(--ease-out),
+      translate 1.08s var(--ease-spring-soft);
+  }
+
+  html.js [data-reveal][data-reveal-mode='wave'] {
+    opacity: 1;
+    filter: none;
+    translate: 0 0.9rem;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-opacity='0'/%3E%3Cstop offset='1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 100 C 60 84 140 84 200 100 S 340 116 400 100 V200 H0Z' fill='url(%23g)'/%3E%3Cpath d='M0 110 C 60 94 140 94 200 110 S 340 126 400 110 V200 H0Z'/%3E%3C/svg%3E") 0 0% / 400px 200% repeat-x;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-opacity='0'/%3E%3Cstop offset='1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 100 C 60 84 140 84 200 100 S 340 116 400 100 V200 H0Z' fill='url(%23g)'/%3E%3Cpath d='M0 110 C 60 94 140 94 200 110 S 340 126 400 110 V200 H0Z'/%3E%3C/svg%3E") 0 0% / 400px 200% repeat-x;
+  }
+
+  html.js [data-reveal][data-reveal-mode='wave'].is-visible {
+    translate: 0 0;
+    -webkit-mask-position: 400px 100%;
+    mask-position: 400px 100%;
+    transition:
+      translate 1.2s var(--ease-spring),
+      -webkit-mask-position 1.3s var(--ease-liquid),
+      mask-position 1.3s var(--ease-liquid);
+  }
+
+  /* After the wave has passed, drop the mask entirely (reveal.ts adds
+     .is-settled) — an idle mask still costs a paint layer. */
+  html.js [data-reveal][data-reveal-mode='wave'].is-settled {
+    -webkit-mask: none;
+    mask: none;
+  }
+
+  html.js [data-reveal][data-reveal-mode='drop'] {
+    opacity: 1;
+    translate: 0 0;
+    filter: none;
+  }
+
+  html.js [data-reveal-mode='drop'] > .reveal-clip-target {
+    clip-path: inset(18% 22% 18% 22% round 999px);
+    scale: 0.94;
+    opacity: 0.4;
+  }
+
+  html.js [data-reveal][data-reveal-mode='drop'].is-visible > .reveal-clip-target {
+    clip-path: inset(0% 0% 0% 0% round var(--drop-radius, var(--radius-glass)));
+    scale: 1;
+    opacity: 1;
+    transition:
+      clip-path 1.25s var(--ease-liquid),
+      scale 1.4s var(--ease-spring-soft),
+      opacity 0.6s var(--ease-out);
+  }
+
+  html.js [data-reveal][data-reveal-mode='drop'].is-settled > .reveal-clip-target {
+    clip-path: none;
+  }
+
+  /* Scale (images that are their own reveal target). */
+  html.js [data-reveal][data-reveal-mode='scale'] {
+    scale: 0.92;
+    filter: blur(12px);
+    translate: 0 1rem;
+  }
+
+  html.js [data-reveal][data-reveal-mode='scale'].is-visible {
+    scale: 1;
+    filter: none;
+    translate: 0 0;
+    transition:
+      opacity 1s var(--ease-out),
+      scale 1.3s var(--ease-spring-soft),
+      translate 1.2s var(--ease-spring),
+      filter 1s var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.js [data-reveal],
+    html.js [data-reveal][data-reveal-mode] {
+      translate: none;
+      scale: none;
+      filter: none;
+      -webkit-mask: none;
+      mask: none;
+    }
+    html.js [data-reveal-mode='drop'] > .reveal-clip-target {
+      clip-path: none;
+      scale: none;
+      opacity: 1;
+    }
+  }
+}
+
+/* ==========================================================================
+   Kinetic type — src/scripts/kinetic-type.ts splits [data-kinetic]
+   headlines into letters that surface one by one, then lean away from the
+   cursor and swell (variable weight) as it passes, like letters floating
+   in water. Only ever split with JS + motion allowed; the h1 keeps an
+   aria-label with its full text.
+   ========================================================================== */
+@layer components {
+  html.js [data-kinetic]:not(.is-split) {
+    opacity: 0;
+  }
+
+  [data-kinetic] .kin-w {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  [data-kinetic] .kin-c {
+    display: inline-block;
+    will-change: transform;
+  }
+
+  [data-kinetic].is-split .kin-c {
+    opacity: 0;
+    translate: 0 0.5em;
+    filter: blur(12px);
+  }
+
+  [data-kinetic].is-in .kin-c {
+    opacity: 1;
+    translate: 0 0;
+    filter: none;
+    transition:
+      opacity 0.9s var(--ease-out),
+      translate 1.1s var(--ease-spring),
+      filter 1s var(--ease-out);
+    transition-delay: calc(var(--d, 0) * 1ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html.js [data-kinetic]:not(.is-split) {
+      opacity: 1;
+    }
+  }
+
+  /* A word filled with moving light instead of flat colour. */
+  .liquid-word {
+    background: linear-gradient(100deg, var(--color-paper) 0%, var(--color-paper) 30%, var(--color-accent-soft) 42%, var(--color-glint) 50%, var(--color-paper) 60%, var(--color-accent-soft) 78%, var(--color-paper) 100%) 0 0 / 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .liquid-word {
+      animation: liquid-light 11s linear infinite;
+    }
+  }
+
+  @keyframes liquid-light {
+    to { background-position: 300% 0; }
   }
 }
 
@@ -188,8 +1533,12 @@
     @apply mt-5 list-disc space-y-2 pl-5 font-body text-lg leading-relaxed text-anthracite/80;
   }
 
+  .prose-vm li::marker {
+    color: var(--color-accent);
+  }
+
   .prose-vm a {
-    @apply underline decoration-graphite/50 underline-offset-2 transition-colors duration-200 hover:decoration-ink;
+    @apply underline decoration-accent/50 decoration-1 underline-offset-4 transition-colors duration-200 hover:decoration-ink;
   }
 
   .prose-vm > div {
@@ -198,30 +1547,35 @@
 }
 
 /* ==========================================================================
-   Portfolio cursor preview — see src/scripts/portfolio-preview.ts and
-   realisations/index.astro. Desktop/fine-pointer enhancement only.
+   Portfolio cursor preview — src/scripts/portfolio-preview.ts. A glass lens
+   that follows the pointer and stretches with its speed.
    ========================================================================== */
 @layer components {
   [data-portfolio-preview] {
     opacity: 0;
-    transition: opacity 0.25s var(--ease-out);
+    scale: 0.6;
+    transition: opacity 0.3s var(--ease-out), scale 0.6s var(--ease-spring);
   }
 
   [data-portfolio-preview].is-active {
     opacity: 1;
+    scale: 1;
   }
 
   [data-preview-panel] {
     opacity: 0;
+    scale: 1.08;
+    transition: opacity 0.45s var(--ease-out), scale 0.9s var(--ease-out);
   }
 
   [data-preview-panel].is-active {
     opacity: 1;
+    scale: 1;
   }
 }
 
 /* ==========================================================================
-   Compare slider (PLAN → 3D) — see src/scripts/compare-slider.ts
+   Compare slider (PLAN → 3D) — src/scripts/compare-slider.ts
    ========================================================================== */
 @layer components {
   [data-compare] {
@@ -238,95 +1592,9 @@
 }
 
 /* ==========================================================================
-   Reveal-on-scroll primitive — see src/scripts/reveal.ts
-   Progressive enhancement: content is fully visible with no JS.
+   Tilt cards — src/scripts/tilt-card.ts
    ========================================================================== */
 @layer components {
-  html.js [data-reveal] {
-    opacity: 0;
-    transform: translateY(1.25rem);
-  }
-
-  html.js [data-reveal].is-visible {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.9s var(--ease-premium), transform 0.9s var(--ease-premium);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html.js [data-reveal] {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  /* Hierarchy, not uniformity: small/secondary elements (badges, dividers,
-     button rows) travel less and settle sooner than headings and imagery,
-     which keep the fuller entrance above. Same mechanism, lighter weight. */
-  html.js [data-reveal][data-reveal-fast] {
-    transform: translateY(0.5rem);
-  }
-
-  html.js [data-reveal][data-reveal-fast].is-visible {
-    transition: opacity var(--duration-moderate) var(--ease-premium), transform var(--duration-moderate) var(--ease-premium);
-  }
-
-  /* Scale — for media that should feel like it's settling into place
-     (imagery, floating panels), not sliding up off a shelf. */
-  html.js [data-reveal][data-reveal-mode='scale'] {
-    transform: scale(0.94);
-  }
-
-  html.js [data-reveal][data-reveal-mode='scale'].is-visible {
-    transform: scale(1);
-    transition: opacity 1s var(--ease-premium), transform 1s var(--ease-premium);
-  }
-
-  /* Clip — a mask wipes away rather than the element fading through it.
-     The [data-reveal] element itself MUST NOT be the one that gets
-     clip-path'd: a target clipped to inset(0 0 100% 0) has zero visible
-     area, and Chromium's IntersectionObserver correctly reports zero
-     intersection for that — regardless of its actual position — which
-     means it can never observe itself becoming visible (confirmed while
-     building this: the element just sat clipped forever). So the outer
-     [data-reveal] node stays a plain, always-fully-rendered observation
-     target, and a nested .reveal-clip-target child carries the real
-     mask-wipe effect. */
-  html.js [data-reveal][data-reveal-mode='clip'] {
-    opacity: 1;
-    transform: none;
-  }
-
-  html.js [data-reveal-mode='clip'] > .reveal-clip-target {
-    clip-path: inset(0 0 100% 0);
-  }
-
-  html.js [data-reveal][data-reveal-mode='clip'].is-visible > .reveal-clip-target {
-    clip-path: inset(0 0 0% 0);
-    transition: clip-path 1.1s var(--ease-in-out);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html.js [data-reveal][data-reveal-mode='scale'] {
-      transform: none;
-    }
-
-    html.js [data-reveal-mode='clip'] > .reveal-clip-target {
-      clip-path: none;
-    }
-  }
-}
-
-/* ==========================================================================
-   Tilt cards — see src/scripts/tilt-card.ts. Rests at a slight static angle
-   (propped up like a real object) and straightens toward the cursor on
-   hover. Static tilt only (no JS) also flattens under reduced motion, since
-   a permanent 3D skew is still a depth effect some users would rather skip.
-   ========================================================================== */
-@layer components {
-  /* Matches [data-reveal]'s own `html.js [data-reveal]` specificity so this
-     doesn't lose the cascade on elements carrying both attributes (the
-     reveal's resting transform would otherwise win the tie). */
   html.js [data-tilt] {
     transform: perspective(2200px) rotateX(2.5deg) rotateY(-4deg);
     transition: transform 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
@@ -344,9 +1612,7 @@
 }
 
 /* ==========================================================================
-   Live-status pulse — small ambient signal (dashboard preview, elsewhere as
-   needed) that something is "running", not a call to action. One element,
-   used sparingly; see emil-design-eng's frequency rule.
+   Live-status pulse
    ========================================================================== */
 @layer components {
   @media (prefers-reduced-motion: no-preference) {
@@ -369,9 +1635,7 @@
 }
 
 /* ==========================================================================
-   Applications dashboard preview — see src/components/portfolio/DashboardPreview.astro
-   and src/scripts/dashboard-preview.ts. Immobile by default; hover/tap on a
-   chart column moves the dot + guide and reveals the value tooltip.
+   Applications dashboard preview — chart states
    ========================================================================== */
 @layer components {
   [data-chart] [data-dot] {
@@ -401,5 +1665,29 @@
 
   [data-chart-tooltip].is-active {
     opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Pressables that aren't liquid buttons (menu toggle, filters…)
+   ========================================================================== */
+@layer components {
+  .btn-motion {
+    transition:
+      color var(--duration-base) var(--ease-out),
+      background-color var(--duration-base) var(--ease-out),
+      border-color var(--duration-base) var(--ease-out),
+      scale var(--duration-firm) var(--ease-spring-firm);
+  }
+
+  .btn-motion:active {
+    scale: 0.94;
+    transition-duration: var(--duration-base), var(--duration-base), var(--duration-base), var(--duration-instant);
+  }
+
+  /* Media that stretches with scroll momentum — src/scripts/fluid-scroll.ts */
+  [data-fluid] {
+    transform-origin: 50% 50%;
+    will-change: transform;
   }
 }

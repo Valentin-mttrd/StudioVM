@@ -11,12 +11,15 @@ export function initProcessProgress(): void {
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     fill.style.transform = 'scaleX(1)';
+    section.querySelectorAll<HTMLElement>('[data-process-step]').forEach((step) => (step.dataset.filled = 'true'));
     return;
   }
 
   controller = new AbortController();
   const { signal } = controller;
   let ticking = false;
+
+  const steps = Array.from(section.querySelectorAll<HTMLElement>('[data-process-step]'));
 
   const update = () => {
     const rect = section.getBoundingClientRect();
@@ -25,6 +28,11 @@ export function initProcessProgress(): void {
     const passed = vh * 0.85 - rect.top;
     const progress = total > 0 ? Math.min(Math.max(passed / total, 0), 1) : 1;
     fill.style.transform = `scaleX(${progress})`;
+    // Each droplet fills once the liquid line has reached it.
+    steps.forEach((step, i) => {
+      const reached = progress >= (i + 0.35) / steps.length;
+      if ((step.dataset.filled === 'true') !== reached) step.dataset.filled = String(reached);
+    });
     ticking = false;
   };
   update();

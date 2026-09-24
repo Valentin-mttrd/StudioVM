@@ -1,28 +1,45 @@
 ---
 import Container from '../ui/Container.astro';
-import Eyebrow from '../ui/Eyebrow.astro';
 
 interface Props {
   eyebrow: string;
   title: string;
+  /** Trailing part of the title set in the bold cut, e.g. "besoins réels." */
+  emphasis?: string;
   description?: string;
 }
 
-const { eyebrow, title, description } = Astro.props;
+const { eyebrow, title, emphasis, description } = Astro.props;
+const split = emphasis && title.endsWith(emphasis) ? title.length - emphasis.length : -1;
+const lead = split > 0 ? title.slice(0, split) : title;
 ---
-<section class="relative overflow-hidden bg-ink pb-20 pt-40 text-paper sm:pb-24 sm:pt-48">
+<!-- Interior page header: deep water with the tile grid (data-water="header"),
+     the title surfacing letter by letter (kinetic-type.ts). -->
+<section
+  data-tone="ink"
+  data-water="header"
+  data-kinetic-zone
+  class="relative overflow-hidden bg-ink pb-20 pt-40 text-paper sm:pb-24 sm:pt-48 lg:pb-28 lg:pt-52"
+>
   <div
-    class="pointer-events-none absolute inset-0 opacity-[0.04]"
+    class="liquid-fallback pointer-events-none absolute inset-0 opacity-[0.04]"
     aria-hidden="true"
     style="background-image: linear-gradient(to right, var(--color-mist) 1px, transparent 1px), linear-gradient(to bottom, var(--color-mist) 1px, transparent 1px); background-size: 56px 56px;"
   >
   </div>
   <Container class="relative">
-    <Eyebrow invert>{eyebrow}</Eyebrow>
-    <h1 class="mt-5 max-w-3xl text-display-lg text-paper" data-reveal>{title}</h1>
+    <div data-reveal data-reveal-fast>
+      <p class="chip chip-dark font-semibold uppercase tracking-[0.24em]">
+        <span class="h-1.5 w-1.5 rounded-full bg-accent-soft" aria-hidden="true"></span>
+        {eyebrow}
+      </p>
+    </div>
+    <h1 class="relative mt-8 max-w-4xl text-display-lg text-paper" data-kinetic data-kinetic-delay="150" data-kinetic-stagger="12">
+      {lead}{split > 0 && <strong>{emphasis}</strong>}
+    </h1>
     {
       description && (
-        <p class="mt-6 max-w-2xl font-body text-lg leading-relaxed text-mist" data-reveal data-reveal-delay="100">
+        <p class="mt-8 max-w-2xl font-body text-lg font-light leading-relaxed text-mist sm:text-xl" data-reveal data-reveal-delay="450">
           {description}
         </p>
       )

@@ -1,108 +1,113 @@
 ---
 import Container from '../ui/Container.astro';
 import Logo from '../ui/Logo.astro';
-import ArrowIcon from '../icons/ArrowIcon.astro';
+import Button from '../ui/Button.astro';
 import MenuIcon from '../icons/MenuIcon.astro';
 import CloseIcon from '../icons/CloseIcon.astro';
 import { NAV_LINKS, PRIMARY_CTA } from '../../data/nav';
 import { SITE } from '../../lib/constants';
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => currentPath === href || currentPath.startsWith(`${href}/`);
 ---
 <a
   href="#main-content"
-  class="fixed left-4 top-4 z-[60] -translate-y-24 bg-ink px-4 py-3 font-body text-sm font-semibold text-paper transition-transform duration-200 focus-visible:translate-y-0"
+  class="fixed left-4 top-4 z-[70] -translate-y-24 rounded-full bg-ink px-5 py-3 font-body text-sm font-semibold text-paper transition-transform duration-200 focus-visible:translate-y-0"
 >
   Aller au contenu principal
 </a>
 
-<header
-  data-nav
-  data-solid="false"
-  data-hidden="false"
-  class="group/nav fixed inset-x-0 top-0 z-50 border-b border-transparent bg-paper/0 data-[solid=true]:border-mist data-[solid=true]:bg-paper/95 data-[solid=true]:backdrop-blur-md"
->
-  <Container class="flex h-20 items-center justify-between lg:h-24">
-    <a href="/" class="relative z-10 shrink-0" aria-label={`${SITE.name} — Accueil`}>
-      <Logo variant="lockup" tone="nav" markClass="h-6 lg:h-7" class="text-[0.95rem] lg:text-base" />
+<!-- Header — see global.css "Navigation" and src/scripts/navbar.ts.
+     data-state: top (part of the page) | float (glass capsule)
+     data-over:  dark | light — the water currently under the capsule -->
+<header data-nav data-state="top" data-over="dark" data-hidden="false" class="fixed inset-x-0 top-0 z-50">
+  <div class="nav-shell flex items-center justify-between gap-4 pl-6 pr-4 sm:pl-8 sm:pr-6 lg:pl-12 lg:pr-12" data-nav-shell>
+    <a href="/" class="relative z-10 shrink-0 rounded-full" aria-label={`${SITE.name} — Accueil`}>
+      <Logo variant="lockup" tone="inherit" markClass="h-6 lg:h-7" class="text-[0.95rem] lg:text-base" />
     </a>
 
-    <nav class="hidden items-center gap-10 lg:flex" aria-label="Navigation principale">
+    <nav class="relative hidden items-center lg:flex" aria-label="Navigation principale" data-nav-links>
+      <span class="nav-goo is-empty" aria-hidden="true" data-nav-goo>
+        <span class="nav-blob" data-blob="lead"></span>
+        <span class="nav-blob" data-blob="trail"></span>
+      </span>
       {
         NAV_LINKS.map((link) => (
-          <a
-            href={link.href}
-            class:list={[
-              'relative font-body text-sm font-medium uppercase tracking-wide text-paper/85 transition-colors duration-300 hover:text-paper group-data-[solid=true]/nav:text-ink/75 group-data-[solid=true]/nav:hover:text-ink',
-              'after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left after:bg-current after:transition-transform after:duration-300 after:ease-out',
-              currentPath === link.href
-                ? 'text-paper group-data-[solid=true]/nav:text-ink after:scale-x-100'
-                : 'after:scale-x-0 hover:after:scale-x-100',
-            ]}
-            aria-current={currentPath === link.href ? 'page' : undefined}
-          >
+          <a href={link.href} class="nav-link" aria-current={isCurrent(link.href) ? 'page' : undefined}>
             {link.label}
           </a>
         ))
       }
     </nav>
 
-    <a
-      href={PRIMARY_CTA.href}
-      class="btn-motion group hidden items-center gap-2.5 whitespace-nowrap rounded-sm border border-paper/40 px-6 py-3.5 font-body text-sm font-semibold uppercase tracking-[0.08em] text-paper hover:border-paper hover:bg-paper/10 active:scale-[0.97] group-data-[solid=true]/nav:border-ink/25 group-data-[solid=true]/nav:text-ink group-data-[solid=true]/nav:hover:border-ink group-data-[solid=true]/nav:hover:bg-ink/5 lg:inline-flex"
-    >
-      {PRIMARY_CTA.label}
-      <ArrowIcon class="h-3.5 w-3.5 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1" />
-    </a>
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <button type="button" class="sound-toggle" data-sound-toggle aria-pressed="false" aria-label="Activer le son">
+        <i></i><i></i><i></i><i></i>
+      </button>
+      <Button href={PRIMARY_CTA.href} variant="solid" invert class="nav-cta hidden lg:inline-flex" data-magnetic="0.22">
+        {PRIMARY_CTA.label}
+      </Button>
+      <button
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Ouvrir le menu"
+        class="btn-motion relative z-10 inline-flex h-11 w-11 items-center justify-center rounded-full lg:hidden"
+      >
+        <MenuIcon class="h-6 w-6 [html.menu-open_&]:hidden" />
+        <CloseIcon class="hidden h-6 w-6 [html.menu-open_&]:block" />
+      </button>
+    </div>
 
-    <button
-      type="button"
-      data-menu-toggle
-      aria-expanded="false"
-      aria-controls="mobile-menu"
-      aria-label="Ouvrir le menu"
-      class="btn-motion relative z-10 -mr-2 inline-flex h-11 w-11 items-center justify-center text-paper active:scale-90 group-data-[solid=true]/nav:text-ink lg:hidden"
-    >
-      <MenuIcon class="h-6 w-6 [html.menu-open_&]:hidden" />
-      <CloseIcon class="hidden h-6 w-6 [html.menu-open_&]:block" />
-    </button>
-  </Container>
+    <span class="nav-progress" aria-hidden="true"></span>
+  </div>
 </header>
 
 <div
   id="mobile-menu"
   data-mobile-menu
+  data-lenis-prevent
   inert
-  class="fixed inset-0 z-40 flex -translate-y-3 flex-col bg-ink text-paper opacity-0 pointer-events-none transition-[opacity,transform] duration-300 ease-out [html.menu-open_&]:pointer-events-auto [html.menu-open_&]:translate-y-0 [html.menu-open_&]:opacity-100 lg:hidden"
+  class="fixed inset-0 z-40 flex flex-col bg-deep/90 text-paper backdrop-blur-2xl lg:hidden"
 >
-  <div class="flex h-full flex-col justify-between px-6 pb-10 pt-28 sm:px-10">
+  <Container class="flex h-full flex-col justify-between pb-10 pt-32">
     <nav class="flex flex-col" aria-label="Navigation mobile">
       {
-        NAV_LINKS.map((link) => (
+        NAV_LINKS.map((link, index) => (
           <a
             href={link.href}
-            aria-current={currentPath === link.href ? 'page' : undefined}
+            data-menu-item
+            style={`--i:${index}`}
+            aria-current={isCurrent(link.href) ? 'page' : undefined}
             class:list={[
-              'flex items-center gap-3 border-b border-paper/15 py-4 font-display text-3xl font-semibold tracking-tight sm:text-4xl',
-              currentPath === link.href && 'text-mist',
+              'group flex items-baseline gap-4 border-b border-paper/10 py-5 font-display text-[2.6rem] font-light leading-none tracking-[-0.03em] sm:text-5xl',
+              isCurrent(link.href) ? 'text-paper' : 'text-paper/80',
             ]}
           >
+            <span class="font-body text-xs font-semibold tracking-[0.2em] text-ash">{String(index + 1).padStart(2, '0')}</span>
             {link.label}
-            {currentPath === link.href && <span class="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />}
+            {isCurrent(link.href) && <span class="h-1.5 w-1.5 self-center rounded-full bg-accent-soft" aria-hidden="true" />}
           </a>
         ))
       }
       <a
         href={PRIMARY_CTA.href}
-        class="py-4 font-display text-3xl font-semibold tracking-tight text-mist sm:text-4xl"
+        data-menu-item
+        style={`--i:${NAV_LINKS.length}`}
+        class="mt-8 inline-flex w-fit items-center gap-3 rounded-full bg-paper px-6 py-4 font-body text-sm font-semibold uppercase tracking-[0.08em] text-ink"
       >
         {PRIMARY_CTA.label}
+        <span aria-hidden="true">→</span>
       </a>
     </nav>
 
-    <div class="flex flex-col gap-1 font-body text-sm text-mist">
-      <a href={`mailto:${SITE.email}`} class="w-fit">{SITE.email}</a>
-      <p>{SITE.locality}</p>
+    <div class="flex items-end justify-between gap-6" data-menu-item style={`--i:${NAV_LINKS.length + 1}`}>
+      <div class="flex flex-col gap-1.5 font-body text-sm text-mist">
+        <a href={`mailto:${SITE.email}`} class="w-fit">{SITE.email}</a>
+        <p>{SITE.locality}</p>
+      </div>
+      <p class="font-body text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-ash">47°44′ N — 3°22′ O</p>
     </div>
-  </div>
+  </Container>
 </div>

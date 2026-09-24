@@ -1,17 +1,24 @@
-let controller: AbortController | null = null;
+import { onTick } from './liquid/ticker';
+import { Spring } from './liquid/spring';
+import { clamp, hasFinePointer, prefersReducedMotion } from './liquid/env';
 
-// Editorial list instead of a card grid: the image only appears once you
-// hover a row, following the cursor rather than sitting fixed in a card.
-// Desktop/fine-pointer only — the mobile markup already shows a small
-// inline thumbnail per row with no hover dependency (see realisations
-// index.astro), so this is pure enhancement, not the only way to see it.
+let controller: AbortController | null = null;
+let unsubscribe: (() => void) | null = null;
+
+// Editorial list instead of a card grid: each project's cover appears in a
+// glass lens that trails the pointer on a spring — it lags, leans into its
+// direction of travel and stretches slightly with speed, as if dragged
+// through water. Desktop/fine-pointer only: the mobile markup shows an
+// inline thumbnail per row, so this never gates access to the image.
 export function initPortfolioPreview(): void {
   controller?.abort();
+  unsubscribe?.();
+  unsubscribe = null;
 
   const list = document.querySelector<HTMLElement>('[data-portfolio-list]');
   const preview = document.querySelector<HTMLElement>('[data-portfolio-preview]');
-  if (!list || !preview) return;
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const lens = preview?.querySelector<HTMLElement>('[data-preview-lens]');
+  if (!list || !preview || !lens || !hasFinePointer()) return;
 
   controller = new AbortController();
   const { signal } = controller;
@@ -20,63 +27,59 @@ export function initPortfolioPreview(): void {
   const panels = preview.querySelectorAll<HTMLElement>('[data-preview-panel]');
   if (rows.length === 0 || panels.length === 0) return;
 
-  let curX = 0;
-  let curY = 0;
-  let targetX = 0;
-  let targetY = 0;
-  let raf = 0;
-  let active = false;
+  const reduced = prefersReducedMotion();
+  const x = new Spring(0, { stiffness: 150, damping: 19 });
+  const y = new Spring(0, { stiffness: 150, damping: 19 });
+  let placed = false;
 
-  const render = () => {
-    curX += (targetX - curX) * 0.2;
-    curY += (targetY - curY) * 0.2;
-    preview.style.transform = `translate3d(${curX.toFixed(1)}px, ${curY.toFixed(1)}px, 0)`;
-
-    if (Math.abs(targetX - curX) > 0.1 || Math.abs(targetY - curY) > 0.1) {
-      raf = requestAnimationFrame(render);
-    } else {
-      raf = 0;
+  const tick = (dt: number) => {
+    x.step(dt);
+    y.step(dt);
+    const lean = clamp(x.velocity * 0.012, -9, 9);
+    const speed = Math.hypot(x.velocity, y.velocity);
+    const stretch = reduced ? 0 : Math.min(speed / 9000, 0.12);
+    preview.style.transform = `translate3d(${x.value.toFixed(1)}px, ${y.value.toFixed(1)}px, 0)`;
+    lens.style.transform = reduced ? '' : `rotate(${lean.toFixed(2)}deg) scale(${(1 + stretch).toFixed(3)}, ${(1 - stretch * 0.5).toFixed(3)})`;
+    if (x.settled && y.settled) {
+      unsubscribe?.();
+      unsubscribe = null;
     }
   };
 
   list.addEventListener(
     'pointermove',
     (event) => {
-      targetX = event.clientX + 32;
-      targetY = event.clientY - preview.offsetHeight / 2;
-      if (!raf) raf = requestAnimationFrame(render);
+      x.target = event.clientX + 48;
+      y.target = event.clientY - preview.offsetHeight / 2;
+      if (!placed || reduced) {
+        x.snap();
+        y.snap();
+        placed = true;
+      }
+      if (!unsubscribe) unsubscribe = onTick(tick);
     },
-    { passive: true, signal }
+    { passive: true, signal },
   );
 
   rows.forEach((row) => {
     const targetId = row.dataset.previewTarget;
-
     row.addEventListener(
       'pointerenter',
       () => {
-        active = true;
         preview.classList.add('is-active');
         panels.forEach((panel) => panel.classList.toggle('is-active', panel.dataset.previewPanel === targetId));
       },
-      { signal }
+      { signal },
     );
-
-    row.addEventListener(
-      'pointerleave',
-      () => {
-        active = false;
-        preview.classList.remove('is-active');
-      },
-      { signal }
-    );
+    row.addEventListener('pointerleave', () => preview.classList.remove('is-active'), { signal });
   });
 
   list.addEventListener(
     'pointerleave',
     () => {
-      if (!active) preview.classList.remove('is-active');
+      preview.classList.remove('is-active');
+      placed = false;
     },
-    { signal }
+    { signal },
   );
 }

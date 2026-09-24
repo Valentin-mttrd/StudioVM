@@ -9,9 +9,12 @@ export function initStickyCounter(): void {
   observer?.disconnect();
   if (!display || items.length === 0) return;
 
+  const total = items.length;
   const setActive = (index: string) => {
     if (display.dataset.current === index) return;
     display.dataset.current = index;
+    // The numeral's liquid level: a quarter fuller at each point.
+    display.style.setProperty('--fill', `${Math.round((Number(index) / total) * 100)}%`);
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       display.textContent = index;

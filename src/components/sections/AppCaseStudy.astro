@@ -21,38 +21,46 @@ const features = [
     <div class="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-8">
       <div class="flex flex-col items-start lg:col-span-5">
         <Eyebrow>Étude de cas — Applications</Eyebrow>
-        <h2 class="mt-5 text-display-lg" data-reveal>
-          Un processus métier complexe, devenu un outil simple.
+        <h2 class="[&_strong]:block mt-6 text-display-lg" data-reveal data-reveal-mode="wave">
+          Un processus métier complexe, <strong>devenu un outil simple.</strong>
         </h2>
-        <p class="mt-6 font-body text-lg leading-relaxed text-anthracite/80" data-reveal data-reveal-delay="100">
+        <p class="mt-7 font-body text-lg font-light leading-relaxed text-anthracite/80" data-reveal data-reveal-delay="100">
           Studio VM a conçu un outil de gestion de stock et de préparation de chantier pour
           remplacer les fichiers dispersés et le suivi manuel par une plateforme centralisée et
           automatisée.
         </p>
-        <span
-          class="mt-6 inline-flex w-fit items-center gap-2 rounded-sm border border-ink/20 px-3 py-1.5 font-body text-xs font-semibold uppercase tracking-[0.15em] text-anthracite"
-          data-reveal
-          data-reveal-delay="150"
-        >
+        <span class="chip mt-7 font-semibold uppercase tracking-[0.18em] text-anthracite" data-reveal data-reveal-fast data-reveal-delay="150">
+          <span class="live-dot h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>
           Démonstration
         </span>
 
-        <Button href="/realisations/stock-chantier" variant="text" class="mt-10 w-fit" data-reveal data-reveal-delay="200">
-          Voir l'étude de cas complète
-        </Button>
+        <div data-reveal data-reveal-fast data-reveal-delay="200">
+          <Button href="/realisations/stock-chantier" variant="text" class="mt-10 w-fit">
+            Voir l'étude de cas complète
+          </Button>
+        </div>
       </div>
 
-      <div class="lg:col-span-7 lg:pl-6" data-reveal data-reveal-mode="scale" data-reveal-delay="120">
-        <StockChantierMockup />
+      <div class="lg:col-span-7 lg:pl-6" data-fluid="0.8">
+        <div data-reveal data-reveal-mode="rise" data-reveal-delay="120">
+          <StockChantierMockup />
+        </div>
       </div>
     </div>
 
-    <ul class="mt-24 grid grid-cols-1 gap-x-8 gap-y-10 border-t border-ink/10 pt-14 sm:grid-cols-2 lg:grid-cols-4">
+    <ul class="mt-24 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:mt-28 lg:grid-cols-4">
       {
-        features.map((feature) => (
-          <li data-reveal data-reveal-group="app-features">
-            <h3 class="font-display text-base font-semibold">{feature.title}</h3>
-            <p class="mt-2 font-body text-sm leading-relaxed text-anthracite/75">{feature.description}</p>
+        features.map((feature, index) => (
+          <li
+            class="glass-light glass-hover glass-lift rounded-[20px] p-6"
+            data-sheen
+            data-reveal
+            data-reveal-mode="rise"
+            data-reveal-group="app-features"
+          >
+            <span class="font-display text-xs font-semibold text-accent">{String(index + 1).padStart(2, '0')}</span>
+            <h3 class="mt-5 font-display text-base font-semibold">{feature.title}</h3>
+            <p class="mt-2 font-body text-sm font-light leading-relaxed text-anthracite/75">{feature.description}</p>
           </li>
         ))
       }

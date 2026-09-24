@@ -11,6 +11,11 @@ function nextDelay(el: HTMLElement): number {
   return Math.min(count, 5) * 90;
 }
 
+// Modes whose "in motion" styling (a travelling mask, a clip) costs a paint
+// layer even once finished — they get .is-settled afterwards so the CSS can
+// drop it. Durations match global.css.
+const SETTLE_AFTER: Record<string, number> = { wave: 1450, drop: 1500 };
+
 let observer: IntersectionObserver | null = null;
 
 export function initReveal(): void {
@@ -19,7 +24,7 @@ export function initReveal(): void {
   if (els.length === 0) return;
 
   if (!('IntersectionObserver' in window)) {
-    els.forEach((el) => el.classList.add('is-visible'));
+    els.forEach((el) => el.classList.add('is-visible', 'is-settled'));
     return;
   }
 
@@ -32,6 +37,8 @@ export function initReveal(): void {
         const delay = nextDelay(el);
         if (delay) el.style.transitionDelay = `${delay}ms`;
         el.classList.add('is-visible');
+        const settle = SETTLE_AFTER[el.dataset.revealMode ?? ''];
+        if (settle) window.setTimeout(() => el.classList.add('is-settled'), delay + settle);
         observer?.unobserve(el);
       }
     },

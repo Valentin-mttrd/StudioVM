@@ -9,39 +9,67 @@ import { DIFFERENTIATORS } from '../../data/differentiators';
     <div class="lg:grid lg:grid-cols-12 lg:gap-16">
       <div class="lg:col-span-4">
         <Eyebrow invert>Pourquoi Studio VM</Eyebrow>
-        <h2 class="mt-5 max-w-md text-display-lg text-paper" data-reveal>
-          Une approche différente, pensée pour être utile.
+        <h2 class="[&_strong]:block mt-6 max-w-md text-display-lg text-paper" data-reveal data-reveal-mode="wave">
+          Une approche différente, <strong>pensée pour être utile.</strong>
         </h2>
 
-        <div class="mt-14 hidden lg:sticky lg:top-32 lg:block">
-          <span
-            data-counter-display
-            class="block font-display text-[7rem] font-bold leading-none tracking-tight text-transparent transition-opacity duration-150 [-webkit-text-stroke:1px_rgba(255,255,255,0.35)]"
-          >
-            01
+        <!-- Scroll-spy numeral (src/scripts/sticky-counter.ts): an outline that
+             fills with water as you move through the four points. -->
+        <div class="mt-14 hidden lg:sticky lg:top-36 lg:block" aria-hidden="true">
+          <span data-counter-display class="counter-liquid block font-display text-[8.5rem] font-extralight leading-none tracking-[-0.05em]">01</span>
+          <span class="mt-4 block font-body text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-ash">
+            Sur {String(DIFFERENTIATORS.length).padStart(2, '0')}
           </span>
         </div>
       </div>
 
-      <div class="mt-16 grid grid-cols-1 gap-x-12 gap-y-14 sm:grid-cols-2 lg:col-span-8 lg:mt-0">
+      <div class="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:col-span-8 lg:mt-2">
         {
           DIFFERENTIATORS.map((item, index) => (
-            <div
-              class="border-t border-paper/15 pt-6"
+            <article
+              class="glass glass-hover glass-lift flex min-h-[15rem] flex-col justify-between overflow-hidden p-7 sm:p-8"
+              data-sheen
               data-reveal
+              data-reveal-mode="rise"
               data-reveal-group="why"
               data-counter-item
               data-counter-index={String(index + 1).padStart(2, '0')}
+              style={`--level: ${9 + index * 4}%`}
             >
-              <span class="font-display text-sm font-semibold text-ash lg:hidden">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              <h3 class="mt-4 text-display-sm text-paper lg:mt-0">{item.title}</h3>
-              <p class="mt-3 max-w-sm font-body text-base leading-relaxed text-mist">{item.description}</p>
-            </div>
+              <span class="glass-water" aria-hidden="true" />
+              <span class="font-display text-sm font-semibold text-accent-soft">{String(index + 1).padStart(2, '0')}</span>
+              <div class="mt-10">
+                <h3 class="text-display-sm text-paper">{item.title}</h3>
+                <p class="mt-3 max-w-sm font-body text-base font-light leading-relaxed text-mist">{item.description}</p>
+              </div>
+            </article>
           ))
         }
       </div>
     </div>
   </Container>
 </Section>
+
+<style>
+  @property --fill {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+  }
+
+  /* Outline numeral + a liquid fill rising inside the glyphs. */
+  .counter-liquid {
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(255 255 255 / 0.32);
+    background: linear-gradient(to top, rgb(174 189 201 / 0.34) 0 var(--fill), transparent var(--fill));
+    -webkit-background-clip: text;
+    background-clip: text;
+    transition:
+      --fill var(--duration-tide) var(--ease-spring-soft),
+      opacity 0.15s var(--ease-out);
+  }
+
+  .glass:hover :global(.glass-water) {
+    height: calc(var(--level) + 9%);
+  }
+</style>

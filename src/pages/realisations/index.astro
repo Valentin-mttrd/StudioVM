@@ -30,6 +30,7 @@ const filters = [
   <PageHeader
     eyebrow="Réalisations"
     title="Ce que Studio VM peut concevoir pour vous."
+    emphasis="concevoir pour vous."
     description="Des projets réels, présentés tels qu'ils sont : démonstrations, projets personnels ou réalisations en cours. Aucun résultat ni client inventé."
   />
 
@@ -42,7 +43,7 @@ const filters = [
               type="button"
               data-filter={filter.value}
               aria-pressed={filter.value === 'all' ? 'true' : 'false'}
-              class="rounded-sm border border-ink/20 px-4 py-2 font-body text-xs font-semibold uppercase tracking-wide text-ink transition-colors duration-200 aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper"
+              class="chip chip-hover px-5 py-3 font-semibold uppercase tracking-[0.12em] text-ink transition-[background-color,color,box-shadow,transform] duration-300 aria-pressed:bg-ink aria-pressed:text-paper aria-pressed:shadow-[0_12px_24px_-12px_rgb(11_11_11/0.6)]"
             >
               {filter.label}
             </button>
@@ -51,25 +52,29 @@ const filters = [
       </div>
 
       <div class="relative mt-14" data-portfolio-list>
-        <ul class="flex flex-col divide-y divide-mist border-t border-mist">
+        <ul class="flex flex-col divide-y divide-ink/10 border-t border-ink/10">
           {
             projects.map((project, index) => (
               <li>
                 <a
                   href={`/realisations/${project.id}`}
-                  class="group flex items-center gap-5 py-7 sm:gap-8 sm:py-9"
+                  class="portfolio-row group relative flex items-center gap-5 py-7 sm:gap-8 sm:py-10"
                   data-project-card
                   data-category={project.data.category}
                   data-portfolio-row
                   data-preview-target={project.id}
+                  data-cursor="view"
+                  data-cursor-label="Voir"
                   data-reveal
+                  data-reveal-mode="rise"
                   data-reveal-group="portfolio"
                 >
+                  <span class="portfolio-row__tide" aria-hidden="true" />
                   <span class="hidden shrink-0 font-display text-sm font-semibold text-graphite sm:block">
                     {String(index + 1).padStart(2, '0')}
                   </span>
 
-                  <div class="h-16 w-20 shrink-0 overflow-hidden rounded-xs lg:hidden">
+                  <div class="h-16 w-20 shrink-0 overflow-hidden rounded-[12px] lg:hidden">
                     <AbstractCover
                       kind={project.data.category}
                       tone={COVER_TONES[project.data.category]}
@@ -79,7 +84,7 @@ const filters = [
                   </div>
 
                   <div class="min-w-0 flex-1">
-                    <h2 class="truncate font-display text-2xl font-semibold leading-snug transition-transform duration-500 ease-out sm:text-3xl lg:translate-x-0 lg:group-hover:translate-x-3 lg:text-4xl">
+                    <h2 class="truncate font-display text-2xl font-light leading-snug tracking-[-0.03em] transition-[translate,font-weight] duration-700 ease-[var(--ease-spring)] sm:text-3xl lg:text-5xl lg:group-hover:translate-x-4 lg:group-hover:font-medium">
                       {project.data.title}
                     </h2>
                     <div class="mt-2 flex items-center gap-3">
@@ -108,15 +113,15 @@ const filters = [
           {
             !hasCategory('3d') && (
               <li>
-                <div class="flex items-center gap-5 py-7 sm:gap-8 sm:py-9" data-project-card data-category="3d" data-reveal data-reveal-group="portfolio">
+                <div class="flex items-center gap-5 py-7 sm:gap-8 sm:py-10" data-project-card data-category="3d" data-reveal data-reveal-mode="rise" data-reveal-group="portfolio">
                   <span class="hidden shrink-0 font-display text-sm font-semibold text-graphite/50 sm:block">
                     {String(projects.length + 1).padStart(2, '0')}
                   </span>
-                  <div class="flex h-16 w-20 shrink-0 items-center justify-center rounded-xs border border-dashed border-mist lg:hidden">
+                  <div class="flex h-16 w-20 shrink-0 items-center justify-center rounded-[12px] border border-dashed border-ink/15 lg:hidden">
                     <span class="font-body text-[9px] font-semibold uppercase tracking-wide text-graphite/70">Bientôt</span>
                   </div>
                   <div class="min-w-0 flex-1">
-                    <h2 class="truncate font-display text-2xl font-semibold leading-snug text-anthracite/50 sm:text-3xl lg:text-4xl">
+                    <h2 class="truncate font-display text-2xl font-light leading-snug tracking-[-0.03em] text-anthracite/45 sm:text-3xl lg:text-5xl">
                       Projets 3D à venir
                     </h2>
                     <div class="mt-2 flex items-center gap-3">
@@ -138,10 +143,10 @@ const filters = [
              access to the image, it just adds to it. -->
         <div
           data-portfolio-preview
-          class="pointer-events-none fixed left-0 top-0 z-40 hidden w-64 lg:block xl:w-72"
+          class="pointer-events-none fixed left-0 top-0 z-40 hidden w-72 lg:block xl:w-80"
           aria-hidden="true"
         >
-          <div class="relative aspect-[4/3] overflow-hidden rounded-sm shadow-2xl shadow-ink/30">
+          <div class="preview-lens relative aspect-[4/3] overflow-hidden rounded-glass" data-preview-lens>
             {
               projects.map((project) => (
                 <div
@@ -163,3 +168,44 @@ const filters = [
     </Container>
   </Section>
 </Layout>
+
+<style>
+  .portfolio-row {
+    isolation: isolate;
+  }
+
+  /* Hovering a project row lets a tide of light water run in behind it. */
+  .portfolio-row__tide {
+    position: absolute;
+    inset: 0 -1.5rem;
+    z-index: -1;
+    border-radius: 24px;
+    background: linear-gradient(90deg, rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.35));
+    box-shadow: inset 0 0 0 1px rgb(11 11 11 / 0.05), 0 20px 40px -30px rgb(18 21 24 / 0.35);
+    clip-path: inset(0 100% 0 0 round 24px);
+    transition: clip-path 0.7s var(--ease-liquid);
+  }
+
+  @media (hover: hover) {
+    .portfolio-row:hover .portfolio-row__tide {
+      clip-path: inset(0 0 0 0 round 24px);
+    }
+  }
+
+  .preview-lens {
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.5),
+      0 40px 70px -30px rgb(18 21 24 / 0.55);
+    will-change: transform;
+  }
+
+  .preview-lens::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(90% 60% at 30% 0%, rgb(255 255 255 / 0.35), transparent 60%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+  }
+</style>

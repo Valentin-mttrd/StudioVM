@@ -14,81 +14,131 @@ const renduImage = '/images/showcase/entree-jardin-rendu.jpg';
 ---
 <Section tone="ink" id="visualisation-3d">
   <Container>
-    <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+    <div class="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-end">
       <div class="max-w-2xl">
         <Eyebrow invert>Visualisation 3D</Eyebrow>
-        <h2 class="mt-5 text-display-lg text-paper" data-reveal>
-          Donner à voir un projet avant qu'il n'existe.
+        <h2 class="[&_strong]:block mt-6 text-display-lg text-paper" data-reveal data-reveal-mode="wave">
+          Donner à voir un projet <strong>avant qu'il n'existe.</strong>
         </h2>
-        <p class="mt-6 max-w-xl font-body text-lg leading-relaxed text-mist" data-reveal data-reveal-delay="100">
+        <p class="mt-7 max-w-xl font-body text-lg font-light leading-relaxed text-mist" data-reveal data-reveal-delay="100">
           Un plan reste abstrait pour la plupart des interlocuteurs. Studio VM le transforme en
           image réaliste, pour aider à décider, présenter ou vendre un projet avant sa
           réalisation.
         </p>
       </div>
-      <Button href="/services#3d" variant="outline" invert data-reveal data-reveal-delay="160">
-        Voir le service 3D
-      </Button>
+      <div data-reveal data-reveal-fast data-reveal-delay="160">
+        <Button href="/services#3d" variant="outline" invert>Voir le service 3D</Button>
+      </div>
     </div>
 
     <!-- data-reveal lives on this plain outer div, not on [data-compare]:
          a clip-path'd target reports zero intersection to its own
          IntersectionObserver in Chromium, so the element that gets
-         data-reveal-mode="clip" must never be the one that gets clipped.
+         data-reveal-mode="drop" must never be the one that gets clipped.
          See DashboardPreview.astro for the fuller explanation. -->
-    <div class="mt-16 w-full" data-reveal data-reveal-mode="clip" data-reveal-delay="120">
-    <div
-      class="reveal-clip-target relative aspect-[16/10] w-full overflow-hidden rounded-sm border border-paper/15 sm:aspect-[16/8]"
-      data-compare
-    >
-      <div class="absolute inset-0">
-        <img
-          src={planImage}
-          alt="Rendu 3D non texturé d'un aménagement extérieur : entrée végétalisée, pergola et cheminement"
-          class="h-full w-full object-cover object-left-bottom"
-          width="2000"
-          height="1125"
-          loading="lazy"
-          decoding="async"
+    <div class="mt-16 w-full" data-reveal data-reveal-mode="drop" data-reveal-delay="120" style="--drop-radius: var(--radius-lens)">
+      <div
+        class="compare reveal-clip-target relative aspect-[16/10] w-full overflow-hidden rounded-lens sm:aspect-[16/8]"
+        data-compare
+        data-cursor="drag"
+        data-cursor-label="Glisser"
+      >
+        <div class="absolute inset-0">
+          <img
+            src={planImage}
+            alt="Rendu 3D non texturé d'un aménagement extérieur : entrée végétalisée, pergola et cheminement"
+            class="h-full w-full object-cover object-left-bottom"
+            width="2000"
+            height="1125"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="chip chip-dark absolute left-5 top-5 font-semibold uppercase tracking-[0.2em] sm:left-6 sm:top-6">Plan</span>
+        </div>
+
+        <div class="absolute inset-0" data-compare-after>
+          <img
+            src={renduImage}
+            alt="Rendu 3D réaliste et texturé du même aménagement extérieur : entrée végétalisée, pergola et cheminement"
+            class="h-full w-full object-cover object-left-bottom"
+            width="2000"
+            height="1125"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="chip chip-dark absolute right-5 top-5 font-semibold uppercase tracking-[0.2em] sm:right-6 sm:top-6">3D</span>
+        </div>
+
+        <!-- The divider is a thread of water; the handle a drop of it. -->
+        <div class="pointer-events-none absolute inset-y-0 w-px" data-compare-handle aria-hidden="true">
+          <span class="compare-thread absolute inset-y-0 left-0 w-px"></span>
+          <span class="compare-lens absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full">
+            <svg viewBox="0 0 24 24" class="h-4 w-4 text-paper" fill="none">
+              <path d="M9 6L4 12L9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M15 6L20 12L15 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+        </div>
+
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value="50"
+          aria-label="Curseur de comparaison entre le plan et la visualisation 3D"
+          class="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
         />
-        <span class="absolute left-6 top-6 font-body text-xs font-semibold uppercase tracking-[0.2em] text-mist">
-          Plan
-        </span>
       </div>
-
-      <div class="absolute inset-0" data-compare-after>
-        <img
-          src={renduImage}
-          alt="Rendu 3D réaliste et texturé du même aménagement extérieur : entrée végétalisée, pergola et cheminement"
-          class="h-full w-full object-cover object-left-bottom"
-          width="2000"
-          height="1125"
-          loading="lazy"
-          decoding="async"
-        />
-        <span class="absolute right-6 top-6 font-body text-xs font-semibold uppercase tracking-[0.2em] text-mist">
-          3D
-        </span>
-      </div>
-
-      <div class="pointer-events-none absolute inset-y-0 w-px bg-paper/60" data-compare-handle aria-hidden="true">
-        <span class="absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-paper/60 bg-ink">
-          <svg viewBox="0 0 24 24" class="h-4 w-4 text-paper" fill="none">
-            <path d="M9 6L4 12L9 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M15 6L20 12L15 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-      </div>
-
-      <input
-        type="range"
-        min="0"
-        max="100"
-        value="50"
-        aria-label="Curseur de comparaison entre le plan et la visualisation 3D"
-        class="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
-      />
-    </div>
     </div>
   </Container>
 </Section>
+
+<style>
+  .compare {
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.12),
+      0 50px 100px -50px rgb(0 0 0 / 0.8);
+  }
+
+  .compare::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+
+  .compare :global(.chip-dark) {
+    color: var(--color-paper);
+    background: rgb(18 21 24 / 0.52);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18), 0 10px 24px -12px rgb(0 0 0 / 0.5);
+  }
+
+  .compare-thread {
+    background: linear-gradient(to bottom, transparent, rgb(255 255 255 / 0.85) 12%, rgb(255 255 255 / 0.85) 88%, transparent);
+    box-shadow: 0 0 12px rgb(219 225 231 / 0.7);
+  }
+
+  .compare-lens {
+    background:
+      radial-gradient(circle at 32% 26%, rgb(255 255 255 / 0.6) 0 5%, transparent 30%),
+      rgb(18 21 24 / 0.28);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.5),
+      inset 0 -6px 14px rgb(174 189 201 / 0.25),
+      0 16px 32px -12px rgb(0 0 0 / 0.6);
+    -webkit-backdrop-filter: blur(8px) saturate(160%);
+    backdrop-filter: blur(8px) saturate(160%);
+    transition: scale var(--duration-firm) var(--ease-spring-firm);
+  }
+
+  .compare:has(input:active) .compare-lens {
+    scale: 0.88 1.08;
+  }
+
+  .compare:has(input:focus-visible) .compare-lens {
+    outline: 2px solid var(--color-accent-soft);
+    outline-offset: 4px;
+  }
+</style>

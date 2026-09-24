@@ -16,8 +16,10 @@ const budgets = [
   'Je ne sais pas encore',
 ];
 
-const inputClass =
-  'w-full rounded-sm border border-mist bg-paper px-4 py-3 font-body text-base text-ink placeholder:text-graphite/60 transition-colors duration-200 focus:border-ink';
+// Fields are liquid glass: a clear pane over the water that fills with light
+// and gains a soft accent rim when focused (global.css has none of this —
+// it only lives here, the one page with a form).
+const inputClass = 'field w-full px-5 py-3.5 font-body text-base text-ink placeholder:text-graphite/60';
 const labelClass = 'block font-body text-sm font-semibold text-ink';
 ---
 <Layout
@@ -28,6 +30,7 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
   <PageHeader
     eyebrow="Contact"
     title="Parlons de votre projet."
+    emphasis="votre projet."
     description="Décrivez votre besoin en quelques lignes. Studio VM revient vers vous rapidement pour en discuter."
   />
 
@@ -35,7 +38,7 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
     <Container>
       <div class="grid grid-cols-1 gap-16 lg:grid-cols-12">
         <div class="lg:col-span-7">
-          <form data-contact-form class="flex flex-col gap-7" novalidate>
+          <form data-contact-form class="glass-light flex flex-col gap-7 rounded-lens p-6 sm:p-10" data-sheen novalidate>
             <div class="absolute -left-[9999px]" aria-hidden="true">
               <label for="societe_web">Ne pas remplir ce champ</label>
               <input type="text" id="societe_web" name="societe_web" tabindex="-1" autocomplete="off" />
@@ -75,7 +78,7 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
                   projectTypes.map((type, index) => (
                     <label class="cursor-pointer">
                       <input type="radio" name="projet" value={type} required={index === 0} class="peer sr-only" />
-                      <span class="inline-flex rounded-sm border border-mist px-4 py-2.5 font-body text-sm text-ink transition-colors duration-200 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent">
+                      <span class="chip chip-hover px-5 py-3 text-sm text-ink transition-[background-color,color,box-shadow,transform] duration-300 peer-checked:bg-ink peer-checked:text-paper peer-checked:shadow-[0_12px_24px_-12px_rgb(11_11_11/0.6)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent">
                         {type}
                       </span>
                     </label>
@@ -102,12 +105,13 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
                 rows="6"
                 class:list={[inputClass, 'mt-2 resize-y']}
                 placeholder="Contexte, objectifs, délais envisagés…"
+                data-lenis-prevent
               />
             </div>
 
-            <p class="border-l-2 border-accent py-1 pl-4 font-body text-sm text-ink" data-form-status hidden></p>
+            <p class="glass-light rounded-drop border-l-2 border-accent px-5 py-3 font-body text-sm text-ink" data-form-status hidden></p>
 
-            <Button type="submit" variant="solid" class="w-fit" data-submit>
+            <Button type="submit" variant="solid" class="w-fit" data-submit data-magnetic="0.25">
               Envoyer ma demande
             </Button>
           </form>
@@ -116,7 +120,7 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
             data-form-success
             hidden
             tabindex="-1"
-            class="rounded-sm border border-mist bg-sand-soft p-8"
+            class="glass-light overflow-hidden rounded-lens p-10"
           >
             <h2 class="text-display-sm">Votre demande a bien été envoyée.</h2>
             <p class="mt-4 font-body text-base leading-relaxed text-anthracite/80">
@@ -127,11 +131,12 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
         </div>
 
         <aside class="lg:col-span-4 lg:col-start-9">
-          <div class="flex flex-col gap-10">
+          <div class="flex flex-col gap-10 lg:sticky lg:top-36 lg:pt-10">
             <div>
               <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">Écrire directement</p>
-              <a href={`mailto:${SITE.email}`} class="mt-3 block font-display text-xl font-semibold">
+              <a href={`mailto:${SITE.email}`} class="tlink mt-4 normal-case tracking-normal font-display text-xl font-semibold">
                 {SITE.email}
+                <span class="tlink__line" aria-hidden="true"></span>
               </a>
             </div>
             <div>
@@ -150,6 +155,39 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
 </Layout>
 
 <style>
+  .field {
+    border-radius: var(--radius-drop);
+    background: linear-gradient(165deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.6));
+    box-shadow: inset 0 0 0 1px rgb(11 11 11 / 0.1), inset 0 1px 2px rgb(18 21 24 / 0.05);
+    transition:
+      box-shadow var(--duration-moderate) var(--ease-out),
+      background-color var(--duration-moderate) var(--ease-out);
+  }
+
+  .field:hover {
+    box-shadow: inset 0 0 0 1px rgb(11 11 11 / 0.18), inset 0 1px 2px rgb(18 21 24 / 0.05);
+  }
+
+  .field:focus {
+    outline: none;
+    background: rgb(255 255 255 / 0.95);
+    box-shadow:
+      inset 0 0 0 1.5px var(--color-accent),
+      0 0 0 5px rgb(70 96 122 / 0.12),
+      0 14px 30px -18px rgb(70 96 122 / 0.45);
+  }
+
+  select.field {
+    appearance: none;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%235c5c5c' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E"),
+      linear-gradient(165deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.6));
+    background-repeat: no-repeat;
+    background-position: right 1.2rem center, 0 0;
+    background-size: 12px 8px, auto;
+    padding-right: 3rem;
+  }
+
   /* Both appear rarely (once per submit) so a real transition earns its
      keep here — see emil-design-eng's frequency rule. @starting-style
      covers the display:none → visible jump the `hidden` attribute makes. */

@@ -1,137 +1,93 @@
-let controller: AbortController | null = null;
+import { onTick } from './liquid/ticker';
+import { hasFinePointer, prefersReducedMotion } from './liquid/env';
 
+let controller: AbortController | null = null;
+let unsubscribe: (() => void) | null = null;
+
+// Hero depth: the fallback tile grid, the floating villa and the glass
+// droplets move at different rates with scroll and pointer, so the scene
+// separates into planes. All eased toward their targets on the shared
+// ticker (frame-rate independent), and nothing runs once settled.
 export function initHeroParallax(): void {
+  controller?.abort();
+  unsubscribe?.();
+  unsubscribe = null;
+
   const section = document.querySelector<HTMLElement>('[data-hero]');
   const grid = document.querySelector<HTMLElement>('[data-parallax]');
   const object = document.querySelector<HTMLElement>('[data-parallax-object]');
-  if (!grid && !object) return;
-
-  controller?.abort();
-
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion) {
-    if (grid) grid.style.transform = '';
-    if (object) object.style.transform = '';
-    return;
-  }
+  const drops = Array.from(document.querySelectorAll<HTMLElement>('.hero-drop[data-depth]'));
+  if (!section || prefersReducedMotion()) return;
 
   controller = new AbortController();
   const { signal } = controller;
 
-  let scrollT = 0;
-  let scrollTicking = false;
-  let gridMouseX = 0;
-  let gridMouseY = 0;
-  let gridTargetX = 0;
-  let gridTargetY = 0;
-  let objMouseX = 0;
-  let objMouseY = 0;
-  let objTiltX = 0;
-  let objTiltY = 0;
-  let objTargetX = 0;
-  let objTargetY = 0;
-  let objTargetTiltX = 0;
-  let objTargetTiltY = 0;
-  let settling = false;
+  let targetX = 0;
+  let targetY = 0;
+  let x = 0;
+  let y = 0;
+  let scroll = window.scrollY;
 
-  const render = () => {
-    if (grid) {
-      const gridScroll = Math.min(scrollT * 0.08, 48);
-      grid.style.transform = `translate3d(${gridMouseX.toFixed(2)}px, ${(gridScroll + gridMouseY).toFixed(2)}px, 0)`;
-    }
+  const apply = () => {
+    const s = Math.min(scroll, window.innerHeight * 1.2);
+    if (grid) grid.style.transform = `translate3d(${(x * 14).toFixed(2)}px, ${(Math.min(s * 0.08, 48) + y * 8).toFixed(2)}px, 0)`;
     if (object) {
-      const objScroll = -Math.min(scrollT * 0.14, 90);
-      object.style.transform = `translate3d(${objMouseX.toFixed(2)}px, ${(objScroll + objMouseY).toFixed(2)}px, 0) rotateX(${objTiltX.toFixed(2)}deg) rotateY(${objTiltY.toFixed(2)}deg)`;
+      object.style.transform =
+        `translate3d(${(x * -22).toFixed(2)}px, ${(-Math.min(s * 0.14, 90) + y * -14).toFixed(2)}px, 0) ` +
+        `rotateX(${(y * -6).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg)`;
+    }
+    for (const drop of drops) {
+      const d = Number(drop.dataset.depth) || 0.5;
+      drop.style.transform = `translate3d(${(x * -40 * d).toFixed(2)}px, ${(y * -30 * d - s * 0.25 * d).toFixed(2)}px, 0)`;
     }
   };
 
-  const updateScroll = () => {
-    scrollT = window.scrollY;
-    render();
-    scrollTicking = false;
+  const tick = (dt: number) => {
+    const k = 1 - Math.exp(-5 * dt);
+    x += (targetX - x) * k;
+    y += (targetY - y) * k;
+    apply();
+    if (Math.abs(targetX - x) < 0.0005 && Math.abs(targetY - y) < 0.0005) {
+      unsubscribe?.();
+      unsubscribe = null;
+    }
   };
-  updateScroll();
 
+  const wake = () => {
+    if (!unsubscribe) unsubscribe = onTick(tick);
+  };
+
+  apply();
   window.addEventListener(
     'scroll',
     () => {
-      if (!scrollTicking) {
-        scrollTicking = true;
-        requestAnimationFrame(updateScroll);
+      scroll = window.scrollY;
+      if (scroll < window.innerHeight * 1.4) {
+        apply();
       }
     },
-    { passive: true, signal }
+    { passive: true, signal },
   );
 
-  // Decorative-only, desktop pointers only: the background grid drifts a
-  // little toward the cursor, the floating 3D render drifts more and tilts
-  // slightly — two layers separating at different speeds is what reads as
-  // depth rather than a single flat plane. Both lerp toward their targets
-  // so they settle like a spring instead of snapping to the pointer.
-  const canTrackPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-
-  const settle = () => {
-    gridMouseX += (gridTargetX - gridMouseX) * 0.08;
-    gridMouseY += (gridTargetY - gridMouseY) * 0.08;
-    objMouseX += (objTargetX - objMouseX) * 0.09;
-    objMouseY += (objTargetY - objMouseY) * 0.09;
-    objTiltX += (objTargetTiltX - objTiltX) * 0.09;
-    objTiltY += (objTargetTiltY - objTiltY) * 0.09;
-    render();
-
-    const settled =
-      Math.abs(gridTargetX - gridMouseX) < 0.05 &&
-      Math.abs(gridTargetY - gridMouseY) < 0.05 &&
-      Math.abs(objTargetX - objMouseX) < 0.05 &&
-      Math.abs(objTargetY - objMouseY) < 0.05 &&
-      Math.abs(objTargetTiltX - objTiltX) < 0.05 &&
-      Math.abs(objTargetTiltY - objTiltY) < 0.05;
-
-    if (!settled) {
-      requestAnimationFrame(settle);
-    } else {
-      settling = false;
-    }
-  };
-
-  if (canTrackPointer && section) {
+  if (hasFinePointer()) {
     section.addEventListener(
       'pointermove',
       (event) => {
         const rect = section.getBoundingClientRect();
-        const relX = (event.clientX - rect.left) / rect.width - 0.5;
-        const relY = (event.clientY - rect.top) / rect.height - 0.5;
-
-        gridTargetX = relX * 14;
-        gridTargetY = relY * 8;
-        objTargetX = relX * -22;
-        objTargetY = relY * -14;
-        objTargetTiltY = relX * 8;
-        objTargetTiltX = relY * -6;
-
-        if (!settling) {
-          settling = true;
-          requestAnimationFrame(settle);
-        }
+        targetX = (event.clientX - rect.left) / rect.width - 0.5;
+        targetY = (event.clientY - rect.top) / rect.height - 0.5;
+        wake();
       },
-      { passive: true, signal }
+      { passive: true, signal },
     );
-
     section.addEventListener(
       'pointerleave',
       () => {
-        gridTargetX = 0;
-        gridTargetY = 0;
-        objTargetX = 0;
-        objTargetY = 0;
-        objTargetTiltX = 0;
-        objTargetTiltY = 0;
-        if (!settling) {
-          settling = true;
-          requestAnimationFrame(settle);
-        }
+        targetX = 0;
+        targetY = 0;
+        wake();
       },
-      { signal }
+      { signal },
     );
   }
 }

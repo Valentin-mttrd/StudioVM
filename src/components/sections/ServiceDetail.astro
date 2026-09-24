@@ -16,45 +16,51 @@ const { service, tone = 'paper', coverTone = 'anthracite', flip = false } = Astr
 ---
 <Section tone={tone} id={service.id} class="scroll-mt-24">
   <Container>
-    <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+    <div class="grid grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-16">
       <div class:list={['lg:col-span-6', flip && 'lg:order-2']}>
-        <span class="font-display text-sm font-semibold text-graphite">{service.index}</span>
-        <h2 class="mt-4 text-display-lg" data-reveal>
+        <div class="flex items-center gap-4" data-reveal data-reveal-fast>
+          <span class="font-display text-sm font-semibold text-accent">{service.index}</span>
+          <span class="h-px w-10 bg-ink/15" aria-hidden="true" />
+          <span class="font-body text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-graphite">Expertise</span>
+        </div>
+        <h2 class="mt-6 text-display-lg" data-reveal data-reveal-mode="wave">
           {service.title}
         </h2>
         {
-          service.description.map((paragraph) => (
-            <p class="mt-5 font-body text-lg leading-relaxed text-anthracite/80">{paragraph}</p>
+          service.description.map((paragraph, i) => (
+            <p class="mt-6 font-body text-lg font-light leading-relaxed text-anthracite/80" data-reveal data-reveal-delay={String(80 + i * 60)}>
+              {paragraph}
+            </p>
           ))
         }
 
-        <ul class="mt-8 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+        <ul class="mt-9 grid grid-cols-1 gap-x-6 gap-y-3.5 sm:grid-cols-2" data-reveal data-reveal-fast data-reveal-delay="160">
           {
             service.bullets.map((bullet) => (
-              <li class="flex items-center gap-2.5 font-body text-sm text-ink">
-                <span class="h-1 w-1 shrink-0 rounded-full bg-ink/60" aria-hidden="true" />
+              <li class="flex items-center gap-3 font-body text-sm text-ink">
+                <span class="h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-accent-soft to-accent shadow-[0_0_0_3px_rgb(70_96_122/0.1)]" aria-hidden="true" />
                 {bullet}
               </li>
             ))
           }
         </ul>
 
-        <div class="mt-8 flex flex-wrap gap-2">
-          {
-            service.audiences.map((audience) => (
-              <span class="rounded-sm border border-mist px-3 py-1.5 font-body text-xs uppercase tracking-wide text-graphite">
-                {audience}
-              </span>
-            ))
-          }
+        <div class="mt-9 flex flex-wrap gap-2" data-reveal data-reveal-fast data-reveal-delay="200">
+          {service.audiences.map((audience) => <span class="chip chip-hover uppercase tracking-[0.12em]">{audience}</span>)}
         </div>
 
-        <Button href={service.cta.href} variant="solid" class="mt-10 w-fit">
-          {service.cta.label}
-        </Button>
+        <div class="mt-11" data-reveal data-reveal-fast data-reveal-delay="240">
+          <Button href={service.cta.href} variant="solid">
+            {service.cta.label}
+          </Button>
+        </div>
       </div>
-      <div class:list={['lg:col-span-6', flip && 'lg:order-1']} data-reveal data-reveal-delay="100">
-        <AbstractCover kind={service.id} tone={coverTone} flip={flip} class="aspect-[4/3] rounded-sm" />
+      <div class:list={['lg:col-span-6', flip && 'lg:order-1']} data-fluid>
+        <div data-reveal data-reveal-mode="drop" data-reveal-delay="100">
+          <div class="reveal-clip-target glass-light overflow-hidden rounded-glass p-2">
+            <AbstractCover kind={service.id} tone={coverTone} flip={flip} class="aspect-[4/3] rounded-[18px]" />
+          </div>
+        </div>
       </div>
     </div>
   </Container>

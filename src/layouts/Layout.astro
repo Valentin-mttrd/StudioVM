@@ -2,6 +2,7 @@
 import { ClientRouter } from 'astro:transitions';
 import Navbar from '../components/layout/Navbar.astro';
 import Footer from '../components/layout/Footer.astro';
+import Logo from '../components/ui/Logo.astro';
 import { SITE, DEFAULT_OG_DESCRIPTION } from '../lib/constants';
 import { absoluteUrl, pageTitle, organizationSchema } from '../lib/seo';
 import '../styles/global.css';
@@ -29,7 +30,7 @@ const resolvedTitle = pageTitle(title, isHome);
 const schemas = [organizationSchema(), ...structuredData];
 ---
 <!doctype html>
-<html lang="fr">
+<html lang="fr" transition:animate="none">
   <head>
     <script is:inline>
       document.documentElement.classList.add('js');
@@ -72,17 +73,44 @@ const schemas = [organizationSchema(), ...structuredData];
     <ClientRouter />
   </head>
   <body>
-    <div
-      data-scroll-progress
-      class="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[2px] origin-left scale-x-0 bg-accent"
-      aria-hidden="true"
-    >
-    </div>
+    <!-- The water behind the whole site (src/scripts/liquid). Persisted so the
+         WebGL context, ripples and time survive client-side navigations. -->
+    <canvas id="liquid-canvas" class="liquid-canvas" aria-hidden="true" transition:persist></canvas>
     <Navbar />
     <main id="main-content">
       <slot />
     </main>
     <Footer />
+
+    <!-- Page-transition wave (src/scripts/page-transition.ts). -->
+    <div id="liquid-veil" class="veil" aria-hidden="true" transition:persist>
+      <svg class="veil__svg" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
+        <defs>
+          <linearGradient id="veil-depth" x1="0" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#181d23" />
+            <stop offset="0.55" stop-color="#121518" />
+            <stop offset="1" stop-color="#0f1012" />
+          </linearGradient>
+        </defs>
+        <path class="veil__fill" fill="url(#veil-depth)" d="M0,100 L100,100 L100,100 L0,100 Z" />
+        <path class="veil__edge" d="M0,100 L100,100" />
+      </svg>
+      <span class="veil__mark"><Logo variant="mark" tone="light" markClass="h-7" /></span>
+    </div>
+
+    <!-- Liquid cursor (src/scripts/cursor.ts) — fine pointers only. -->
+    <div id="liquid-cursor" class="cursor" data-state="default" data-over="dark" aria-hidden="true" transition:persist>
+      <div class="cursor__ring"><span class="cursor__label"></span></div>
+      <div class="cursor__dot"></div>
+    </div>
+
+    <!-- Shared SVG filters. #goo merges blobs into one liquid shape (nav indicator). -->
+    <svg class="pointer-events-none absolute h-0 w-0" aria-hidden="true" focusable="false">
+      <filter id="goo" x="-20%" y="-50%" width="140%" height="200%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" />
+      </filter>
+    </svg>
 
     <script src="../scripts/main.ts"></script>
   </body>
