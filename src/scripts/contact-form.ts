@@ -53,6 +53,7 @@ export function initContactForm(): void {
 
     submitBtn?.setAttribute('disabled', 'true');
     submitBtn?.setAttribute('data-loading', 'true');
+    submitBtn?.setAttribute('aria-busy', 'true');
     setStatus('');
 
     try {
@@ -81,6 +82,7 @@ export function initContactForm(): void {
     } finally {
       submitBtn?.removeAttribute('disabled');
       submitBtn?.removeAttribute('data-loading');
+      submitBtn?.removeAttribute('aria-busy');
     }
   });
 }

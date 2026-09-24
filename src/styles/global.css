@@ -53,8 +53,27 @@
   /* Container */
   --container-max: 90rem;
 
-  /* Easing */
-  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  /* ==========================================================================
+     Motion — one system, three tiers. Every transition in the codebase should
+     round to one of these durations, paired with the easing that matches its
+     nature (entering/exiting vs. moving vs. a plain hover/color swap).
+
+       micro interaction   (button press, checkbox)      → --duration-instant
+       standard interaction (hover, dropdown, tooltip)    → --duration-fast / --duration-base
+       important transition (page-level reveal, drawer)   → --duration-moderate / slower, case-by-case
+
+     Easing: --ease-out for anything entering/appearing (starts fast, feels
+     responsive — never ease-in on UI). --ease-in-out for things moving or
+     morphing while already on screen.
+     ========================================================================== */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-premium: var(--ease-out);
+
+  --duration-instant: 120ms;
+  --duration-fast: 180ms;
+  --duration-base: 240ms;
+  --duration-moderate: 400ms;
 }
 
 /* ==========================================================================
@@ -109,6 +128,23 @@
 
   html.menu-open {
     @apply overflow-hidden;
+  }
+}
+
+/* ==========================================================================
+   Pressable elements — buttons, links styled as buttons, the nav CTA.
+   Color/background/border settle at a normal pace; the press itself (scale,
+   applied via active:scale-[…] utilities) must feel instant, so it gets its
+   own fast entry in the same transition list instead of inheriting the
+   slower color timing.
+   ========================================================================== */
+@layer components {
+  .btn-motion {
+    transition:
+      color var(--duration-base) var(--ease-out),
+      background-color var(--duration-base) var(--ease-out),
+      border-color var(--duration-base) var(--ease-out),
+      transform var(--duration-instant) var(--ease-out);
   }
 }
 
@@ -199,6 +235,17 @@
       opacity: 1;
       transform: none;
     }
+  }
+
+  /* Hierarchy, not uniformity: small/secondary elements (badges, dividers,
+     button rows) travel less and settle sooner than headings and imagery,
+     which keep the fuller entrance above. Same mechanism, lighter weight. */
+  html.js [data-reveal][data-reveal-fast] {
+    transform: translateY(0.5rem);
+  }
+
+  html.js [data-reveal][data-reveal-fast].is-visible {
+    transition: opacity var(--duration-moderate) var(--ease-premium), transform var(--duration-moderate) var(--ease-premium);
   }
 }
 

@@ -33,9 +33,11 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
           <a
             href={link.href}
             class:list={[
-              'relative font-body text-sm font-medium uppercase tracking-wide text-paper/85 transition-colors duration-500 hover:text-paper group-data-[solid=true]/nav:text-ink/75 group-data-[solid=true]/nav:hover:text-ink',
-              currentPath === link.href &&
-                'text-paper group-data-[solid=true]/nav:text-ink after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:bg-current',
+              'relative font-body text-sm font-medium uppercase tracking-wide text-paper/85 transition-colors duration-300 hover:text-paper group-data-[solid=true]/nav:text-ink/75 group-data-[solid=true]/nav:hover:text-ink',
+              'after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left after:bg-current after:transition-transform after:duration-300 after:ease-out',
+              currentPath === link.href
+                ? 'text-paper group-data-[solid=true]/nav:text-ink after:scale-x-100'
+                : 'after:scale-x-0 hover:after:scale-x-100',
             ]}
             aria-current={currentPath === link.href ? 'page' : undefined}
           >
@@ -47,7 +49,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 
     <a
       href={PRIMARY_CTA.href}
-      class="group hidden items-center gap-2.5 whitespace-nowrap rounded-sm border border-paper/40 px-6 py-3.5 font-body text-sm font-semibold uppercase tracking-[0.08em] text-paper transition-colors duration-500 hover:border-paper hover:bg-paper/10 group-data-[solid=true]/nav:border-ink/25 group-data-[solid=true]/nav:text-ink group-data-[solid=true]/nav:hover:border-ink group-data-[solid=true]/nav:hover:bg-ink/5 lg:inline-flex"
+      class="btn-motion group hidden items-center gap-2.5 whitespace-nowrap rounded-sm border border-paper/40 px-6 py-3.5 font-body text-sm font-semibold uppercase tracking-[0.08em] text-paper hover:border-paper hover:bg-paper/10 active:scale-[0.97] group-data-[solid=true]/nav:border-ink/25 group-data-[solid=true]/nav:text-ink group-data-[solid=true]/nav:hover:border-ink group-data-[solid=true]/nav:hover:bg-ink/5 lg:inline-flex"
     >
       {PRIMARY_CTA.label}
       <ArrowIcon class="h-3.5 w-3.5 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1" />
@@ -59,7 +61,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
       aria-expanded="false"
       aria-controls="mobile-menu"
       aria-label="Ouvrir le menu"
-      class="relative z-10 -mr-2 inline-flex h-11 w-11 items-center justify-center text-paper transition-colors duration-500 group-data-[solid=true]/nav:text-ink lg:hidden"
+      class="btn-motion relative z-10 -mr-2 inline-flex h-11 w-11 items-center justify-center text-paper active:scale-90 group-data-[solid=true]/nav:text-ink lg:hidden"
     >
       <MenuIcon class="h-6 w-6 [html.menu-open_&]:hidden" />
       <CloseIcon class="hidden h-6 w-6 [html.menu-open_&]:block" />

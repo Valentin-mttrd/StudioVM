@@ -148,3 +148,40 @@ const labelClass = 'block font-body text-sm font-semibold text-ink';
     </Container>
   </Section>
 </Layout>
+
+<style>
+  /* Both appear rarely (once per submit) so a real transition earns its
+     keep here — see emil-design-eng's frequency rule. @starting-style
+     covers the display:none → visible jump the `hidden` attribute makes. */
+  [data-form-status] {
+    opacity: 1;
+    transition: opacity var(--duration-base) var(--ease-out);
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  [data-form-success] {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--duration-moderate) var(--ease-out),
+      transform var(--duration-moderate) var(--ease-out);
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-form-success] {
+      transition: opacity var(--duration-moderate) ease;
+
+      @starting-style {
+        transform: none;
+      }
+    }
+  }
+</style>

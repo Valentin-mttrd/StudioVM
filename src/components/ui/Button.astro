@@ -27,7 +27,7 @@ const {
 const Tag = href ? 'a' : 'button';
 
 const base =
-  'group relative inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-sm font-body text-sm font-semibold uppercase tracking-[0.08em] transition-colors duration-300 ease-out disabled:cursor-not-allowed disabled:opacity-40';
+  'btn-motion group relative inline-flex items-center justify-center gap-2.5 whitespace-nowrap rounded-sm font-body text-sm font-semibold uppercase tracking-[0.08em] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100 disabled:data-[loading=true]:cursor-progress disabled:data-[loading=true]:opacity-100';
 
 const variants: Record<Variant, string> = {
   solid: invert
@@ -52,10 +52,22 @@ const labelClasses =
   class:list={[base, variants[variant], className]}
   {...rest}
 >
-  <span class:list={[labelClasses]}>
+  <span
+    class:list={[labelClasses, 'transition-opacity duration-150 ease-out group-data-[loading=true]:opacity-70']}
+  >
     <slot />
   </span>
   {arrow && (
-    <ArrowIcon class="h-3.5 w-3.5 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1" />
+    <ArrowIcon class="h-3.5 w-3.5 shrink-0 transition-transform duration-300 ease-out group-hover:translate-x-1 group-data-[loading=true]:hidden" />
   )}
+  <svg
+    class="hidden h-3.5 w-3.5 shrink-0 animate-spin group-data-[loading=true]:block"
+    viewBox="0 0 16 16"
+    fill="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5" opacity="0.25" />
+    <path d="M14.5 8a6.5 6.5 0 0 0-6.5-6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+  </svg>
 </Tag>

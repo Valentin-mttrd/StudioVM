@@ -8,7 +8,7 @@ const watermark = rawMark
   .replace('<svg ', '<svg class="h-auto w-full" ')
   .replace(/ width="[^"]*" height="[^"]*"/, '');
 ---
-<section class="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink text-paper">
+<section data-hero class="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink text-paper">
   <!-- Decorative backdrop: brand mark watermark + fine technical grid. Purely visual, aria-hidden.
        Oversized on the y-axis (-inset-y-12) so the JS scroll parallax (src/scripts/parallax.ts)
        never reveals an edge; overflow-hidden on the section clips it back to bounds. -->
@@ -26,7 +26,7 @@ const watermark = rawMark
   </div>
 
   <Container class="relative flex flex-1 flex-col justify-center py-32 sm:py-36">
-    <div class="flex items-center gap-3" data-reveal>
+    <div class="flex items-center gap-3" data-reveal data-reveal-fast>
       <Logo variant="mark" tone="light" markClass="h-4" />
       <span class="h-3.5 w-px bg-paper/30" aria-hidden="true"></span>
       <p class="font-body text-xs font-semibold uppercase tracking-[0.28em] text-mist">
@@ -42,7 +42,13 @@ const watermark = rawMark
       Des solutions digitales pour donner vie à vos projets.
     </h1>
 
-    <span class="mt-8 block h-px w-16 bg-paper/30" aria-hidden="true" data-reveal data-reveal-delay="160"></span>
+    <span
+      class="mt-8 block h-px w-16 bg-paper/30"
+      aria-hidden="true"
+      data-reveal
+      data-reveal-fast
+      data-reveal-delay="160"
+    ></span>
 
     <p
       class="mt-8 max-w-xl font-body text-lg leading-relaxed text-mist sm:text-xl"
@@ -53,7 +59,7 @@ const watermark = rawMark
       votre activité.
     </p>
 
-    <div class="mt-12 flex flex-wrap items-center gap-4" data-reveal data-reveal-delay="260">
+    <div class="mt-12 flex flex-wrap items-center gap-4" data-reveal data-reveal-fast data-reveal-delay="260">
       <Button href="/services" variant="outline" invert>Découvrir nos services</Button>
       <Button href="/contact" variant="solid" invert>Parler de votre projet</Button>
     </div>
