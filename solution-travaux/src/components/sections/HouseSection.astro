@@ -1,0 +1,303 @@
+---
+/**
+ * Cross-section (coupe) of a house, split into the six families of trades.
+ * Every element carries data-zone; Trades.astro sets data-active on the
+ * figure and CSS brings that family forward while the rest steps back.
+ * Decorative: the trades themselves are listed in text next to it.
+ */
+
+/** Zigzag insulation symbol between two points. */
+function zigzag(x1: number, y1: number, x2: number, y2: number, amp = 5, step = 7): string {
+  const len = Math.hypot(x2 - x1, y2 - y1);
+  const ux = (x2 - x1) / len;
+  const uy = (y2 - y1) / len;
+  const nx = -uy;
+  const ny = ux;
+  const count = Math.floor(len / step);
+  const pts: string[] = [];
+  for (let i = 0; i <= count; i++) {
+    const side = i % 2 === 0 ? amp : -amp;
+    const x = x1 + ux * i * step + nx * side;
+    const y = y1 + uy * i * step + ny * side;
+    pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+  }
+  return `M${pts.join('L')}`;
+}
+
+// Slate courses: short ticks along both roof slopes.
+const slateTicks: string[] = [];
+for (let i = 1; i < 20; i++) {
+  const t = i / 20;
+  const lx = 146 + (360 - 146) * t;
+  const ly = 262 - (262 - 46) * t;
+  const rx = 574 - (574 - 360) * t;
+  const ry = ly;
+  slateTicks.push(`M${lx} ${ly}l6 6M${rx} ${ry}l-6 6`);
+}
+
+// Staircase: 8 risers from the ground floor up to the landing.
+const stairs: string[] = [];
+{
+  let x = 300;
+  let y = 415;
+  const dx = 13;
+  const dy = 14.375;
+  stairs.push(`M${x} ${y}`);
+  for (let i = 0; i < 8; i++) {
+    y -= dy;
+    stairs.push(`V${y.toFixed(2)}`);
+    x += dx;
+    stairs.push(`H${x}`);
+  }
+}
+
+const tiles = Array.from({ length: 12 }, (_, i) => 222 + i * 16).filter((x) => x < 300);
+const boards = Array.from({ length: 16 }, (_, i) => 222 + i * 12).filter((x) => x < 298 || (x > 410 && x < 506));
+const gateBars = Array.from({ length: 9 }, (_, i) => 614 + i * 9);
+---
+<svg class="coupe" viewBox="0 0 720 560" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="coupe-masonry" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" class="pat" />
+    </pattern>
+    <pattern id="coupe-soil" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+      <line x1="0" y1="0" x2="0" y2="10" class="pat pat--soft" />
+    </pattern>
+    <pattern id="coupe-concrete" width="8" height="8" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.8" class="pat-dot" />
+      <circle cx="6" cy="6" r="0.6" class="pat-dot" />
+    </pattern>
+  </defs>
+
+  <!-- ── Conception: axes and dimension line ── -->
+  <g data-zone="plan">
+    <path class="ln ln--axis" d="M192 30V548M528 30V548" />
+    <circle cx="192" cy="18" r="11" class="ln paper" />
+    <circle cx="528" cy="18" r="11" class="ln paper" />
+    <text x="192" y="22" class="axis-label">A</text>
+    <text x="528" y="22" class="axis-label">B</text>
+    <path class="ln" d="M192 540H528M186 546l12-12M522 546l12-12" />
+  </g>
+
+  <!-- ── Gros œuvre: soil, foundations, walls, slabs, drainage ── -->
+  <g data-zone="ground">
+    <rect x="0" y="430" width="720" height="92" class="soil" />
+    <rect x="172" y="430" width="40" height="46" class="ln f-concrete" />
+    <rect x="508" y="430" width="40" height="46" class="ln f-concrete" />
+    <path class="ln f-masonry" d="M180 240H204V336H180ZM180 392H204V430H180Z" />
+    <path class="ln f-masonry" d="M516 240H540V330H516ZM516 366H540V430H516Z" />
+    <rect x="204" y="418" width="312" height="12" class="ln f-concrete" />
+    <path class="ln f-concrete" d="M204 300H300V312H204ZM404 300H516V312H404Z" />
+    <!-- drain to the septic tank -->
+    <path class="ln ln--pipe" d="M500 430V452H600" />
+    <rect x="600" y="444" width="64" height="40" rx="6" class="ln paper" />
+    <path class="ln ln--thin" d="M612 444V436H652V444" />
+    <line x1="0" y1="430" x2="180" y2="430" class="ln ln--ground" />
+    <line x1="540" y1="430" x2="720" y2="430" class="ln ln--ground" />
+  </g>
+
+  <!-- ── Clos & couvert: roof, framing, render, windows ── -->
+  <g data-zone="envelope">
+    <path class="ln ln--bold" d="M146 262L360 46L574 262" />
+    <path class="ln ln--thin" d={slateTicks.join('')} />
+    <path class="ln" d="M154 262L360 56L566 262" />
+    <path class="ln" d="M184 248L360 70L536 248" />
+    <rect x="296" y="128" width="128" height="8" class="ln paper" />
+    <rect x="353" y="56" width="14" height="14" class="ln paper" />
+    <rect x="181" y="232" width="22" height="8" class="ln paper" />
+    <rect x="517" y="232" width="22" height="8" class="ln paper" />
+    <path class="ln ln--thin" d="M146 262v6a5 5 0 0 0 10 0v-6M564 262v6a5 5 0 0 0 10 0v-6" />
+    <path class="ln ln--thin" d="M176 244V430M544 244V430" />
+    <!-- windows -->
+    <rect x="180" y="336" width="24" height="56" class="ln paper" />
+    <path class="ln ln--thin" d="M190 336V392M194 336V392M174 392H204" />
+    <rect x="516" y="330" width="24" height="36" class="ln paper" />
+    <path class="ln ln--thin" d="M526 330V366M530 330V366M516 366H546" />
+  </g>
+
+  <!-- ── Lots techniques: insulation, heating, plumbing, wiring, sanitary ── -->
+  <g data-zone="network">
+    <path class="ln ln--net" d={zigzag(200, 244, 292, 152, 4, 6)} />
+    <path class="ln ln--net" d={zigzag(428, 152, 520, 244, 4, 6)} />
+    <path class="ln ln--net" d={zigzag(209, 244, 209, 298, 4, 6)} />
+    <path class="ln ln--net" d={zigzag(209, 314, 209, 416, 4, 6)} />
+    <path class="ln ln--net" d={zigzag(511, 244, 511, 298, 4, 6)} />
+    <path class="ln ln--net" d={zigzag(511, 314, 511, 416, 4, 6)} />
+    <!-- radiator -->
+    <rect x="218" y="394" width="34" height="18" rx="2" class="ln ln--net paper" />
+    <path class="ln ln--net ln--thin" d="M224 396V410M230 396V410M236 396V410M242 396V410M248 396V410M235 412V418" />
+    <!-- plumbing stack and basin branch -->
+    <path class="ln ln--pipe ln--net" d="M500 296V430M436 286H500" />
+    <!-- bathtub and washbasin -->
+    <rect x="444" y="274" width="58" height="24" rx="8" class="ln ln--net paper" />
+    <path class="ln ln--net" d="M424 256H448L444 268H428ZM436 268V298M446 256V248H452" />
+    <!-- wiring: switch, ceiling light, socket -->
+    <path class="ln ln--wire" d="M254 356V316H444V394" />
+    <rect x="250" y="356" width="8" height="12" rx="1" class="ln ln--net paper" />
+    <rect x="440" y="394" width="8" height="10" rx="1" class="ln ln--net paper" />
+    <path class="ln ln--net" d="M238 312V324M230 332L234 324H242L246 332Z" />
+    <path class="ln ln--net" d="M330 136V150M322 158L326 150H334L338 158Z" />
+  </g>
+
+  <!-- ── Second œuvre: finishes, stairs, partitions, doors, fittings ── -->
+  <g data-zone="interior">
+    <path class="ln" d="M204 415H300M404 415H516" />
+    <path class="ln ln--thin" d={tiles.map((x) => `M${x} 415v3`).join('')} />
+    <path class="ln" d="M204 298H300M404 298H516" />
+    <path class="ln ln--thin" d={boards.map((x) => `M${x} 298v2`).join('')} />
+    <path class="ln" d={stairs.join('')} />
+    <path class="ln ln--thin" d="M300 418L404 312" />
+    <rect x="408" y="136" width="6" height="162" class="ln paper" />
+    <!-- door on the back wall -->
+    <rect x="262" y="334" width="32" height="81" class="ln paper" />
+    <circle cx="288" cy="376" r="1.6" class="ln" />
+    <!-- kitchen -->
+    <rect x="452" y="382" width="54" height="33" class="ln paper" />
+    <path class="ln ln--bold" d="M450 381H508" />
+    <path class="ln ln--thin" d="M479 382V415M472 392H476M482 392H486" />
+    <rect x="456" y="318" width="44" height="22" class="ln paper" />
+    <path class="ln ln--thin" d="M478 318V340" />
+    <!-- decoration: a frame in the upper room -->
+    <rect x="236" y="236" width="32" height="24" class="ln paper" />
+    <path class="ln ln--thin" d="M241 255L250 246L256 251L262 243" />
+  </g>
+
+  <!-- ── Extérieurs: tree, grass, gate and fence ── -->
+  <g data-zone="outside">
+    <path class="ln" d="M70 430V356M70 384L56 368M70 372L84 358" />
+    <path
+      class="ln paper"
+      d="M38 330C28 312 40 290 60 292C64 276 88 272 98 288C116 288 122 308 110 322C114 338 96 348 82 340C72 350 50 348 46 336C40 338 36 334 38 330Z"
+    />
+    <path class="ln ln--thin" d="M24 430q3-8 6 0q3-8 6 0M120 430q3-8 6 0q3-8 6 0M572 430q3-8 6 0q3-8 6 0" />
+    <rect x="596" y="370" width="10" height="60" class="ln paper" />
+    <rect x="694" y="370" width="10" height="60" class="ln paper" />
+    <path class="ln" d="M606 384H694M606 424H694" />
+    <path class="ln ln--thin" d={gateBars.map((x) => `M${x} 384V424`).join('')} />
+    <path class="ln ln--thin" d="M704 392H720M704 416H720" />
+  </g>
+</svg>
+
+<style>
+  .coupe {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .ln {
+    fill: none;
+    stroke: var(--c-ink);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ln--thin {
+    stroke-width: 1;
+  }
+
+  .ln--bold {
+    stroke-width: 2.6;
+  }
+
+  .ln--ground {
+    stroke-width: 2.4;
+  }
+
+  .ln--axis {
+    stroke-width: 0.9;
+    stroke-dasharray: 14 4 2 4;
+    opacity: 0.7;
+  }
+
+  .ln--net {
+    stroke: var(--c-ria);
+  }
+
+  .ln--pipe {
+    stroke-width: 3;
+  }
+
+  .ln--wire {
+    stroke: var(--c-ria);
+    stroke-width: 1.1;
+    stroke-dasharray: 4 3;
+  }
+
+  .paper {
+    fill: var(--c-paper);
+  }
+
+  /* pattern fills live in CSS: a fill attribute would lose to .ln */
+  .f-masonry {
+    fill: url(#coupe-masonry);
+  }
+
+  .f-concrete {
+    fill: url(#coupe-concrete);
+  }
+
+  .pat {
+    stroke: var(--c-ink);
+    stroke-width: 1;
+    opacity: 0.55;
+  }
+
+  .pat--soft {
+    opacity: 0.25;
+  }
+
+  .pat-dot {
+    fill: var(--c-ink);
+    opacity: 0.5;
+  }
+
+  .soil {
+    fill: url(#coupe-soil);
+    stroke: none;
+  }
+
+  .axis-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    text-anchor: middle;
+    fill: var(--c-ink);
+  }
+
+  [data-zone] {
+    transition: opacity var(--dur-3) var(--ease-out);
+  }
+
+  [data-zone] .ln {
+    transition: stroke var(--dur-2) ease;
+  }
+
+  /* Active family forward, the rest steps back to a faint trace. */
+  :global([data-active]) .coupe [data-zone] {
+    opacity: 0.16;
+  }
+
+  :global([data-active='plan']) .coupe [data-zone='plan'],
+  :global([data-active='ground']) .coupe [data-zone='ground'],
+  :global([data-active='envelope']) .coupe [data-zone='envelope'],
+  :global([data-active='network']) .coupe [data-zone='network'],
+  :global([data-active='interior']) .coupe [data-zone='interior'],
+  :global([data-active='outside']) .coupe [data-zone='outside'] {
+    opacity: 1;
+  }
+
+  :global([data-active='plan']) .coupe [data-zone='plan'] .ln,
+  :global([data-active='ground']) .coupe [data-zone='ground'] .ln,
+  :global([data-active='envelope']) .coupe [data-zone='envelope'] .ln,
+  :global([data-active='network']) .coupe [data-zone='network'] .ln,
+  :global([data-active='interior']) .coupe [data-zone='interior'] .ln,
+  :global([data-active='outside']) .coupe [data-zone='outside'] .ln {
+    stroke: var(--c-accent);
+  }
+
+  :global([data-active='plan']) .coupe [data-zone='plan'] .axis-label {
+    fill: var(--c-accent);
+  }
+</style>

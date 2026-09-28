@@ -1,0 +1,87 @@
+---
+/**
+ * A group of radio or checkbox tiles inside a fieldset. For checkboxes,
+ * `required` means "at least one" (checked by src/scripts/forms.ts).
+ */
+interface Props {
+  name: string;
+  legend: string;
+  type?: 'radio' | 'checkbox';
+  required?: boolean;
+  hint?: string;
+  choices: { value: string; label: string }[];
+  columns?: 1 | 2 | 3;
+  checked?: string;
+  legendClass?: string;
+}
+
+const { name, legend, type = 'radio', required = false, hint, choices, columns = 2, checked, legendClass } = Astro.props;
+const id = `f-${name}`;
+---
+<fieldset
+  class="choices"
+  data-group={name}
+  data-group-required={required && type === 'checkbox' ? '' : undefined}
+  aria-describedby={[hint && `${id}-hint`, `${id}-error`].filter(Boolean).join(' ')}
+>
+  <legend class:list={['field__label', legendClass]}>
+    {legend}
+    {!required && <span class="optional"> (facultatif)</span>}
+  </legend>
+  {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
+  <div class="choices__grid" data-cols={columns}>
+    {
+      choices.map((c, i) => (
+        <label class="choice">
+          <input
+            type={type}
+            name={name}
+            value={c.value}
+            required={required && type === 'radio' && i === 0}
+            checked={checked === c.value}
+            data-label={c.label}
+          />
+          <span class="choice__face">
+            <span class="choice__mark" aria-hidden="true" />
+            {c.label}
+          </span>
+        </label>
+      ))
+    }
+  </div>
+  <p class="field__error" id={`${id}-error`} data-error-for={name} aria-live="polite"></p>
+</fieldset>
+
+<style>
+  .choices {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .choices legend {
+    padding: 0;
+    margin-bottom: var(--s-3);
+  }
+
+  .choices__grid {
+    display: grid;
+    gap: var(--s-2);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 30rem) {
+    .choices__grid:is([data-cols='2'], [data-cols='3']) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .choices__grid[data-cols='3'] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

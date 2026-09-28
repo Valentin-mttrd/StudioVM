@@ -1,0 +1,241 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import SectionHead from '../components/ui/SectionHead.astro';
+import FormShell from '../components/forms/FormShell.astro';
+import Field from '../components/forms/Field.astro';
+import Icon from '../components/ui/Icon.astro';
+import { PARTNER, TRADE_GROUPS, SITE } from '../data/site';
+import { breadcrumbSchema } from '../lib/seo';
+---
+<Layout
+  title="Devenir partenaire"
+  description="Artisans et entreprises du bâtiment : rejoignez le réseau de Solution Travaux, courtier en travaux à Étel. Des projets pré-évalués et un budget contrôlé, entre Lorient et Vannes."
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Devenir partenaire', path: '/devenir-partenaire/' }])]}
+>
+  <PageHero crumb="Devenir partenaire" index="✚" note="Artisans et entreprises" title="Trouvez de nouveaux chantiers." lead={PARTNER.audience} />
+
+  <section class="section-tight benefits" aria-labelledby="benefits-title">
+    <div class="container">
+      <SectionHead index="01" label="Ce que vous y gagnez" />
+      <h2 id="benefits-title" class="sr-only">Les avantages pour les artisans</h2>
+      <ul role="list" class="benefits__grid" data-reveal-group>
+        {
+          PARTNER.benefits.map((b, i) => (
+            <li class="benefit" data-reveal>
+              <span class="benefit__n">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="h3">{b.title}</h3>
+              <p class="muted">{b.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section-tight join" aria-labelledby="join-title">
+    <div class="container join__grid">
+      <div class="join__aside">
+        <SectionHead index="02" label="Les conditions" />
+        <h2 id="join-title" class="h1 join__title" data-reveal>Pour être référencé.</h2>
+        <ul role="list" class="reqs" data-reveal>
+          {
+            PARTNER.requirements.map((r) => (
+              <li>
+                <span class="reqs__mark">
+                  <Icon name="check" size={16} strokeWidth={2} />
+                </span>
+                {r}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="muted join__note" data-reveal>
+          {SITE.broker.displayName}, professionnel du bâtiment depuis plus de 20 ans, vérifie les assurances et les compétences
+          de toutes les entreprises présentées aux clients.
+        </p>
+        <p class="join__call" data-reveal>
+          Une question avant de vous lancer&nbsp;? <a href={SITE.mobile.href}>{SITE.mobile.display}</a>
+        </p>
+      </div>
+
+      <div class="join__form" id="candidature">
+        <p class="label join__kicker">Présentez votre entreprise</p>
+        <FormShell
+          name="partenaire"
+          subject="Candidature partenaire (site)"
+          submitLabel="Envoyer ma candidature"
+          successTitle="Candidature reçue."
+          successText="Merci. Solution Travaux revient vers vous pour faire connaissance et vérifier vos attestations."
+        >
+          <div class="join__row">
+            <Field name="entreprise" label="Entreprise" required autocomplete="organization" />
+            <Field
+              name="metier"
+              label="Corps d'état principal"
+              type="select"
+              required
+              placeholder="Choisir…"
+              options={TRADE_GROUPS.map((g) => ({ label: g.title, options: [...g.trades] }))}
+            />
+          </div>
+          <div class="join__row">
+            <Field name="commune" label="Commune du siège" required autocomplete="address-level2" />
+            <Field name="siret" label="SIRET" inputmode="numeric" placeholder="14 chiffres" pattern="[0-9 ]{14,17}" />
+          </div>
+          <div class="join__row">
+            <Field name="nom" label="Nom du contact" required autocomplete="name" />
+            <Field
+              name="telephone"
+              label="Téléphone"
+              type="tel"
+              required
+              autocomplete="tel"
+              inputmode="tel"
+              pattern="(?:(?:\+|00)33[\s.\-]?|0)[1-9](?:[\s.\-]?[0-9]{2}){4}"
+            />
+          </div>
+          <Field name="email" label="E-mail" type="email" required autocomplete="email" />
+          <Field
+            name="message"
+            label="Votre activité en quelques mots"
+            type="textarea"
+            rows={4}
+            placeholder="Spécialités, secteur d'intervention, taille de l'équipe…"
+          />
+          <label class="check">
+            <input type="checkbox" name="assurances" value="oui" required data-msg="Des attestations à jour sont demandées pour être référencé." />
+            <span>Je dispose d'attestations d'assurance à jour (responsabilité civile et décennale).</span>
+          </label>
+          <p class="field__error" data-error-for="assurances" aria-live="polite"></p>
+        </FormShell>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .section-tight {
+    padding-bottom: var(--section-y);
+  }
+
+  .benefits__grid {
+    display: grid;
+    gap: var(--s-4);
+    margin-top: var(--s-10);
+  }
+
+  @media (min-width: 48rem) {
+    .benefits__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .benefit {
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+    padding: var(--s-8) var(--s-6);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background: rgb(255 255 255 / 0.35);
+  }
+
+  .benefit__n {
+    font-size: 3.5rem;
+    font-weight: 800;
+    font-stretch: 125%;
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1.25px var(--c-accent);
+    margin-bottom: var(--s-4);
+  }
+
+  .join__grid {
+    display: grid;
+    gap: var(--s-12);
+  }
+
+  @media (min-width: 64rem) {
+    .join__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(2rem, 1rem + 4vw, 6rem);
+      align-items: start;
+    }
+
+    .join__aside {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-6));
+    }
+  }
+
+  .join__title {
+    margin-top: var(--s-8);
+  }
+
+  .reqs {
+    display: grid;
+    gap: var(--s-4);
+    margin-top: var(--s-8);
+    font-size: var(--fs-lg);
+    font-weight: 560;
+  }
+
+  .reqs li {
+    display: flex;
+    gap: var(--s-3);
+    align-items: flex-start;
+  }
+
+  .reqs__mark {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 1.625rem;
+    height: 1.625rem;
+    margin-top: 0.1em;
+    border-radius: 50%;
+    background: var(--c-ink);
+    color: var(--c-paper);
+  }
+
+  .join__note {
+    margin-top: var(--s-8);
+    max-width: 40ch;
+  }
+
+  .join__call {
+    margin-top: var(--s-4);
+  }
+
+  .join__call a {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .join__form {
+    padding: clamp(1.25rem, 0.5rem + 3vw, 3rem);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background: rgb(255 255 255 / 0.35);
+    box-shadow: var(--shadow-lift);
+    scroll-margin-top: calc(var(--header-h) + var(--s-4));
+  }
+
+  .join__kicker {
+    color: var(--c-accent);
+    margin-bottom: var(--s-6);
+  }
+
+  .join__row {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  @media (min-width: 40rem) {
+    .join__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

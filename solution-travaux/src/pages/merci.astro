@@ -1,0 +1,30 @@
+---
+/** Landing page for forms submitted without JavaScript (Netlify Forms). */
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import Button from '../components/ui/Button.astro';
+import { SITE } from '../data/site';
+---
+<Layout title="Merci" description="Votre demande a bien été envoyée à Solution Travaux." noindex>
+  <PageHero
+    crumb="Merci"
+    index="✓"
+    title="Votre demande est bien partie."
+    lead={`Merci. ${SITE.name} vous recontacte dans les plus brefs délais. Une urgence ? ${SITE.broker.displayName} : ${SITE.mobile.display}.`}
+  >
+    <div class="thanks__actions">
+      <Button href="/" variant="dark" icon="arrow">Retour à l'accueil</Button>
+      <Button href="/nos-derniers-travaux/" variant="secondary">Voir nos réalisations</Button>
+    </div>
+  </PageHero>
+</Layout>
+
+<style>
+  .thanks__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-8);
+    padding-bottom: var(--section-y);
+  }
+</style>

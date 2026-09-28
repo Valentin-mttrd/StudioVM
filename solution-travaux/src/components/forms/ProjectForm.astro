@@ -1,0 +1,206 @@
+---
+/**
+ * "Décrivez votre projet" — four short steps instead of one long form:
+ * what, where, when, who. Works as a single page without JS.
+ */
+import FormShell from './FormShell.astro';
+import Field from './Field.astro';
+import Choices from './Choices.astro';
+import { PROJECT_TYPES, TOWNS, HOME_BASE } from '../../data/site';
+
+const towns = [HOME_BASE.name, ...TOWNS.map((t) => t.name)].sort((a, b) => a.localeCompare(b, 'fr'));
+---
+<FormShell
+  name="projet"
+  subject="Nouvelle demande de projet (site)"
+  submitLabel="Envoyer ma demande"
+  successTitle="Votre demande est bien partie."
+  successText="Merci. Solution Travaux vous recontacte pour convenir de la visite : le courtier se déplace chez vous sous 48 heures maximum."
+  steps={['Le projet', 'Le lieu', 'Le besoin', 'Vos coordonnées']}
+>
+  <fieldset class="step" data-step>
+    <legend class="step__legend">
+      <span class="label step__kicker">Étape 1 sur 4</span>
+      <span class="h3 step__heading" tabindex="-1" data-step-title>Quel est votre projet&nbsp;?</span>
+    </legend>
+    <Choices
+      name="projet"
+      legend="Type de travaux"
+      legendClass="sr-only"
+      type="checkbox"
+      required
+      hint="Plusieurs choix possibles."
+      columns={3}
+      choices={[...PROJECT_TYPES.map((p) => ({ value: p.id, label: p.label })), { value: 'autre', label: 'Autre projet' }]}
+    />
+  </fieldset>
+
+  <fieldset class="step" data-step>
+    <legend class="step__legend">
+      <span class="label step__kicker">Étape 2 sur 4</span>
+      <span class="h3 step__heading" tabindex="-1" data-step-title>Où se situent les travaux&nbsp;?</span>
+    </legend>
+    <Field
+      name="commune"
+      label="Commune"
+      required
+      autocomplete="address-level2"
+      list={towns}
+      hint="Solution Travaux intervient dans un rayon de 50 km environ autour d'Étel."
+    />
+    <Choices
+      name="bien"
+      legend="Type de bien"
+      columns={2}
+      choices={[
+        { value: 'Maison', label: 'Maison' },
+        { value: 'Appartement', label: 'Appartement' },
+        { value: 'Local professionnel', label: 'Local professionnel' },
+        { value: 'Terrain', label: 'Terrain' },
+      ]}
+    />
+  </fieldset>
+
+  <fieldset class="step" data-step>
+    <legend class="step__legend">
+      <span class="label step__kicker">Étape 3 sur 4</span>
+      <span class="h3 step__heading" tabindex="-1" data-step-title>Parlez-nous de votre besoin</span>
+    </legend>
+    <Field
+      name="description"
+      label="Description du projet"
+      type="textarea"
+      rows={6}
+      placeholder="Surface, état actuel, ce que vous imaginez, contraintes…"
+      hint="Quelques lignes suffisent : tout se précise lors de la visite."
+    />
+    <Choices
+      name="delai"
+      legend="Quand souhaitez-vous démarrer ?"
+      columns={2}
+      choices={[
+        { value: 'Dès que possible', label: 'Dès que possible' },
+        { value: 'Dans les 3 mois', label: 'Dans les 3 mois' },
+        { value: "Dans l'année", label: "Dans l'année" },
+        { value: 'Pas encore défini', label: 'Pas encore défini' },
+      ]}
+    />
+  </fieldset>
+
+  <fieldset class="step" data-step>
+    <legend class="step__legend">
+      <span class="label step__kicker">Étape 4 sur 4</span>
+      <span class="h3 step__heading" tabindex="-1" data-step-title>Comment vous joindre&nbsp;?</span>
+    </legend>
+    <div class="step__row">
+      <Field name="nom" label="Nom et prénom" required autocomplete="name" />
+      <Field
+        name="telephone"
+        label="Téléphone"
+        type="tel"
+        required
+        autocomplete="tel"
+        inputmode="tel"
+        pattern="(?:(?:\+|00)33[\s.\-]?|0)[1-9](?:[\s.\-]?[0-9]{2}){4}"
+        placeholder="06 12 34 56 78"
+      />
+    </div>
+    <Field name="email" label="E-mail" type="email" autocomplete="email" placeholder="nom@domaine.fr" />
+    <Choices
+      name="creneau"
+      legend="Meilleur moment pour vous appeler"
+      columns={2}
+      choices={[
+        { value: 'Matin', label: 'Le matin' },
+        { value: 'Midi', label: 'Le midi' },
+        { value: 'Après-midi', label: "L'après-midi" },
+        { value: 'Fin de journée', label: 'En fin de journée' },
+      ]}
+    />
+    <div class="recap" data-recap-wrap hidden>
+      <p class="label recap__title">Récapitulatif</p>
+      <dl class="recap__list" data-recap></dl>
+    </div>
+  </fieldset>
+</FormShell>
+
+<style>
+  .step {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .step__legend {
+    display: grid;
+    gap: var(--s-2);
+    padding: 0;
+    margin-bottom: var(--s-2);
+  }
+
+  .step__kicker {
+    color: var(--c-accent);
+  }
+
+  .step__heading:focus {
+    outline: none;
+  }
+
+  .step__row {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  @media (min-width: 40rem) {
+    .step__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .recap {
+    padding: var(--s-5);
+    border: 1px dashed var(--c-line-strong);
+    border-radius: var(--r);
+    background: rgb(255 255 255 / 0.4);
+  }
+
+  .recap__title {
+    color: var(--c-muted);
+    margin-bottom: var(--s-3);
+  }
+
+  .recap__list {
+    display: grid;
+    gap: var(--s-2);
+    font-size: var(--fs-sm);
+  }
+
+  .recap__list :global(div) {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: var(--s-3);
+  }
+
+  .recap__list :global(dt) {
+    color: var(--c-muted);
+  }
+
+  .recap__list :global(dd) {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  /* Without the stepper (no JS) the step kickers would read "1 sur 4"
+     above one long form: keep only the headings. */
+  :global(form:not(.is-stepped)) .step__kicker {
+    display: none;
+  }
+
+  :global(form:not(.is-stepped)) .step + .step {
+    padding-top: var(--s-8);
+    border-top: 1px solid var(--c-line);
+  }
+</style>

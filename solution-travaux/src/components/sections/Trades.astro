@@ -1,0 +1,256 @@
+---
+import SectionHead from '../ui/SectionHead.astro';
+import HouseSection from './HouseSection.astro';
+import { TRADE_GROUPS, TRADE_COUNT } from '../../data/site';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<section id="corps-d-etat" class="section trades surface-2" aria-labelledby="trades-title" data-trades>
+  <div class="container">
+    <SectionHead index="03" label="Corps d'état" note={`${TRADE_COUNT} métiers · ${TRADE_GROUPS.length} familles`} />
+
+    <div class="trades__intro">
+      <h2 id="trades-title" class="h1" data-reveal>Tous les corps d'état, de l'architecte au paysagiste.</h2>
+      <p class="lead muted" data-reveal>
+        Chaque lot de vos travaux trouve son professionnel. Faites défiler les familles de métiers pour les situer dans la
+        maison.
+      </p>
+    </div>
+
+    <div class="trades__grid">
+      <figure class="trades__figure" data-trades-figure>
+        <div class="trades__sheet">
+          <HouseSection />
+        </div>
+        <figcaption class="trades__caption">
+          <span class="label">Coupe de principe</span>
+          <span class="label trades__active" aria-hidden="true" data-trades-label>Tous les lots</span>
+        </figcaption>
+      </figure>
+
+      <ol class="lots" role="list">
+        {
+          TRADE_GROUPS.map((g, i) => (
+            <li class="lot" data-lot={g.zone}>
+              <div class="lot__head">
+                <span class="label lot__num">Lot {pad(i + 1)}</span>
+                <h3 class="h3 lot__title">{g.title}</h3>
+                <p class="lot__caption muted">{g.caption}</p>
+              </div>
+              <ul role="list" class="lot__trades">
+                {g.trades.map((t) => (
+                  <li class="chip lot__chip">{t}</li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .trades__intro {
+    display: grid;
+    gap: var(--s-6);
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .trades__intro {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: end;
+      gap: var(--s-16);
+    }
+  }
+
+  .trades__intro .h1 {
+    max-width: 16ch;
+  }
+
+  .trades__grid {
+    display: grid;
+    gap: var(--s-8);
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .trades__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(2rem, 1rem + 3vw, 5rem);
+      align-items: start;
+    }
+  }
+
+  /* The drawing stays in view while the lots scroll past it — at the top
+     of the screen on phones, beside the list on desktop. */
+  .trades__figure {
+    position: sticky;
+    top: var(--s-2);
+    z-index: 2;
+    margin: 0 calc(-1 * var(--gutter));
+    padding: var(--s-3) var(--gutter) var(--s-2);
+    background: var(--c-paper-2) url('/textures/grain.png') 0 0 / 128px 128px;
+    box-shadow: 0 10px 18px -16px rgb(20 28 33 / 0.5);
+  }
+
+  @media (min-width: 64rem) {
+    .trades__figure {
+      top: calc(var(--header-h) + var(--s-6));
+      margin: 0;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+    }
+  }
+
+  .trades__sheet {
+    padding: clamp(0.5rem, 0.2rem + 1.5vw, 2rem);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background: var(--c-paper);
+    max-height: 42svh;
+    display: grid;
+    place-items: center;
+  }
+
+  .trades__sheet :global(svg) {
+    max-height: calc(42svh - 1.5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .trades__sheet {
+      max-height: none;
+    }
+
+    .trades__sheet :global(svg) {
+      max-height: none;
+    }
+  }
+
+  .trades__caption {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-4);
+    margin-top: var(--s-2);
+    color: var(--c-muted);
+  }
+
+  .trades__active {
+    color: var(--c-accent);
+  }
+
+  .lots {
+    display: grid;
+    margin: 0;
+  }
+
+  .lot {
+    padding: var(--s-8) 0 var(--s-10);
+    border-top: 1px solid var(--c-line-strong);
+    transition: opacity var(--dur-3) var(--ease-out);
+  }
+
+  @media (min-width: 64rem) {
+    .lot {
+      padding: var(--s-10) 0 var(--s-12);
+      min-height: 32vh;
+    }
+
+    .lot:last-child {
+      min-height: 0;
+    }
+  }
+
+  .lot__num {
+    color: var(--c-accent);
+  }
+
+  .lot__title {
+    margin-top: var(--s-2);
+  }
+
+  .lot__caption {
+    margin-top: var(--s-1);
+  }
+
+  .lot__trades {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-top: var(--s-5);
+  }
+
+  .lot__chip {
+    background: var(--c-paper);
+    font-weight: 540;
+    transition: background-color var(--dur-2) ease, color var(--dur-2) ease, border-color var(--dur-2) ease;
+  }
+
+  .lot.is-active .lot__chip {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+    color: var(--c-paper);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lot.is-active .lot__chip {
+      transition-delay: calc(var(--i, 0) * 25ms);
+    }
+  }
+</style>
+
+<script>
+  // The lot crossing the reading line becomes active and lights its part of
+  // the section drawing; pointing at a lot does the same.
+  const root = document.querySelector<HTMLElement>('[data-trades]');
+  if (root) {
+    const figure = root.querySelector<HTMLElement>('[data-trades-figure]');
+    const label = root.querySelector<HTMLElement>('[data-trades-label]');
+    const lots = [...root.querySelectorAll<HTMLElement>('[data-lot]')];
+    let scrolled: HTMLElement | null = null;
+    let pointed: HTMLElement | null = null;
+
+    lots.forEach((lot) =>
+      lot.querySelectorAll<HTMLElement>('.lot__chip').forEach((c, i) => c.style.setProperty('--i', String(i))),
+    );
+
+    const render = () => {
+      const active = pointed ?? scrolled;
+      lots.forEach((l) => l.classList.toggle('is-active', l === active));
+      if (!figure) return;
+      if (active) figure.dataset.active = active.dataset.lot;
+      else delete figure.dataset.active;
+      if (label) label.textContent = active?.querySelector('.lot__title')?.textContent ?? 'Tous les lots';
+    };
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) scrolled = e.target as HTMLElement;
+            else if (scrolled === e.target) scrolled = null;
+          }
+          render();
+        },
+        // reading line in the lower-middle of the screen, below the sticky drawing on phones
+        { rootMargin: '-58% 0px -38% 0px' },
+      );
+      lots.forEach((l) => io.observe(l));
+    }
+
+    if (window.matchMedia('(hover: hover)').matches) {
+      lots.forEach((l) => {
+        l.addEventListener('pointerenter', () => {
+          pointed = l;
+          render();
+        });
+        l.addEventListener('pointerleave', () => {
+          pointed = null;
+          render();
+        });
+      });
+    }
+  }
+</script>

@@ -1,0 +1,249 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import ProjectForm from '../components/forms/ProjectForm.astro';
+import Icon from '../components/ui/Icon.astro';
+import { SITE, MAPS_URL, STEPS } from '../data/site';
+import { CALLBACK_HREF } from '../data/nav';
+import { breadcrumbSchema } from '../lib/seo';
+---
+<Layout
+  title="Contactez-nous"
+  description="Contactez Solution Travaux, courtier en travaux à Étel (56) : décrivez votre projet en ligne ou appelez le 02 97 55 27 48. Visite chez vous sous 48 h, entre Lorient et Vannes."
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Contactez-nous', path: '/contactez-nous/' }])]}
+>
+  <PageHero
+    crumb="Contactez-nous"
+    index="→"
+    note="Visite sous 48 h"
+    title="Parlons de votre projet."
+    lead="Décrivez vos travaux en quatre étapes, ou appelez-nous directement. Le courtier se déplace chez vous sous 48 heures maximum."
+  />
+
+  <section class="contact" aria-label="Formulaire et coordonnées">
+    <div class="container contact__grid">
+      <div class="contact__form" id="projet">
+        <ProjectForm />
+      </div>
+
+      <aside class="contact__aside" aria-label="Coordonnées">
+        <div class="card on-ink">
+          <p class="label card__kicker">Coordonnées</p>
+          <address class="card__lines">
+            <a href={SITE.phone.href} class="card__line card__line--big">
+              <Icon name="phone" size={22} />
+              <span><span class="label">Agence</span>{SITE.phone.display}</span>
+            </a>
+            <a href={SITE.mobile.href} class="card__line card__line--big">
+              <Icon name="mobile" size={22} />
+              <span><span class="label">{SITE.broker.displayName}</span>{SITE.mobile.display}</span>
+            </a>
+            <a href={`mailto:${SITE.email}`} class="card__line">
+              <Icon name="mail" />
+              <span>{SITE.email}</span>
+            </a>
+            <a href={MAPS_URL} class="card__line" target="_blank" rel="noopener">
+              <Icon name="pin" />
+              <span>
+                {SITE.name}<br />{SITE.address.street}<br />{SITE.address.postalCode} {SITE.address.city}
+                <span class="card__sub">Voir sur la carte<span class="sr-only"> (nouvel onglet)</span></span>
+              </span>
+            </a>
+          </address>
+        </div>
+
+        <a href={CALLBACK_HREF} class="callback-card">
+          <Icon name="callback" size={26} />
+          <span>
+            <strong>Vous préférez être rappelé&nbsp;?</strong>
+            <span class="muted">Laissez simplement votre numéro.</span>
+          </span>
+          <Icon name="arrow" size={18} class="callback-card__arrow" />
+        </a>
+
+        <div class="next">
+          <p class="label next__title">Et ensuite&nbsp;?</p>
+          <ol role="list" class="next__list">
+            {
+              STEPS.slice(0, 3).map((s, i) => (
+                <li>
+                  <span class="label next__n">{String(i + 1).padStart(2, '0')}</span>
+                  <span>{s.title}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <a href="/#methode" class="link">Toute la méthode</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .contact {
+    padding-bottom: var(--section-y);
+  }
+
+  .contact__grid {
+    display: grid;
+    gap: var(--s-12);
+  }
+
+  @media (min-width: 64rem) {
+    .contact__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      gap: clamp(2rem, 1rem + 4vw, 6rem);
+      align-items: start;
+    }
+
+    .contact__aside {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-6));
+    }
+  }
+
+  .contact__form {
+    padding: clamp(1.25rem, 0.5rem + 3vw, 3rem);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background: rgb(255 255 255 / 0.35);
+    box-shadow: var(--shadow-lift);
+    scroll-margin-top: calc(var(--header-h) + var(--s-4));
+  }
+
+  .contact__aside {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .card {
+    padding: var(--s-6);
+    border-radius: var(--r-lg);
+  }
+
+  .card__kicker {
+    color: var(--c-on-ink-muted);
+  }
+
+  .card__lines {
+    display: grid;
+    gap: var(--s-2);
+    margin-top: var(--s-4);
+    font-style: normal;
+  }
+
+  .card__line {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-3);
+    padding: var(--s-2) 0;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .card__line :global(svg) {
+    flex: none;
+    margin-top: 0.15em;
+    color: var(--c-accent-soft);
+  }
+
+  .card__line--big span {
+    display: grid;
+    gap: 0.2rem;
+    font-size: var(--fs-xl);
+    font-weight: 680;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  .card__line--big .label {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--c-on-ink-muted);
+  }
+
+  .card__sub {
+    display: block;
+    margin-top: var(--s-1);
+    font-size: var(--fs-sm);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    color: var(--c-on-ink-muted);
+  }
+
+  @media (hover: hover) {
+    .card__line:hover {
+      color: var(--c-accent-soft);
+    }
+  }
+
+  .callback-card {
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+    padding: var(--s-5) var(--s-6);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    text-decoration: none;
+    transition: background-color var(--dur-2) ease, color var(--dur-2) ease;
+  }
+
+  .callback-card > span {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .callback-card :global(svg:first-child) {
+    color: var(--c-accent);
+    flex: none;
+  }
+
+  .callback-card :global(.callback-card__arrow) {
+    margin-left: auto;
+    flex: none;
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .callback-card:hover {
+      background: var(--c-ink);
+      color: var(--c-paper);
+    }
+
+    .callback-card:hover .muted {
+      color: var(--c-on-ink-muted);
+    }
+
+    .callback-card:hover :global(.callback-card__arrow) {
+      transform: translateX(3px);
+    }
+  }
+
+  .next {
+    padding: var(--s-6);
+    border: 1px dashed var(--c-line-strong);
+    border-radius: var(--r-lg);
+  }
+
+  .next__title {
+    color: var(--c-muted);
+  }
+
+  .next__list {
+    display: grid;
+    gap: var(--s-3);
+    margin: var(--s-4) 0 var(--s-5);
+    font-weight: 600;
+  }
+
+  .next__list li {
+    display: flex;
+    gap: var(--s-3);
+    align-items: baseline;
+  }
+
+  .next__n {
+    color: var(--c-accent);
+  }
+</style>

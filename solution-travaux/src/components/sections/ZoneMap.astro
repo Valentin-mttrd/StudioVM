@@ -1,0 +1,278 @@
+---
+/**
+ * Radial diagram of the intervention zone, centred on Étel. Bearings are
+ * true; distances use a square-root scale so the towns around the ria
+ * don't pile up — the rings are drawn on the same scale and labelled with
+ * their real distances, so the reading stays honest.
+ */
+import { TOWNS, HOME_BASE, ZONE_RADIUS_KM } from '../../data/site';
+import { kmFromEtel } from '../../lib/seo';
+
+const R = 250; // radius of the 50 km ring, in viewBox units
+const kx = 111.32 * Math.cos((HOME_BASE.lat * Math.PI) / 180);
+const ky = 110.57;
+const scale = (km: number) => Math.sqrt(km / ZONE_RADIUS_KM) * R;
+
+// Hand-placed labels so neighbours never overlap.
+const LABELS: Record<string, { dx: number; dy: number; anchor: 'start' | 'middle' | 'end' }> = {
+  Lorient: { dx: -10, dy: -6, anchor: 'end' },
+  Riantec: { dx: -10, dy: 14, anchor: 'end' },
+  Gâvres: { dx: -10, dy: 16, anchor: 'end' },
+  Merlevenez: { dx: 10, dy: -8, anchor: 'start' },
+  Plouhinec: { dx: 10, dy: 5, anchor: 'start' },
+  Erdeven: { dx: 10, dy: 5, anchor: 'start' },
+  Plouharnel: { dx: -10, dy: 5, anchor: 'end' },
+  Carnac: { dx: 9, dy: 16, anchor: 'start' },
+  'La Trinité-sur-Mer': { dx: 10, dy: -6, anchor: 'start' },
+  Quiberon: { dx: 10, dy: 5, anchor: 'start' },
+  Auray: { dx: 0, dy: -14, anchor: 'middle' },
+  Vannes: { dx: 0, dy: -14, anchor: 'middle' },
+};
+
+const points = TOWNS.map((t, i) => {
+  const ex = (t.lon - HOME_BASE.lon) * kx;
+  const ey = -(t.lat - HOME_BASE.lat) * ky;
+  const km = kmFromEtel(t.lat, t.lon);
+  const r = scale(Math.hypot(ex, ey));
+  const d = Math.hypot(ex, ey) || 1;
+  return {
+    ...t,
+    i,
+    km: Math.round(km),
+    x: (ex / d) * r,
+    y: (ey / d) * r,
+    label: LABELS[t.name] ?? { dx: 10, dy: 4, anchor: 'start' as const },
+  };
+});
+
+const rings = [10, 25, 50].map((km) => ({ km, r: scale(km) }));
+const ticks = Array.from({ length: 72 }, (_, i) => i * 5);
+const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]+/g, '-');
+---
+<svg class="zmap" viewBox="-300 -300 600 600" aria-hidden="true" focusable="false" data-zmap>
+  <!-- rings -->
+  <g class="zmap__rings">
+    {rings.map((ring) => <circle r={ring.r} class:list={['zmap__ring', ring.km === 50 && 'zmap__ring--outer']} />)}
+    <circle r={R} class="zmap__fill" />
+  </g>
+
+  <!-- compass ticks -->
+  <g class="zmap__ticks">
+    {
+      ticks.map((deg) => (
+        <line
+          x1="0"
+          y1={-R - 4}
+          x2="0"
+          y2={deg % 45 === 0 ? -R - 16 : -R - 9}
+          transform={`rotate(${deg})`}
+          class:list={['zmap__tick', deg % 45 === 0 && 'zmap__tick--major']}
+        />
+      ))
+    }
+    <text x="0" y={-R - 24} class="zmap__north">N</text>
+  </g>
+
+  <!-- axes -->
+  <path class="zmap__axis" d={`M${-R} 0H${R}M0 ${-R}V${R}`} />
+
+  <!-- ring labels on the north-east diagonal -->
+  {
+    rings.map((ring) => (
+      <text x={ring.r * 0.707 + 6} y={-ring.r * 0.707 - 6} class="zmap__ring-label">
+        {ring.km} km
+      </text>
+    ))
+  }
+
+  <text x="-105" y="150" class="zmap__sea">Océan Atlantique</text>
+
+  <!-- towns -->
+  {
+    points.map((p) => (
+      <g class:list={['zmap__town', p.bound && 'zmap__town--bound']} data-dot={slug(p.name)} style={`--i:${p.i}`}>
+        <line x1="0" y1="0" x2={p.x} y2={p.y} class="zmap__ray" />
+        <circle cx={p.x} cy={p.y} r={p.bound ? 6 : 4.5} class="zmap__dot" />
+        <text x={p.x + p.label.dx} y={p.y + p.label.dy} text-anchor={p.label.anchor} class="zmap__label">
+          {p.name}
+        </text>
+      </g>
+    ))
+  }
+
+  <!-- Étel -->
+  <g class="zmap__home">
+    <circle r="18" class="zmap__pulse" />
+    <circle r="9" class="zmap__home-dot" />
+    <text x="0" y="34" class="zmap__home-label">Étel</text>
+  </g>
+</svg>
+
+<style>
+  .zmap {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-family: var(--font-mono);
+  }
+
+  .zmap__ring {
+    fill: none;
+    stroke: var(--c-line-ink-strong);
+    stroke-width: 1;
+    stroke-dasharray: 3 5;
+  }
+
+  .zmap__ring--outer {
+    stroke: var(--c-accent-soft);
+    stroke-width: 1.5;
+    stroke-dasharray: none;
+  }
+
+  .zmap__fill {
+    fill: rgb(224 122 79 / 0.05);
+  }
+
+  .zmap__tick {
+    stroke: var(--c-line-ink-strong);
+    stroke-width: 1;
+  }
+
+  .zmap__tick--major {
+    stroke: var(--c-on-ink);
+    stroke-width: 1.5;
+  }
+
+  .zmap__north {
+    fill: var(--c-on-ink);
+    font-size: 16px;
+    font-weight: 500;
+    text-anchor: middle;
+  }
+
+  .zmap__axis {
+    stroke: var(--c-line-ink);
+    stroke-width: 1;
+  }
+
+  .zmap__ring-label {
+    fill: var(--c-on-ink-muted);
+    font-size: 12px;
+  }
+
+  .zmap__sea {
+    fill: var(--c-ria-soft);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-anchor: middle;
+    opacity: 0.7;
+  }
+
+  .zmap__ray {
+    stroke: var(--c-line-ink);
+    stroke-width: 1;
+    transition: stroke var(--dur-2) ease;
+  }
+
+  .zmap__dot {
+    fill: var(--c-ink);
+    stroke: var(--c-on-ink);
+    stroke-width: 2;
+    transition: fill var(--dur-2) ease, stroke var(--dur-2) ease;
+  }
+
+  .zmap__town--bound .zmap__dot {
+    fill: var(--c-on-ink);
+  }
+
+  .zmap__label {
+    fill: var(--c-on-ink);
+    font-size: 14px;
+    font-weight: 500;
+    paint-order: stroke;
+    stroke: var(--c-ink);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+    transition: fill var(--dur-2) ease;
+  }
+
+  .zmap__town.is-hl .zmap__dot {
+    fill: var(--c-accent-soft);
+    stroke: var(--c-accent-soft);
+  }
+
+  .zmap__town.is-hl .zmap__ray {
+    stroke: var(--c-accent-soft);
+  }
+
+  .zmap__town.is-hl .zmap__label {
+    fill: var(--c-accent-soft);
+  }
+
+  .zmap__home-dot {
+    fill: var(--c-accent-soft);
+  }
+
+  .zmap__pulse {
+    fill: none;
+    stroke: var(--c-accent-soft);
+    stroke-width: 1.5;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .zmap__home-label {
+    fill: var(--c-on-ink);
+    font-family: var(--font-sans);
+    font-size: 20px;
+    font-weight: 700;
+    text-anchor: middle;
+    paint-order: stroke;
+    stroke: var(--c-ink);
+    stroke-width: 6px;
+  }
+
+  /* Phones: the SVG shrinks to ~60%, so its type grows to stay legible. */
+  @media (max-width: 40rem) {
+    .zmap__label {
+      font-size: 19px;
+    }
+
+    .zmap__ring-label,
+    .zmap__sea {
+      font-size: 16px;
+    }
+
+    .zmap__home-label {
+      font-size: 26px;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .zmap__pulse {
+      animation: pulse 2.8s var(--ease-out) infinite;
+    }
+
+    .js .zmap .zmap__town {
+      opacity: 0;
+      transition: opacity var(--dur-3) var(--ease-out);
+      transition-delay: calc(var(--i) * 70ms);
+    }
+
+    .js .zmap.is-in .zmap__town {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(0.6);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+  }
+</style>

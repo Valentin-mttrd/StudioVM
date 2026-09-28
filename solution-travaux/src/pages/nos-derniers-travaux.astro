@@ -1,0 +1,92 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import Gallery from '../components/realisations/Gallery.astro';
+import PhotoSlot from '../components/ui/PhotoSlot.astro';
+import Button from '../components/ui/Button.astro';
+import FinalCta from '../components/sections/FinalCta.astro';
+import { REALISATIONS } from '../data/realisations';
+import { QUOTE_HREF } from '../data/nav';
+import { breadcrumbSchema } from '../lib/seo';
+
+const hasProjects = REALISATIONS.length > 0;
+---
+<Layout
+  title="Nos réalisations"
+  description="Rénovations, extensions, combles, salles de bain, terrasses : les réalisations de Solution Travaux, courtier en travaux à Étel, entre Lorient et Vannes."
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Nos réalisations', path: '/nos-derniers-travaux/' }])]}
+>
+  <PageHero
+    crumb="Nos réalisations"
+    index="05"
+    note={hasProjects ? `${REALISATIONS.length} chantiers` : 'Galerie'}
+    title="Nos derniers travaux."
+    lead="Des chantiers menés avec les entreprises sélectionnées par Solution Travaux, entre Lorient et Vannes."
+  />
+
+  <section class="works" aria-label="Réalisations">
+    <div class="container">
+      {
+        hasProjects ? (
+          <Gallery />
+        ) : (
+          <>
+            <div class="works__empty">
+              <p class="label works__kicker">Galerie en cours de reprise</p>
+              <p class="works__text">
+                Les photos des chantiers présentées sur le site actuel viendront se placer ici, avec pour chacune le type de
+                travaux, la commune et, quand elles existent, les vues avant/après.
+              </p>
+              <Button href={QUOTE_HREF} icon="arrow">Parler de mon projet</Button>
+            </div>
+            <ul role="list" class="works__slots" data-reveal-group>
+              {[1, 2, 3].map((n) => (
+                <li data-reveal class:list={[n === 1 && 'works__slot--wide']}>
+                  <PhotoSlot label={`Réalisation n°${n}, à reprendre du site actuel`} ratio={n === 1 ? '16 / 7' : '4 / 3'} />
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </div>
+  </section>
+
+  <FinalCta title="Votre chantier, le prochain." />
+</Layout>
+
+<style>
+  .works {
+    padding-bottom: var(--section-y);
+  }
+
+  .works__empty {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-4);
+    max-width: 44rem;
+    margin-bottom: var(--s-10);
+    padding: var(--s-6);
+    border-left: 3px solid var(--c-accent);
+    background: rgb(255 255 255 / 0.35);
+  }
+
+  .works__kicker {
+    color: var(--c-accent);
+  }
+
+  .works__slots {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  @media (min-width: 48rem) {
+    .works__slots {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .works__slot--wide {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

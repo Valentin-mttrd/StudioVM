@@ -1,0 +1,91 @@
+---
+/**
+ * Typographic wordmark. Stand-in until the client's official logo file is
+ * supplied (AUDIT.md §4) — swap the markup below for the real SVG then.
+ * The mark is a level/plumb square: the broker's tool, not a new emblem.
+ */
+interface Props {
+  tone?: 'ink' | 'paper';
+  class?: string;
+}
+
+const { tone = 'ink', class: className } = Astro.props;
+---
+<span class:list={['logo', `logo--${tone}`, className]}>
+  <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <rect x="1" y="1" width="30" height="30" rx="3" class="logo__tile" />
+    <path d="M8 23.5V8.5h15" class="logo__square" />
+    <path d="M8 23.5 23 8.5" class="logo__diag" />
+    <circle cx="23" cy="23" r="2.4" class="logo__dot" />
+  </svg>
+  <span class="logo__text">
+    <span class="logo__name">Solution<span class="logo__sep"> </span>Travaux</span>
+    <span class="logo__tag">Courtier en travaux · Étel</span>
+  </span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    line-height: 1;
+  }
+
+  .logo__mark {
+    width: 2.125rem;
+    height: 2.125rem;
+    flex: none;
+  }
+
+  .logo__tile {
+    fill: var(--c-ink);
+  }
+
+  .logo__square,
+  .logo__diag {
+    fill: none;
+    stroke: var(--c-paper);
+    stroke-width: 2.2;
+    stroke-linecap: square;
+  }
+
+  .logo__diag {
+    stroke-width: 1.2;
+    opacity: 0.55;
+  }
+
+  .logo__dot {
+    fill: var(--c-accent-soft);
+  }
+
+  .logo--paper .logo__tile {
+    fill: var(--c-paper);
+  }
+
+  .logo--paper .logo__square,
+  .logo--paper .logo__diag {
+    stroke: var(--c-ink);
+  }
+
+  .logo__text {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .logo__name {
+    font-size: 1.125rem;
+    font-weight: 760;
+    font-stretch: 112%;
+    letter-spacing: -0.02em;
+  }
+
+  .logo__tag {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.72;
+  }
+</style>

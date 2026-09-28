@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/sections/Hero.astro';
+import Principle from '../components/sections/Principle.astro';
+import Method from '../components/sections/Method.astro';
+import Trades from '../components/sections/Trades.astro';
+import Projects from '../components/sections/Projects.astro';
+import RealisationsTeaser from '../components/sections/RealisationsTeaser.astro';
+import Zone from '../components/sections/Zone.astro';
+import Broker from '../components/sections/Broker.astro';
+import Faq from '../components/sections/Faq.astro';
+import PartnerBanner from '../components/sections/PartnerBanner.astro';
+import FinalCta from '../components/sections/FinalCta.astro';
+import { faqSchema } from '../lib/seo';
+---
+<Layout
+  title="Solution Travaux - Courtier en travaux à Etel (56)"
+  description="Courtier en travaux à Étel depuis 2010 : Solution Travaux sélectionne des professionnels du bâtiment dans tous les corps d'état, entre Lorient et Vannes."
+  isHome
+  structuredData={[faqSchema()]}
+>
+  <Hero />
+  <Principle />
+  <Method />
+  <Trades />
+  <Projects />
+  <RealisationsTeaser />
+  <Zone />
+  <Broker />
+  <Faq />
+  <PartnerBanner />
+  <FinalCta />
+</Layout>

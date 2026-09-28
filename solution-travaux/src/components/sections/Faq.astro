@@ -1,0 +1,163 @@
+---
+import SectionHead from '../ui/SectionHead.astro';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { FAQ, SITE } from '../../data/site';
+import { QUOTE_HREF } from '../../data/nav';
+---
+<section id="questions" class="section faq surface-2" aria-labelledby="faq-title">
+  <div class="container faq__grid">
+    <div class="faq__aside">
+      <SectionHead index="08" label="Questions fréquentes" />
+      <h2 id="faq-title" class="h1 faq__title" data-reveal>Les réponses, avant de vous lancer.</h2>
+      <p class="muted faq__more" data-reveal>
+        Une autre question&nbsp;? Appelez le <a href={SITE.phone.href}>{SITE.phone.display}</a> ou décrivez votre projet.
+      </p>
+      <div data-reveal>
+        <Button href={QUOTE_HREF} icon="arrow">Décrire mon projet</Button>
+      </div>
+    </div>
+
+    <div class="faq__list" data-reveal-group>
+      {
+        FAQ.map((item, i) => (
+          <details class="qa" data-reveal name="faq" open={i === 0}>
+            <summary class="qa__q">
+              <span class="label qa__n">{String(i + 1).padStart(2, '0')}</span>
+              <span class="qa__text">{item.q}</span>
+              <span class="qa__icon" aria-hidden="true">
+                <Icon name="plus" size={20} />
+              </span>
+            </summary>
+            <div class="qa__a">
+              <p>{item.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__grid {
+    display: grid;
+    gap: var(--s-10);
+  }
+
+  @media (min-width: 64rem) {
+    .faq__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(3rem, 1rem + 5vw, 7rem);
+      align-items: start;
+    }
+
+    .faq__aside {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-8));
+    }
+  }
+
+  .faq__title {
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    max-width: 14ch;
+  }
+
+  .faq__more {
+    margin: var(--s-6) 0 var(--s-8);
+    max-width: 34ch;
+  }
+
+  .faq__more a {
+    color: var(--c-ink);
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  .faq__list {
+    border-top: 1px solid var(--c-line-strong);
+  }
+
+  .qa {
+    border-bottom: 1px solid var(--c-line-strong);
+  }
+
+  .qa__q {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: var(--s-4);
+    padding: var(--s-6) 0;
+    cursor: pointer;
+    list-style: none;
+    font-size: var(--fs-lg);
+    font-weight: 640;
+    line-height: 1.3;
+  }
+
+  .qa__q::-webkit-details-marker {
+    display: none;
+  }
+
+  .qa__n {
+    color: var(--c-accent);
+  }
+
+  .qa__icon {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    align-self: center;
+    border: 1px solid var(--c-line-strong);
+    border-radius: 50%;
+    transition:
+      transform var(--dur-3) var(--ease-out),
+      background-color var(--dur-2) ease,
+      color var(--dur-2) ease;
+  }
+
+  .qa[open] .qa__icon {
+    transform: rotate(45deg);
+    background: var(--c-ink);
+    color: var(--c-paper);
+    border-color: var(--c-ink);
+  }
+
+  @media (hover: hover) {
+    .qa__q:hover .qa__text {
+      color: var(--c-accent);
+    }
+  }
+
+  .qa__q:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .qa__a {
+    padding: 0 3.25rem var(--s-6) calc(2.5ch + var(--s-4));
+    color: var(--c-ink-3);
+    max-width: 62ch;
+  }
+
+  /* Smooth open/close where the browser can animate to auto height. */
+  @supports (interpolate-size: allow-keywords) {
+    @media (prefers-reduced-motion: no-preference) {
+      .faq__list {
+        interpolate-size: allow-keywords;
+      }
+
+      .qa::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition:
+          block-size var(--dur-3) var(--ease-out),
+          content-visibility var(--dur-3) allow-discrete;
+      }
+
+      .qa[open]::details-content {
+        block-size: auto;
+      }
+    }
+  }
+</style>

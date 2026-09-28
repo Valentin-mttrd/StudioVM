@@ -1,0 +1,173 @@
+---
+import Logo from '../ui/Logo.astro';
+import Icon from '../ui/Icon.astro';
+import { SITE, MAPS_URL, TRADE_GROUPS, TOWNS, HOME_BASE, COPY } from '../../data/site';
+import { PAGES } from '../../data/nav';
+
+const year = new Date().getFullYear();
+const towns = [HOME_BASE.name, ...TOWNS.map((t) => t.name)];
+---
+<footer class="footer on-ink">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <Logo tone="paper" />
+        <p class="footer__pitch">{COPY.selection}</p>
+      </div>
+
+      <address class="footer__contact">
+        <p class="label footer__title">Coordonnées</p>
+        <a href={MAPS_URL} class="footer__line" rel="noopener" target="_blank">
+          <Icon name="pin" />
+          <span>{SITE.address.street}<br />{SITE.address.postalCode} {SITE.address.city}<span class="sr-only"> (ouvre la carte dans un nouvel onglet)</span></span>
+        </a>
+        <a href={SITE.phone.href} class="footer__line">
+          <Icon name="phone" /> <span>{SITE.phone.display}</span>
+        </a>
+        <a href={SITE.mobile.href} class="footer__line">
+          <Icon name="mobile" /> <span>{SITE.mobile.display} <span class="muted">· {SITE.broker.displayName}</span></span>
+        </a>
+        <a href={`mailto:${SITE.email}`} class="footer__line">
+          <Icon name="mail" /> <span>{SITE.email}</span>
+        </a>
+        <a href={SITE.facebook} class="footer__line" rel="noopener" target="_blank">
+          <Icon name="facebook" /> <span>Facebook<span class="sr-only"> (nouvel onglet)</span></span>
+        </a>
+      </address>
+
+      <nav class="footer__nav" aria-label="Pages du site">
+        <p class="label footer__title">Le site</p>
+        <ul role="list">
+          {PAGES.map((p) => <li><a href={p.href}>{p.label}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+
+    <div class="footer__index">
+      <div>
+        <p class="label footer__title">Corps d'état</p>
+        <p class="footer__words">{TRADE_GROUPS.flatMap((g) => g.trades).join(' · ')}</p>
+      </div>
+      <div>
+        <p class="label footer__title">Zone d'intervention · 50 km autour d'Étel</p>
+        <p class="footer__words">{towns.join(' · ')}</p>
+      </div>
+    </div>
+
+    <div class="footer__base">
+      <p>© {year} {SITE.name} · {SITE.role} à {SITE.address.city} ({SITE.address.postalCode.slice(0, 2)}) · SIRET {SITE.siret}</p>
+      <a href="/mentions-legales/">Mentions légales</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: var(--s-20) calc(var(--s-8) + var(--mobile-bar-h, 0px));
+    font-size: var(--fs-sm);
+  }
+
+  .footer a {
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .footer a:hover {
+      color: var(--c-accent-soft);
+    }
+  }
+
+  .footer__top {
+    display: grid;
+    gap: var(--s-12);
+  }
+
+  @media (min-width: 48rem) {
+    .footer__top {
+      grid-template-columns: 1.3fr 1fr 0.7fr;
+      gap: var(--s-10);
+    }
+  }
+
+  .footer__pitch {
+    margin-top: var(--s-6);
+    max-width: 34ch;
+    font-size: var(--fs-base);
+    color: var(--c-on-ink-muted);
+  }
+
+  .footer__title {
+    margin-bottom: var(--s-4);
+    color: var(--c-on-ink-muted);
+  }
+
+  .footer__contact {
+    font-style: normal;
+    display: grid;
+    align-content: start;
+    gap: var(--s-1);
+  }
+
+  .footer__line {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-3);
+    padding-block: var(--s-2);
+    font-size: var(--fs-base);
+    overflow-wrap: anywhere;
+  }
+
+  .footer__line :global(svg) {
+    flex: none;
+    margin-top: 0.2em;
+    opacity: 0.8;
+  }
+
+  .footer__nav ul {
+    display: grid;
+    gap: var(--s-1);
+  }
+
+  .footer__nav a {
+    display: inline-block;
+    padding-block: var(--s-2);
+    font-size: var(--fs-base);
+  }
+
+  .footer__index {
+    display: grid;
+    gap: var(--s-8);
+    margin-top: var(--s-16);
+    padding-top: var(--s-8);
+    border-top: 1px solid var(--c-line-ink);
+  }
+
+  @media (min-width: 48rem) {
+    .footer__index {
+      grid-template-columns: 1.3fr 1fr;
+      gap: var(--s-10);
+    }
+  }
+
+  .footer__words {
+    color: var(--c-on-ink-muted);
+    line-height: 1.8;
+    text-wrap: pretty;
+  }
+
+  .footer__base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-3) var(--s-8);
+    margin-top: var(--s-12);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--c-line-ink);
+    color: var(--c-on-ink-muted);
+  }
+
+  .footer__base a {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+</style>

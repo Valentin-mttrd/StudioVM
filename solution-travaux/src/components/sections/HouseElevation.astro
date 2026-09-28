@@ -1,0 +1,606 @@
+---
+/**
+ * Hero drawing: front elevation of a néo-breton house (slate roof, granite
+ * gable chimneys, "lucarnes passantes") with a planned extension drawn in
+ * the accent colour, as an architect marks what is to be built.
+ *
+ * Every annotation is one of the project types named on the current site
+ * and links to the project form with that type pre-selected. Hovering or
+ * focusing an annotation highlights its part of the house (pure CSS :has).
+ */
+import { QUOTE_HREF } from '../../data/nav';
+
+interface Note {
+  id: string;
+  label: string;
+  // marker (on the drawing) and chip anchor, in viewBox units
+  m: [number, number];
+  c: [number, number];
+}
+
+const NOTES: Note[] = [
+  { id: 'combles', label: 'Aménagement de combles', m: [265, 318], c: [205, 38] },
+  { id: 'salle-de-bain', label: 'Salle de bain', m: [465, 318], c: [505, 38] },
+  { id: 'jardin', label: 'Jardin', m: [86, 290], c: [70, 212] },
+  { id: 'extension', label: 'Extension', m: [651, 440], c: [760, 336] },
+  { id: 'renovation', label: 'Rénovation', m: [316, 446], c: [352, 566] },
+  { id: 'muret-cloture', label: 'Muret, clôture', m: [84, 452], c: [98, 566] },
+  { id: 'terrasse', label: 'Terrasse', m: [712, 493], c: [700, 566] },
+];
+
+const W = 880;
+const H = 600;
+const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
+const href = (id: string) => QUOTE_HREF.replace('#', `?projet=${id}#`);
+
+// Granite quoins (chaînes d'angle): alternating long and short blocks.
+const quoins = Array.from({ length: 10 }, (_, i) => ({ y: 330 + i * 17, long: i % 2 === 0 }));
+// Slate courses across the roof.
+const slates = Array.from({ length: 13 }, (_, i) => 182 + i * 12);
+// Deck boards.
+const boards = Array.from({ length: 20 }, (_, i) => 578 + i * 12);
+// Cladding on the extension.
+const cladding = Array.from({ length: 4 }, (_, i) => 728 + i * 6);
+---
+<figure class="elev" data-elev>
+  <div class="elev__stage">
+    <svg class="elev__svg" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
+      <defs>
+        <pattern id="elev-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="7" class="elev__hatch-line" />
+        </pattern>
+        <pattern id="elev-hatch-accent" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+          <line x1="0" y1="0" x2="0" y2="9" class="elev__hatch-accent" />
+        </pattern>
+      </defs>
+
+      <!-- Ground -->
+      <g class="d d--1">
+        <rect x="0" y="500" width={W} height="24" fill="url(#elev-hatch)" class="elev__soil" />
+        <line x1="0" y1="500" x2={W} y2="500" class="s s--ground" pathLength="1" />
+      </g>
+
+      <!-- Garden: maritime pine and hydrangeas -->
+      <g class="part d d--4" data-part="jardin">
+        <!-- trunk (two strokes) and forked branches -->
+        <path
+          class="s"
+          pathLength="1"
+          d="M82 470C84 430 87 398 93 360C96 340 99 326 103 312M90 470C91 432 94 402 99 364C102 346 105 332 110 318M97 340C87 328 76 318 64 306M106 322C112 312 118 306 126 300"
+        />
+        <!-- umbrella canopy of a maritime pine -->
+        <path
+          class="s fillable"
+          pathLength="1"
+          d="M14 300C10 287 24 276 40 280C46 266 68 261 82 269C92 256 120 255 130 268C146 263 162 274 158 288C167 296 158 310 142 307C132 317 106 316 96 309C84 318 56 318 46 309C30 316 12 313 14 300Z"
+        />
+        <path class="s s--thin" pathLength="1" d="M34 297C44 291 56 292 64 297M80 287C92 280 106 281 114 288M120 299C130 294 142 295 148 300" />
+        <path
+          class="s fillable"
+          pathLength="1"
+          d="M188 500C186 488 196 480 206 484C212 474 228 478 228 490C236 490 238 500 236 500Z"
+        />
+        <path
+          class="s fillable"
+          pathLength="1"
+          d="M500 500C498 490 508 482 518 486C524 478 538 482 536 492C542 494 542 500 540 500Z"
+        />
+      </g>
+
+      <!-- Low wall and fence -->
+      <g class="part d d--4" data-part="muret-cloture">
+        <line x1="24" y1="436" x2="24" y2="470" class="s" pathLength="1" />
+        <line x1="86" y1="436" x2="86" y2="470" class="s" pathLength="1" />
+        <line x1="146" y1="436" x2="146" y2="470" class="s" pathLength="1" />
+        <line x1="20" y1="442" x2="150" y2="442" class="s s--thin" pathLength="1" />
+        <line x1="20" y1="450" x2="150" y2="450" class="s s--thin" pathLength="1" />
+        <line x1="20" y1="458" x2="150" y2="458" class="s s--thin" pathLength="1" />
+        <rect x="16" y="464" width="138" height="7" class="s paper fillable" pathLength="1" />
+        <rect x="20" y="471" width="130" height="29" class="s paper fillable" pathLength="1" />
+        <path
+          class="s s--thin"
+          pathLength="1"
+          d="M20 481H150M20 491H150M46 471V481M80 471V481M116 471V481M32 481V491M64 481V491M98 481V491M132 481V491M52 491V500M88 491V500M122 491V500"
+        />
+      </g>
+
+      <!-- Main house: the existing building (rénovation) -->
+      <g class="part d d--2" data-part="renovation">
+        <rect x="168" y="330" width="394" height="170" class="s paper fillable" pathLength="1" />
+        <line x1="168" y1="486" x2="562" y2="486" class="s s--thin" pathLength="1" />
+        {
+          quoins.map((q) => (
+            <>
+              <rect x="168" y={q.y} width={q.long ? 24 : 15} height="17" class="s s--thin" pathLength="1" />
+              <rect x={q.long ? 538 : 547} y={q.y} width={q.long ? 24 : 15} height="17" class="s s--thin" pathLength="1" />
+            </>
+          ))
+        }
+        <!-- ground-floor windows with granite lintels and sills -->
+        <rect x="240" y="392" width="50" height="60" class="s paper" pathLength="1" />
+        <path class="s s--thin" pathLength="1" d="M265 392V452M240 412H290M240 432H290" />
+        <rect x="234" y="384" width="62" height="8" class="s" pathLength="1" />
+        <rect x="236" y="452" width="58" height="6" class="s" pathLength="1" />
+        <rect x="440" y="392" width="50" height="60" class="s paper" pathLength="1" />
+        <path class="s s--thin" pathLength="1" d="M465 392V452M440 412H490M440 432H490" />
+        <rect x="434" y="384" width="62" height="8" class="s" pathLength="1" />
+        <rect x="436" y="452" width="58" height="6" class="s" pathLength="1" />
+        <!-- door -->
+        <rect x="343" y="404" width="44" height="96" class="s paper" pathLength="1" />
+        <rect x="337" y="396" width="56" height="8" class="s" pathLength="1" />
+        <rect x="353" y="414" width="24" height="22" class="s s--thin" pathLength="1" />
+        <circle cx="380" cy="462" r="2" class="s" />
+        <rect x="333" y="494" width="64" height="6" class="s s--thin" pathLength="1" />
+      </g>
+
+      <!-- Roof, gables and chimneys (combles) -->
+      <g class="part d d--3" data-part="combles">
+        <rect x="182" y="170" width="366" height="160" class="s paper fillable" pathLength="1" />
+        <g class="slates">{slates.map((y) => <line x1="182" y1={y} x2="548" y2={y} class="s s--slate" />)}</g>
+        <rect x="162" y="170" width="20" height="160" class="s paper" pathLength="1" />
+        <rect x="548" y="170" width="20" height="160" class="s paper" pathLength="1" />
+        <line x1="156" y1="170" x2="574" y2="170" class="s s--bold" pathLength="1" />
+        <line x1="158" y1="330" x2="572" y2="330" class="s s--bold" pathLength="1" />
+        <rect x="158" y="112" width="28" height="58" class="s paper" pathLength="1" />
+        <rect x="154" y="104" width="36" height="8" class="s paper" pathLength="1" />
+        <rect x="544" y="112" width="28" height="58" class="s paper" pathLength="1" />
+        <rect x="540" y="104" width="36" height="8" class="s paper" pathLength="1" />
+        <!-- left dormer -->
+        <path class="s paper fillable" pathLength="1" d="M238 352V286L265 256L292 286V352Z" />
+        <path class="s s--bold" pathLength="1" d="M231 291L265 251L299 291" />
+        <rect x="250" y="294" width="30" height="46" class="s paper" pathLength="1" />
+        <path class="s s--thin" pathLength="1" d="M265 294V340M250 316H280" />
+      </g>
+
+      <!-- Right dormer (salle de bain under the roof) -->
+      <g class="part d d--3" data-part="salle-de-bain">
+        <path class="s paper fillable" pathLength="1" d="M438 352V286L465 256L492 286V352Z" />
+        <path class="s s--bold" pathLength="1" d="M431 291L465 251L499 291" />
+        <rect x="450" y="294" width="30" height="46" class="s paper" pathLength="1" />
+        <path class="s s--thin" pathLength="1" d="M465 294V340M450 316H480" />
+      </g>
+
+      <!-- Planned extension, drawn in accent -->
+      <g class="part part--new d d--5" data-part="extension">
+        <rect x="562" y="384" width="188" height="102" class="a paper-tint" />
+        <rect x="558" y="376" width="198" height="9" class="a paper" pathLength="1" />
+        <rect x="584" y="404" width="134" height="82" class="a paper" pathLength="1" />
+        <path class="a a--thin" pathLength="1" d="M629 404V486M673 404V486M596 420L608 408M641 420L653 408" />
+        {cladding.map((x) => <line x1={x} y1="392" x2={x} y2="486" class="a a--thin" />)}
+        <line x1="562" y1="486" x2="750" y2="486" class="a" pathLength="1" />
+      </g>
+
+      <!-- Terrace deck -->
+      <g class="part part--new d d--6" data-part="terrasse">
+        <rect x="566" y="486" width="240" height="14" class="a paper fillable" pathLength="1" />
+        {boards.map((x) => <line x1={x} y1="486" x2={x} y2="500" class="a a--thin" />)}
+      </g>
+
+      <!-- Leaders and markers -->
+      <g class="elev__notes">
+        {
+          NOTES.map((n, i) => (
+            <g class="note" data-note={n.id} style={`--n:${i}`}>
+              <line x1={n.m[0]} y1={n.m[1]} x2={n.c[0]} y2={n.c[1]} class="note__leader" pathLength="1" />
+              <circle cx={n.m[0]} cy={n.m[1]} r="9" class="note__ring" />
+              <circle cx={n.m[0]} cy={n.m[1]} r="3.5" class="note__dot" />
+            </g>
+          ))
+        }
+      </g>
+    </svg>
+
+    <ol class="elev__chips" role="list" aria-label="Projets : touchez une zone pour décrire le vôtre">
+      {
+        NOTES.map((n, i) => (
+          <li class="elev__chip-item" style={`left:${pct(n.c[0], W)};top:${pct(n.c[1], H)};--n:${i}`}>
+            <a class="elev__chip" href={href(n.id)} data-chip={n.id}>
+              <span class="elev__chip-num" aria-hidden="true">{i + 1}</span>
+              <span class="elev__chip-label">{n.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <figcaption class="elev__caption">
+    <span class="label">Élévation de principe</span>
+    <span class="elev__hint">Choisissez une zone pour décrire votre projet</span>
+    <span class="elev__legend label"><i class="elev__legend-new"></i> À créer</span>
+  </figcaption>
+</figure>
+
+<style>
+  .elev {
+    position: relative;
+    margin: 0;
+  }
+
+  .elev__stage {
+    position: relative;
+  }
+
+  .elev__svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* strokes (user units: the drawing scales as one sheet) */
+  .s,
+  .a {
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .s {
+    stroke: var(--c-ink);
+  }
+
+  .a {
+    stroke: var(--c-accent);
+  }
+
+  .s--thin,
+  .a--thin {
+    stroke-width: 1.1;
+  }
+
+  .s--bold,
+  .s--ground {
+    stroke-width: 2.6;
+  }
+
+  .s--slate {
+    stroke-width: 0.8;
+  }
+
+  .slates {
+    opacity: 0.4;
+  }
+
+  @media (max-width: 47.99rem) {
+    .s,
+    .a {
+      stroke-width: 2.6;
+    }
+
+    .s--thin,
+    .a--thin,
+    .s--slate {
+      stroke-width: 1.6;
+    }
+
+    .s--bold,
+    .s--ground {
+      stroke-width: 3.4;
+    }
+  }
+
+  .part {
+    transition: opacity var(--dur-2) ease;
+  }
+
+  .paper {
+    fill: var(--c-paper);
+  }
+
+  .paper-tint {
+    fill: url(#elev-hatch-accent);
+  }
+
+  .elev__hatch-line {
+    stroke: var(--c-ink);
+    stroke-width: 0.8;
+    opacity: 0.4;
+  }
+
+  .elev__hatch-accent {
+    stroke: var(--c-accent);
+    stroke-width: 1;
+    opacity: 0.55;
+  }
+
+  .part .fillable,
+  .part .paper,
+  .part rect,
+  .part path {
+    transition:
+      fill var(--dur-2) ease,
+      stroke var(--dur-2) ease,
+      opacity var(--dur-2) ease;
+  }
+
+  /* ── Highlight the part tied to the focused/hovered chip ── */
+  .elev:has(.elev__chip:is(:hover, :focus-visible)) .part {
+    opacity: 0.38;
+  }
+
+  .elev:has(.elev__chip:is(:hover, :focus-visible)) .note {
+    opacity: 0.3;
+  }
+
+  .note {
+    transition: opacity var(--dur-2) ease;
+  }
+
+  /* one rule per part; generated statically to stay CSS-only */
+  .elev:has([data-chip='combles']:is(:hover, :focus-visible)) :is([data-part='combles'], [data-note='combles']),
+  .elev:has([data-chip='salle-de-bain']:is(:hover, :focus-visible)) :is([data-part='salle-de-bain'], [data-note='salle-de-bain']),
+  .elev:has([data-chip='jardin']:is(:hover, :focus-visible)) :is([data-part='jardin'], [data-note='jardin']),
+  .elev:has([data-chip='extension']:is(:hover, :focus-visible)) :is([data-part='extension'], [data-note='extension']),
+  .elev:has([data-chip='renovation']:is(:hover, :focus-visible)) :is([data-part='renovation'], [data-note='renovation']),
+  .elev:has([data-chip='muret-cloture']:is(:hover, :focus-visible)) :is([data-part='muret-cloture'], [data-note='muret-cloture']),
+  .elev:has([data-chip='terrasse']:is(:hover, :focus-visible)) :is([data-part='terrasse'], [data-note='terrasse']) {
+    opacity: 1;
+  }
+
+  .elev:has([data-chip='combles']:is(:hover, :focus-visible)) [data-part='combles'] .fillable,
+  .elev:has([data-chip='salle-de-bain']:is(:hover, :focus-visible)) [data-part='salle-de-bain'] .fillable,
+  .elev:has([data-chip='jardin']:is(:hover, :focus-visible)) [data-part='jardin'] .fillable,
+  .elev:has([data-chip='extension']:is(:hover, :focus-visible)) [data-part='extension'] .paper-tint,
+  .elev:has([data-chip='renovation']:is(:hover, :focus-visible)) [data-part='renovation'] .fillable,
+  .elev:has([data-chip='muret-cloture']:is(:hover, :focus-visible)) [data-part='muret-cloture'] .fillable,
+  .elev:has([data-chip='terrasse']:is(:hover, :focus-visible)) [data-part='terrasse'] .fillable {
+    fill: #f0d9cc;
+  }
+
+  /* ── Markers and leaders ── */
+  .note__leader {
+    stroke: var(--c-ink);
+    stroke-width: 1.1;
+    opacity: 0.7;
+  }
+
+  .note__ring {
+    fill: var(--c-paper);
+    stroke: var(--c-accent);
+    stroke-width: 1.6;
+  }
+
+  .note__dot {
+    fill: var(--c-accent);
+  }
+
+  /* ── Chips (HTML, so text stays crisp and links are real links) ── */
+  .elev__chips {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+  }
+
+  .elev__chip-item {
+    position: absolute;
+    transform: translate(-50%, -50%);
+  }
+
+  .elev__chip {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 2.25rem;
+    padding: 0 var(--s-3) 0 var(--s-1);
+    border: 1px solid var(--c-line-strong);
+    border-radius: 999px;
+    background: var(--c-paper);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 6px 18px -12px rgb(20 28 33 / 0.5);
+    transition:
+      background-color var(--dur-1) ease,
+      color var(--dur-1) ease,
+      border-color var(--dur-1) ease,
+      transform var(--dur-2) var(--ease-out);
+  }
+
+  .elev__chip-num {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--c-ink);
+    color: var(--c-paper);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .elev__chip:is(:hover, :focus-visible) {
+    background: var(--c-ink);
+    color: var(--c-paper);
+    border-color: var(--c-ink);
+    transform: translateY(-2px);
+  }
+
+  .elev__chip:is(:hover, :focus-visible) .elev__chip-num {
+    background: var(--c-accent-soft);
+    color: var(--c-ink);
+  }
+
+  .elev__chip:active {
+    transform: scale(0.97);
+  }
+
+  /* Small screens: numbered pins only; the legend below the drawing
+     (in Hero) carries the words. */
+  @media (max-width: 47.99rem) {
+    .elev__chip {
+      padding: 0;
+      min-height: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .elev__chip-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .elev__chip-num {
+      width: 1.625rem;
+      height: 1.625rem;
+      box-shadow: 0 0 0 3px var(--c-paper);
+    }
+
+    /* the tap target stays 44px even though the pin is smaller */
+    .elev__chip::after {
+      content: '';
+      position: absolute;
+      inset: -0.5rem;
+    }
+
+    .elev__chip {
+      position: relative;
+    }
+  }
+
+  .elev__caption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-4);
+    margin-top: var(--s-6);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--c-line);
+    font-size: var(--fs-sm);
+    color: var(--c-muted);
+  }
+
+  @media (max-width: 47.99rem) {
+    .elev__caption {
+      display: none;
+    }
+  }
+
+  .elev__legend {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--c-accent);
+  }
+
+  .elev__legend-new {
+    display: inline-block;
+    width: 1.5rem;
+    height: 0.625rem;
+    border: 1px solid var(--c-accent);
+    background: repeating-linear-gradient(-45deg, transparent 0 3px, rgb(164 68 31 / 0.4) 3px 4px);
+  }
+
+  /* ── Drawing-in on load ─────────────────────────────────────────── */
+  /* Outlines (anything with pathLength) are drawn like a pen stroke, in
+     construction order: ground, walls, roof, garden, then what's new.
+     Textures (slates, boards, hatching) fade in once their frame exists. */
+  @media (prefers-reduced-motion: no-preference) {
+    .js .d [pathLength] {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: draw var(--dur-4) var(--ease-in-out) forwards;
+      animation-delay: var(--d, 0ms);
+    }
+
+    .js .d :is(line, circle):not([pathLength]),
+    .js .d .paper-tint,
+    .js .d .elev__soil {
+      opacity: 0;
+      animation: fade 700ms ease forwards;
+      animation-delay: calc(var(--d, 0ms) + 700ms);
+    }
+
+    .js .d--1 {
+      --d: 0ms;
+    }
+
+    .js .d--2 {
+      --d: 250ms;
+    }
+
+    .js .d--3 {
+      --d: 650ms;
+    }
+
+    .js .d--4 {
+      --d: 1000ms;
+    }
+
+    .js .d--5 {
+      --d: 1350ms;
+    }
+
+    .js .d--6 {
+      --d: 1650ms;
+    }
+
+    .js .note__leader {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: draw 600ms var(--ease-in-out) forwards;
+      animation-delay: calc(2100ms + var(--n) * 90ms);
+    }
+
+    .js .note__ring,
+    .js .note__dot {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: pop 520ms var(--ease-out) forwards;
+      animation-delay: calc(2000ms + var(--n) * 90ms);
+    }
+
+    .js .elev__chip-item {
+      opacity: 0;
+      animation: chip-in 600ms var(--ease-out) forwards;
+      animation-delay: calc(2250ms + var(--n) * 90ms);
+    }
+  }
+
+  @keyframes fade {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes chip-in {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+</style>

@@ -1,0 +1,13 @@
+{
+  "name": "Solution Travaux – Courtier en travaux à Étel",
+  "short_name": "Solution Travaux",
+  "lang": "fr",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#f3f0e9",
+  "theme_color": "#141c21",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

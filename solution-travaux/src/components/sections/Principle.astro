@@ -1,0 +1,234 @@
+---
+import SectionHead from '../ui/SectionHead.astro';
+import Icon from '../ui/Icon.astro';
+import { SITE, COPY, TRADE_COUNT, ZONE_RADIUS_KM } from '../../data/site';
+
+const statement = COPY.selection.split(' ');
+
+// Figures are all stated on the current site (TRADE_COUNT is the length of
+// its own list of trades). `count` numbers tick up when they scroll in.
+const FIGURES = [
+  { prefix: '', value: String(SITE.foundedYear), unit: '', text: "Création de l'agence de courtage", count: false },
+  { prefix: '', value: '48', unit: 'h', text: 'Maximum pour la première visite chez vous', count: true },
+  { prefix: '', value: String(ZONE_RADIUS_KM), unit: 'km', text: "Rayon d'intervention autour d'Étel", count: true },
+  { prefix: '+', value: '20', unit: 'ans', text: `${SITE.broker.displayName} dans le bâtiment`, count: true },
+  { prefix: '', value: String(TRADE_COUNT), unit: '', text: 'Métiers du bâtiment dans le réseau', count: true },
+];
+---
+<section id="principe" class="section principle on-ink" aria-labelledby="principe-title">
+  <div class="container">
+    <SectionHead index="01" label="Le principe" note="Courtage en travaux" />
+
+    <h2 id="principe-title" class="sr-only">Le principe du courtage en travaux</h2>
+    <p class="principle__statement">
+      {
+        statement.map((word, i) => (
+          <>
+            <span class:list={['w', i < 2 && 'w--brand']}>{word}</span>{' '}
+          </>
+        ))
+      }
+    </p>
+
+    <div class="principle__cols" data-reveal-group>
+      <p class="lead" data-reveal>{COPY.intro}</p>
+      <div class="principle__check" data-reveal>
+        <Icon name="shield" size={28} />
+        <p>{COPY.verification}</p>
+      </div>
+    </div>
+
+    <dl class="figures" data-reveal-group>
+      {
+        FIGURES.map((f) => (
+          <div class="figure" data-reveal>
+            <dt class="figure__text">{f.text}</dt>
+            <dd class="figure__value">
+              {f.prefix && <span class="figure__unit">{f.prefix}</span>}
+              <span data-count={f.count ? f.value : undefined}>{f.value}</span>
+              {f.unit && <span class="figure__unit">{f.unit}</span>}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .principle {
+    overflow: clip;
+  }
+
+  .principle__statement {
+    margin-top: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+    max-width: 22ch;
+    font-size: clamp(2rem, 1.2rem + 3.6vw, 4.75rem);
+    font-weight: 680;
+    font-stretch: 106%;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .w--brand {
+    color: var(--c-accent-soft);
+  }
+
+  /* Reading sweep: each word lights up as it crosses the lower third of
+     the screen. Pure CSS where scroll timelines exist; full text otherwise. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .w {
+        animation: word-on linear both;
+        animation-timeline: view();
+        animation-range: entry 60% cover 42%;
+      }
+    }
+  }
+
+  @keyframes word-on {
+    from {
+      opacity: 0.16;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .principle__cols {
+    display: grid;
+    gap: var(--s-8);
+    margin-top: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  @media (min-width: 56rem) {
+    .principle__cols {
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem, 1rem + 4vw, 6rem);
+    }
+  }
+
+  .principle__cols .lead {
+    color: var(--c-on-ink);
+  }
+
+  .principle__check {
+    display: flex;
+    gap: var(--s-4);
+    align-items: flex-start;
+    padding: var(--s-6);
+    border: 1px solid var(--c-line-ink);
+    border-radius: var(--r-lg);
+    background: rgb(255 255 255 / 0.03);
+    font-size: var(--fs-lg);
+    line-height: 1.5;
+  }
+
+  .principle__check :global(svg) {
+    flex: none;
+    color: var(--c-accent-soft);
+  }
+
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: clamp(3.5rem, 2rem + 5vw, 7rem);
+    border-top: 1px solid var(--c-line-ink-strong);
+  }
+
+  @media (min-width: 56rem) {
+    .figures {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .figure {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+    gap: var(--s-3);
+    padding: var(--s-6) var(--s-4) var(--s-6) 0;
+    border-bottom: 1px solid var(--c-line-ink);
+  }
+
+  .figure:first-child {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 56rem) {
+    .figure {
+      padding: var(--s-8) var(--s-6) var(--s-2) 0;
+      border-bottom: 0;
+    }
+
+    .figure + .figure {
+      padding-left: var(--s-6);
+      border-left: 1px solid var(--c-line-ink);
+    }
+
+    .figure:first-child {
+      grid-column: auto;
+    }
+  }
+
+  .figure__value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.15em;
+    font-size: clamp(2.5rem, 1.8rem + 2.8vw, 4.5rem);
+    font-weight: 700;
+    font-stretch: 116%;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .figure__unit {
+    font-size: 0.42em;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: var(--c-accent-soft);
+  }
+
+  .figure__text {
+    font-size: var(--fs-sm);
+    color: var(--c-on-ink-muted);
+    max-width: 18ch;
+  }
+</style>
+
+<script>
+  // Count-up for key figures. The final number is in the HTML; this only
+  // animates towards it, once, when it scrolls into view.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const nodes = document.querySelectorAll<HTMLElement>('[data-count]');
+
+  if (!reduce && 'IntersectionObserver' in window) {
+    const run = (el: HTMLElement) => {
+      const target = Number(el.dataset.count);
+      const start = performance.now();
+      const duration = 1200;
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 4);
+        el.textContent = String(Math.round(target * eased));
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      el.textContent = '0';
+      requestAnimationFrame(tick);
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            run(e.target as HTMLElement);
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.6 },
+    );
+    nodes.forEach((n) => io.observe(n));
+  }
+</script>

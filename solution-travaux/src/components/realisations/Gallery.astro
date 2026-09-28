@@ -1,0 +1,453 @@
+---
+/**
+ * Projects grid with type filters and a lightbox. Everything is driven by
+ * src/data/realisations.ts; filters only list types that have projects.
+ */
+import { Image, getImage } from 'astro:assets';
+import Compare from './Compare.astro';
+import Icon from '../ui/Icon.astro';
+import { REALISATIONS } from '../../data/realisations';
+import { PROJECT_TYPES } from '../../data/site';
+
+const typeLabel = (id: string) => PROJECT_TYPES.find((t) => t.id === id)?.label ?? id;
+const types = PROJECT_TYPES.filter((t) => REALISATIONS.some((r) => r.type === t.id));
+
+// Large renditions for the lightbox, computed at build time.
+const slides = await Promise.all(
+  REALISATIONS.map(async (r) => {
+    const photos = [r.cover, ...(r.before ? [r.before] : []), ...(r.gallery ?? [])];
+    return Promise.all(
+      photos.map(async (p) => {
+        const img = await getImage({ src: p.src, width: 1600 });
+        return { src: img.src, alt: p.alt };
+      }),
+    );
+  }),
+);
+---
+<div class="gallery" data-gallery>
+  {
+    types.length > 1 && (
+      <div class="filters" role="group" aria-label="Filtrer par type de projet">
+        <button type="button" class="filter" aria-pressed="true" data-filter="all">
+          Tout <span class="filter__n">{REALISATIONS.length}</span>
+        </button>
+        {types.map((t) => (
+          <button type="button" class="filter" aria-pressed="false" data-filter={t.id}>
+            {t.label} <span class="filter__n">{REALISATIONS.filter((r) => r.type === t.id).length}</span>
+          </button>
+        ))}
+      </div>
+    )
+  }
+  <p class="sr-only" role="status" data-gallery-status></p>
+
+  <ul role="list" class="grid">
+    {
+      REALISATIONS.map((r, i) => (
+        <li class:list={['item', i % 5 === 0 && 'item--wide']} id={r.id} data-type={r.type}>
+          <article class="card">
+            {r.before ? (
+              <Compare before={r.before} after={r.cover} label={r.title} />
+            ) : (
+              <button type="button" class="card__media" data-open={i} aria-label={`Agrandir les photos : ${r.title}`}>
+                <Image src={r.cover.src} alt={r.cover.alt} widths={[480, 800, 1200]} sizes="(min-width: 64rem) 50vw, 100vw" class="card__img" />
+                <span class="card__zoom" aria-hidden="true">
+                  <Icon name="plus" size={18} />
+                </span>
+              </button>
+            )}
+            <div class="card__body">
+              <p class="label card__meta">
+                {typeLabel(r.type)}
+                {r.town && ` · ${r.town}`}
+              </p>
+              <h2 class="h3 card__title">{r.title}</h2>
+              {r.summary && <p class="muted">{r.summary}</p>}
+              {r.trades && r.trades.length > 0 && (
+                <ul role="list" class="card__trades">
+                  {r.trades.map((t) => (
+                    <li class="chip">{t}</li>
+                  ))}
+                </ul>
+              )}
+              {r.before && (
+                <button type="button" class="link card__more" data-open={i}>
+                  Voir toutes les photos
+                </button>
+              )}
+            </div>
+          </article>
+        </li>
+      ))
+    }
+  </ul>
+
+  <dialog class="lightbox" aria-label="Photos de la réalisation" data-lightbox>
+    <div class="lightbox__frame">
+      <img class="lightbox__img" alt="" data-lightbox-img />
+      <p class="lightbox__caption" data-lightbox-caption></p>
+    </div>
+    <div class="lightbox__bar">
+      <span class="label" data-lightbox-count></span>
+      <div class="lightbox__nav">
+        <button type="button" class="lightbox__btn" data-lightbox-prev aria-label="Photo précédente">
+          <Icon name="arrow" class="lightbox__prev" />
+        </button>
+        <button type="button" class="lightbox__btn" data-lightbox-next aria-label="Photo suivante">
+          <Icon name="arrow" />
+        </button>
+        <button type="button" class="lightbox__btn" data-lightbox-close aria-label="Fermer">
+          <Icon name="close" />
+        </button>
+      </div>
+    </div>
+  </dialog>
+  <script type="application/json" data-slides set:html={JSON.stringify(slides)} />
+</div>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-bottom: var(--s-8);
+  }
+
+  .filter {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 2.75rem;
+    padding: 0 var(--s-4);
+    border: 1px solid var(--c-line-strong);
+    border-radius: 999px;
+    background: transparent;
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    transition: background-color var(--dur-1) ease, color var(--dur-1) ease, transform var(--dur-1) var(--ease-out);
+  }
+
+  .filter:active {
+    transform: scale(0.97);
+  }
+
+  .filter[aria-pressed='true'] {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+    color: var(--c-paper);
+  }
+
+  @media (hover: hover) {
+    .filter[aria-pressed='false']:hover {
+      border-color: var(--c-ink);
+    }
+  }
+
+  .filter__n {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    opacity: 0.7;
+  }
+
+  .grid {
+    display: grid;
+    gap: clamp(1.5rem, 1rem + 2vw, 3rem) var(--s-6);
+  }
+
+  @media (min-width: 48rem) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .item--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .item.is-hidden {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .item.is-entering {
+      animation: item-in var(--dur-3) var(--ease-out) both;
+    }
+  }
+
+  @keyframes item-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  .card {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .card__media {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--c-paper-2);
+    cursor: zoom-in;
+  }
+
+  .card__media :global(.card__img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform 900ms var(--ease-out);
+  }
+
+  .item--wide .card__media :global(.card__img) {
+    aspect-ratio: 16 / 7;
+  }
+
+  .card__zoom {
+    position: absolute;
+    right: var(--s-3);
+    bottom: var(--s-3);
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--c-paper);
+    color: var(--c-ink);
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .card__media:hover :global(.card__img) {
+      transform: scale(1.03);
+    }
+
+    .card__media:hover .card__zoom {
+      transform: scale(1.1);
+    }
+  }
+
+  .card__media:focus-visible {
+    outline-offset: 4px;
+  }
+
+  .card__body {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .card__meta {
+    color: var(--c-accent);
+  }
+
+  .card__trades {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+  }
+
+  .card__more {
+    justify-self: start;
+    margin-top: var(--s-2);
+    border: 0;
+    padding: 0 0 2px;
+    background-color: transparent;
+    font: inherit;
+    font-weight: 600;
+  }
+
+  /* ── Lightbox ── */
+  .lightbox {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgb(12 17 20 / 0.96);
+    color: var(--c-on-ink);
+    opacity: 0;
+    transition:
+      opacity var(--dur-2) ease,
+      overlay var(--dur-2) allow-discrete,
+      display var(--dur-2) allow-discrete;
+  }
+
+  .lightbox[open] {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    opacity: 1;
+  }
+
+  @starting-style {
+    .lightbox[open] {
+      opacity: 0;
+    }
+  }
+
+  .lightbox::backdrop {
+    background: transparent;
+  }
+
+  .lightbox__frame {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: var(--s-3);
+    min-height: 0;
+    padding: var(--s-6) var(--gutter) 0;
+  }
+
+  .lightbox__img {
+    max-width: 100%;
+    max-height: calc(100dvh - 9rem);
+    object-fit: contain;
+    border-radius: var(--r);
+  }
+
+  .lightbox__img.is-loading {
+    opacity: 0;
+  }
+
+  .lightbox__img {
+    transition: opacity var(--dur-2) ease;
+  }
+
+  .lightbox__caption {
+    font-size: var(--fs-sm);
+    color: var(--c-on-ink-muted);
+    text-align: center;
+  }
+
+  .lightbox__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--s-4) var(--gutter) calc(var(--s-4) + env(safe-area-inset-bottom));
+  }
+
+  .lightbox__nav {
+    display: flex;
+    gap: var(--s-2);
+  }
+
+  .lightbox__btn {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid var(--c-line-ink-strong);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--c-on-ink);
+    transition: background-color var(--dur-1) ease, color var(--dur-1) ease;
+  }
+
+  @media (hover: hover) {
+    .lightbox__btn:hover {
+      background: var(--c-paper);
+      color: var(--c-ink);
+    }
+  }
+
+  .lightbox__btn :global(.lightbox__prev) {
+    transform: scaleX(-1);
+  }
+
+  .lightbox :focus-visible {
+    outline-color: var(--c-accent-soft);
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-gallery]');
+  if (root) {
+    // ── Filters ──
+    const items = [...root.querySelectorAll<HTMLElement>('[data-type]')];
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const status = root.querySelector<HTMLElement>('[data-gallery-status]');
+    buttons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.filter;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        let shown = 0;
+        items.forEach((it) => {
+          const on = f === 'all' || it.dataset.type === f;
+          it.classList.toggle('is-hidden', !on);
+          it.classList.remove('is-entering');
+          if (on) {
+            void it.offsetWidth; // restart the entrance animation
+            it.classList.add('is-entering');
+            it.style.animationDelay = `${Math.min(shown, 6) * 60}ms`;
+            shown++;
+          }
+        });
+        if (status) status.textContent = `${shown} réalisation${shown > 1 ? 's' : ''} affichée${shown > 1 ? 's' : ''}.`;
+      }),
+    );
+
+    // ── Lightbox ──
+    const dialog = root.querySelector<HTMLDialogElement>('[data-lightbox]');
+    const img = root.querySelector<HTMLImageElement>('[data-lightbox-img]');
+    const caption = root.querySelector<HTMLElement>('[data-lightbox-caption]');
+    const count = root.querySelector<HTMLElement>('[data-lightbox-count]');
+    const slides: { src: string; alt: string }[][] = JSON.parse(
+      root.querySelector('[data-slides]')?.textContent ?? '[]',
+    );
+    let set: { src: string; alt: string }[] = [];
+    let index = 0;
+    let opener: HTMLElement | null = null;
+
+    const render = () => {
+      if (!img || !set[index]) return;
+      img.classList.add('is-loading');
+      img.onload = () => img.classList.remove('is-loading');
+      img.src = set[index].src;
+      img.alt = set[index].alt;
+      if (caption) caption.textContent = set[index].alt;
+      if (count) count.textContent = `${index + 1} / ${set.length}`;
+      root.querySelectorAll<HTMLButtonElement>('[data-lightbox-prev],[data-lightbox-next]').forEach((b) => (b.hidden = set.length < 2));
+    };
+    const step = (d: number) => {
+      index = (index + d + set.length) % set.length;
+      render();
+    };
+
+    root.querySelectorAll<HTMLElement>('[data-open]').forEach((btn) =>
+      btn.addEventListener('click', () => {
+        set = slides[Number(btn.dataset.open)] ?? [];
+        index = 0;
+        opener = btn;
+        render();
+        dialog?.showModal();
+      }),
+    );
+    root.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => step(-1));
+    root.querySelector('[data-lightbox-next]')?.addEventListener('click', () => step(1));
+    root.querySelector('[data-lightbox-close]')?.addEventListener('click', () => dialog?.close());
+    dialog?.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') step(1);
+      if (e.key === 'ArrowLeft') step(-1);
+    });
+    dialog?.addEventListener('close', () => opener?.focus());
+    // Tap on the dark area closes; swipes change photo.
+    dialog?.addEventListener('click', (e) => {
+      if (e.target === dialog || (e.target as HTMLElement).classList.contains('lightbox__frame')) dialog.close();
+    });
+    let x0: number | null = null;
+    dialog?.addEventListener('pointerdown', (e) => (x0 = e.clientX));
+    dialog?.addEventListener('pointerup', (e) => {
+      if (x0 !== null && Math.abs(e.clientX - x0) > 50) step(e.clientX < x0 ? 1 : -1);
+      x0 = null;
+    });
+  }
+</script>

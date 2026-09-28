@@ -1,0 +1,168 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import FormShell from '../components/forms/FormShell.astro';
+import Field from '../components/forms/Field.astro';
+import Choices from '../components/forms/Choices.astro';
+import Icon from '../components/ui/Icon.astro';
+import { SITE, PROJECT_TYPES } from '../data/site';
+import { QUOTE_HREF } from '../data/nav';
+import { breadcrumbSchema } from '../lib/seo';
+---
+<Layout
+  title="Demande de rappel"
+  description="Laissez votre numéro : Solution Travaux, courtier en travaux à Étel, vous rappelle dans les plus brefs délais pour parler de votre projet. Ou appelez le 02 97 55 27 48."
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Demande de rappel', path: '/demande-de-rappel/' }])]}
+>
+  <PageHero
+    crumb="Demande de rappel"
+    index="↺"
+    note="Formulaire court"
+    title="On vous rappelle."
+    lead="Laissez votre numéro : Solution Travaux vous rappelle dans les plus brefs délais pour parler de votre projet."
+  />
+
+  <section class="callback" aria-label="Formulaire de rappel">
+    <div class="container callback__grid">
+      <div class="callback__form">
+        <FormShell
+          name="rappel"
+          subject="Demande de rappel (site)"
+          submitLabel="Être rappelé"
+          successTitle="C'est noté."
+          successText="Merci. Solution Travaux vous rappelle dans les plus brefs délais au numéro indiqué."
+        >
+          <div class="callback__row">
+            <Field name="nom" label="Nom" required autocomplete="name" />
+            <Field
+              name="telephone"
+              label="Téléphone"
+              type="tel"
+              required
+              autocomplete="tel"
+              inputmode="tel"
+              pattern="(?:(?:\+|00)33[\s.\-]?|0)[1-9](?:[\s.\-]?[0-9]{2}){4}"
+              placeholder="06 12 34 56 78"
+            />
+          </div>
+          <Choices
+            name="creneau"
+            legend="Quand vous rappeler ?"
+            columns={2}
+            choices={[
+              { value: 'Matin', label: 'Le matin' },
+              { value: 'Midi', label: 'Le midi' },
+              { value: 'Après-midi', label: "L'après-midi" },
+              { value: 'Fin de journée', label: 'En fin de journée' },
+            ]}
+          />
+          <Field
+            name="objet"
+            label="Votre projet en un mot"
+            type="select"
+            placeholder="Choisir un type de projet…"
+            options={[...PROJECT_TYPES.map((p) => p.label), 'Autre']}
+          />
+        </FormShell>
+      </div>
+
+      <aside class="callback__aside" aria-label="Appeler directement">
+        <p class="label callback__kicker">Vous préférez appeler&nbsp;?</p>
+        <a href={SITE.phone.href} class="callback__phone">
+          <Icon name="phone" size={24} />
+          {SITE.phone.display}
+        </a>
+        <a href={SITE.mobile.href} class="callback__phone">
+          <Icon name="mobile" size={24} />
+          {SITE.mobile.display}
+        </a>
+        <p class="muted callback__who">Ligne directe de {SITE.broker.displayName}, {SITE.broker.role.toLowerCase()}.</p>
+        <hr />
+        <p>Vous avez déjà une idée précise de vos travaux&nbsp;?</p>
+        <a href={QUOTE_HREF} class="link">Décrire mon projet en détail</a>
+      </aside>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .callback {
+    padding-bottom: var(--section-y);
+  }
+
+  .callback__grid {
+    display: grid;
+    gap: var(--s-12);
+  }
+
+  @media (min-width: 64rem) {
+    .callback__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      gap: clamp(2rem, 1rem + 4vw, 6rem);
+      align-items: start;
+    }
+  }
+
+  .callback__form {
+    padding: clamp(1.25rem, 0.5rem + 3vw, 3rem);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background: rgb(255 255 255 / 0.35);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .callback__row {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  @media (min-width: 40rem) {
+    .callback__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .callback__aside {
+    display: grid;
+    gap: var(--s-3);
+    align-content: start;
+  }
+
+  .callback__kicker {
+    color: var(--c-muted);
+  }
+
+  .callback__phone {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-size: var(--fs-2xl);
+    font-weight: 700;
+    font-stretch: 108%;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    transition: color var(--dur-1) ease;
+  }
+
+  .callback__phone :global(svg) {
+    color: var(--c-accent);
+  }
+
+  @media (hover: hover) {
+    .callback__phone:hover {
+      color: var(--c-accent);
+    }
+  }
+
+  .callback__who {
+    font-size: var(--fs-sm);
+  }
+
+  .callback__aside hr {
+    width: 100%;
+    margin: var(--s-6) 0;
+    border: 0;
+    border-top: 1px solid var(--c-line);
+  }
+</style>

@@ -1,0 +1,127 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import { SITE } from '../data/site';
+import { breadcrumbSchema } from '../lib/seo';
+---
+<Layout
+  title="Mentions légales"
+  description="Mentions légales du site de Solution Travaux, courtier en travaux à Étel (56) : éditeur, SIRET, hébergeur et données personnelles."
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Mentions légales', path: '/mentions-legales/' }])]}
+>
+  <PageHero crumb="Mentions légales" index="§" title="Informations légales." />
+
+  <section class="legal">
+    <div class="container legal__grid">
+      <nav class="legal__toc" aria-label="Sommaire">
+        <p class="label">Sommaire</p>
+        <ol role="list">
+          <li><a href="#editeur">Éditeur du site</a></li>
+          <li><a href="#hebergeur">Hébergeur</a></li>
+          <li><a href="#donnees">Données personnelles</a></li>
+          <li><a href="#cookies">Cookies</a></li>
+          <li><a href="#propriete">Propriété intellectuelle</a></li>
+        </ol>
+      </nav>
+
+      <div class="prose legal__body">
+        <h2 id="editeur">Éditeur du site</h2>
+        <p>
+          <strong>{SITE.legalName}</strong><br />
+          {SITE.address.street}<br />
+          {SITE.address.postalCode} {SITE.address.city}<br />
+          SIRET : {SITE.siret}
+        </p>
+        <p>
+          Téléphone : <a href={SITE.phone.href}>{SITE.phone.display}</a><br />
+          E-mail : <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </p>
+        <p>Responsable éditorial : {SITE.name}, {SITE.address.street}, {SITE.address.postalCode} {SITE.address.city}.</p>
+
+        <h2 id="hebergeur">Hébergeur</h2>
+        <p>{SITE.host.name}, {SITE.host.address}.</p>
+
+        <h2 id="donnees">Données personnelles</h2>
+        <p>
+          Pour certains services proposés par le site, vous pouvez être amené à nous communiquer des données personnelles :
+          nom, fonction, nom de votre société, adresse e-mail, numéro de téléphone — notamment lorsque vous remplissez un
+          formulaire (demande de projet, demande de rappel, candidature partenaire).
+        </p>
+        <p>
+          Ces informations servent uniquement à répondre à votre demande et à vous recontacter. Elles ne sont ni vendues ni
+          transmises à des tiers à des fins commerciales.
+        </p>
+        <p>
+          Conformément au Règlement général sur la protection des données et à la loi « Informatique et Libertés », vous
+          disposez d'un droit d'accès, de rectification, d'effacement et d'opposition sur les données vous concernant. Pour
+          l'exercer, écrivez à <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ou par courrier à l'adresse ci-dessus. Vous
+          pouvez également adresser une réclamation à la CNIL.
+        </p>
+
+        <h2 id="cookies">Cookies</h2>
+        <p>Ce site ne dépose aucun cookie publicitaire ni de mesure d'audience.</p>
+
+        <h2 id="propriete">Propriété intellectuelle</h2>
+        <p>
+          L'ensemble des contenus de ce site (textes, photographies, illustrations) est la propriété de {SITE.name} ou de ses
+          partenaires. Toute reproduction sans autorisation préalable est interdite.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .legal {
+    padding-bottom: var(--section-y);
+  }
+
+  .legal__grid {
+    display: grid;
+    gap: var(--s-10);
+  }
+
+  @media (min-width: 64rem) {
+    .legal__grid {
+      grid-template-columns: 16rem minmax(0, 1fr);
+      gap: var(--s-16);
+      align-items: start;
+    }
+
+    .legal__toc {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-6));
+    }
+  }
+
+  .legal__toc .label {
+    color: var(--c-muted);
+  }
+
+  .legal__toc ol {
+    display: grid;
+    gap: var(--s-2);
+    margin-top: var(--s-4);
+    padding-left: var(--s-4);
+    border-left: 1px solid var(--c-line-strong);
+  }
+
+  .legal__toc a {
+    text-decoration: none;
+    font-weight: 560;
+  }
+
+  @media (hover: hover) {
+    .legal__toc a:hover {
+      color: var(--c-accent);
+    }
+  }
+
+  .legal__body h2:first-child {
+    margin-top: 0;
+  }
+
+  .legal__body h2 {
+    scroll-margin-top: calc(var(--header-h) + var(--s-6));
+  }
+</style>

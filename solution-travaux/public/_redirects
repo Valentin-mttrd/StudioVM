@@ -1,0 +1,26 @@
+# Old WordPress addresses and common variants → current pages (301).
+# Every URL indexed today (/, /contactez-nous/, /nos-derniers-travaux/,
+# /devenir-partenaire, /demande-de-rappel/, /mentions-legales/) keeps its
+# address; these rules only catch the variants.
+/devenir-partenaire        /devenir-partenaire/        301
+/contact                   /contactez-nous/            301
+/contact/                  /contactez-nous/            301
+/contactez-nous            /contactez-nous/            301
+/realisations              /nos-derniers-travaux/      301
+/realisations/             /nos-derniers-travaux/      301
+/nos-realisations          /nos-derniers-travaux/      301
+/nos-realisations/         /nos-derniers-travaux/      301
+/nos-derniers-travaux      /nos-derniers-travaux/      301
+/demande-de-rappel         /demande-de-rappel/         301
+/rappel                    /demande-de-rappel/         301
+/mentions-legales          /mentions-legales/          301
+/partenaire                /devenir-partenaire/        301
+/accueil                   /                           301
+/accueil/                  /                           301
+/index.php                 /                           301
+/feed                      /                           301
+/feed/                     /                           301
+/comments/feed/            /                           301
+/wp-content/*              /                           301
+/wp-admin/*                /                           301
+/wp-login.php              /                           301

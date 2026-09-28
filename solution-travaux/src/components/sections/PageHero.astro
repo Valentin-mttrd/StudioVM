@@ -1,0 +1,142 @@
+---
+/**
+ * Header of inner pages: breadcrumb, title-block strip and tagline, on
+ * the same graph-paper sheet as the home hero. The H1 is the page's name
+ * as the current site titles it (Contactez-nous, Nos réalisations…), so
+ * each URL keeps its heading; the large line below is the tagline.
+ */
+interface Props {
+  title: string;
+  lead?: string;
+  crumb: string;
+  index?: string;
+  note?: string;
+}
+
+const { title, lead, crumb, index = '—', note } = Astro.props;
+---
+<section class="page-hero">
+  <div class="container">
+    <nav aria-label="Fil d'Ariane" class="crumbs">
+      <ol role="list">
+        <li><a href="/">Accueil</a></li>
+        <li aria-current="page">{crumb}</li>
+      </ol>
+    </nav>
+
+    <div class="page-hero__strip">
+      <span class="label page-hero__index" aria-hidden="true">{index}</span>
+      <h1 class="label page-hero__h1">{crumb}</h1>
+      {note && <span class="label page-hero__note">{note}</span>}
+    </div>
+
+    <p class="display page-hero__title">{title}</p>
+    {lead && <p class="lead page-hero__lead">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    padding-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    padding-bottom: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+    isolation: isolate;
+  }
+
+  .page-hero::before {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--header-h)) 0 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(to right, rgb(20 28 33 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(20 28 33 / 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: linear-gradient(to bottom, #000 40%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent);
+    pointer-events: none;
+  }
+
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    font-size: var(--fs-sm);
+    color: var(--c-muted);
+  }
+
+  .crumbs li + li::before {
+    content: '/';
+    margin-right: var(--s-2);
+    color: var(--c-granite);
+  }
+
+  .crumbs a {
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .crumbs a:hover {
+      color: var(--c-accent);
+    }
+  }
+
+  .page-hero__strip {
+    display: flex;
+    gap: var(--s-4);
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--c-line-strong);
+  }
+
+  .page-hero__index {
+    color: var(--c-accent);
+  }
+
+  .page-hero__h1 {
+    margin: 0;
+  }
+
+  .page-hero__note {
+    margin-left: auto;
+    color: var(--c-muted);
+  }
+
+  .page-hero__title {
+    margin-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    font-size: clamp(2.5rem, 1.4rem + 5vw, 6.25rem);
+    max-width: 16ch;
+  }
+
+  .page-hero__lead {
+    margin-top: var(--s-6);
+    max-width: 44rem;
+    color: var(--c-ink-3);
+  }
+
+  /* The tagline only slides (never transparent) so it paints — and counts
+     as the page's largest paint — immediately. */
+  @media (prefers-reduced-motion: no-preference) {
+    .page-hero__title {
+      animation: ph-slide 800ms var(--ease-out) both;
+    }
+
+    .page-hero__lead {
+      animation: ph-in 800ms var(--ease-out) 90ms both;
+    }
+  }
+
+  @keyframes ph-slide {
+    from {
+      transform: translateY(14px);
+    }
+  }
+
+  @keyframes ph-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+</style>

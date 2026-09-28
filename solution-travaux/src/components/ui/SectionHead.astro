@@ -1,0 +1,54 @@
+---
+/**
+ * The title-block strip that opens each section, like the cartouche of an
+ * architectural sheet: planche number, sheet name, and an optional note.
+ */
+interface Props {
+  index: string;
+  label: string;
+  note?: string;
+  class?: string;
+}
+
+const { index, label, note, class: className } = Astro.props;
+---
+<div class:list={['section-head', className]} data-reveal>
+  <span class="label section-head__index">{index}</span>
+  <span class="label section-head__label">{label}</span>
+  {note && <span class="label section-head__note">{note}</span>}
+</div>
+
+<style>
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-4);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--c-line-strong);
+  }
+
+  .section-head__index {
+    color: var(--c-accent);
+    min-width: 2.5ch;
+  }
+
+  :global(.on-ink) .section-head__index {
+    color: var(--c-accent-soft);
+  }
+
+  .section-head__note {
+    margin-left: auto;
+    color: var(--c-muted);
+    text-align: right;
+  }
+
+  :global(.on-ink) .section-head__note {
+    color: var(--c-on-ink-muted);
+  }
+
+  @media (max-width: 40rem) {
+    .section-head__note {
+      display: none;
+    }
+  }
+</style>

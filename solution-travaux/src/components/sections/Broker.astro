@@ -1,0 +1,108 @@
+---
+import SectionHead from '../ui/SectionHead.astro';
+import PhotoSlot from '../ui/PhotoSlot.astro';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { SITE } from '../../data/site';
+import { CALLBACK_HREF } from '../../data/nav';
+---
+<section class="section broker" aria-labelledby="broker-title">
+  <div class="container broker__grid">
+    <div class="broker__photo" data-reveal>
+      <PhotoSlot label={`Portrait de ${SITE.broker.displayName}`} ratio="4 / 5" />
+    </div>
+
+    <div class="broker__text">
+      <SectionHead index="07" label="Votre interlocuteur" note={SITE.broker.role} />
+      <h2 id="broker-title" class="h1 broker__title" data-reveal>
+        {SITE.broker.displayName}, <span class="muted">professionnel du bâtiment depuis plus de 20&nbsp;ans.</span>
+      </h2>
+      <p class="lead broker__lead" data-reveal>
+        Il vérifie les assurances et les compétences de toutes les entreprises qu'il vous présente, et vous accompagne tout au
+        long de la réalisation de votre projet.
+      </p>
+
+      <dl class="broker__contact" data-reveal>
+        <div>
+          <dt class="label">Ligne directe</dt>
+          <dd><a href={SITE.mobile.href}><Icon name="mobile" /> {SITE.mobile.display}</a></dd>
+        </div>
+        <div>
+          <dt class="label">Agence</dt>
+          <dd><a href={SITE.phone.href}><Icon name="phone" /> {SITE.phone.display}</a></dd>
+        </div>
+      </dl>
+
+      <div class="broker__cta" data-reveal>
+        <Button href={CALLBACK_HREF} variant="dark" iconStart="callback">Demander à être rappelé</Button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .broker__grid {
+    display: grid;
+    gap: var(--s-12);
+  }
+
+  @media (min-width: 56rem) {
+    .broker__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: clamp(3rem, 1rem + 5vw, 7rem);
+      align-items: center;
+    }
+  }
+
+  .broker__photo {
+    max-width: 30rem;
+  }
+
+  .broker__title {
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    max-width: 18ch;
+  }
+
+  .broker__lead {
+    margin-top: var(--s-6);
+    max-width: 38rem;
+  }
+
+  .broker__contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-6) var(--s-12);
+    margin-top: var(--s-10);
+  }
+
+  .broker__contact dt {
+    color: var(--c-muted);
+  }
+
+  .broker__contact dd a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+    font-size: var(--fs-xl);
+    font-weight: 680;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--dur-1) ease;
+  }
+
+  .broker__contact dd a :global(svg) {
+    color: var(--c-accent);
+  }
+
+  @media (hover: hover) {
+    .broker__contact dd a:hover {
+      color: var(--c-accent);
+    }
+  }
+
+  .broker__cta {
+    margin-top: var(--s-10);
+  }
+</style>

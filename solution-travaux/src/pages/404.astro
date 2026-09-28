@@ -1,0 +1,95 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/ui/Button.astro';
+import { PAGES, QUOTE_HREF } from '../data/nav';
+import { SITE } from '../data/site';
+---
+<Layout title="Page introuvable" description="Cette page n'existe pas ou a changé d'adresse." noindex>
+  <section class="nf">
+    <div class="container nf__grid">
+      <div>
+        <p class="label nf__kicker">Erreur 404 · Hors plan</p>
+        <h1 class="display nf__title">Cette pièce n'est pas sur le plan.</h1>
+        <p class="lead muted nf__lead">
+          La page demandée n'existe pas ou a changé d'adresse. Voici les pages du site — ou appelez le
+          <a href={SITE.phone.href}>{SITE.phone.display}</a>.
+        </p>
+        <div class="nf__actions">
+          <Button href="/" variant="dark" icon="arrow">Retour à l'accueil</Button>
+          <Button href={QUOTE_HREF} variant="secondary">Demander un devis</Button>
+        </div>
+      </div>
+      <nav aria-label="Pages principales" class="nf__nav">
+        <ul role="list">
+          {PAGES.map((p) => <li><a href={p.href}>{p.label}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .nf {
+    padding-block: clamp(3rem, 2rem + 6vw, 8rem) var(--section-y);
+  }
+
+  .nf__grid {
+    display: grid;
+    gap: var(--s-12);
+  }
+
+  @media (min-width: 64rem) {
+    .nf__grid {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      align-items: end;
+    }
+  }
+
+  .nf__kicker {
+    color: var(--c-accent);
+  }
+
+  .nf__title {
+    margin-top: var(--s-6);
+    font-size: clamp(2.5rem, 1.4rem + 5vw, 6rem);
+    max-width: 14ch;
+  }
+
+  .nf__lead {
+    margin-top: var(--s-6);
+    max-width: 40rem;
+  }
+
+  .nf__lead a {
+    color: var(--c-ink);
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-8);
+  }
+
+  .nf__nav ul {
+    display: grid;
+    border-top: 1px solid var(--c-line-strong);
+  }
+
+  .nf__nav a {
+    display: block;
+    padding: var(--s-4) 0;
+    border-bottom: 1px solid var(--c-line-strong);
+    font-size: var(--fs-lg);
+    font-weight: 620;
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .nf__nav a:hover {
+      color: var(--c-accent);
+    }
+  }
+</style>

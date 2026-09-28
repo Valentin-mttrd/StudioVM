@@ -1,0 +1,89 @@
+---
+/**
+ * Pictograms for each project type, drawn on a 48px grid in the same line
+ * language as the plans (1.5 stroke, accent marks what gets built).
+ */
+import type { ProjectTypeId } from '../../data/site';
+
+const ICONS: Record<ProjectTypeId | 'autre', { base: string; accent: string }> = {
+  renovation: {
+    base: 'M8 40V22L24 9l16 13v18ZM19 40V29h10v11',
+    accent: 'M33 6l6 6-12 12-7 1 1-7Z',
+  },
+  extension: {
+    base: 'M5 40V22L19 10l14 12v18ZM14 40V31h8v9',
+    accent: 'M33 25h10v15H33M36 31h4',
+  },
+  combles: {
+    base: 'M6 40h36M9 40V24M39 40V24M4 26L24 8l20 18',
+    accent: 'M19 26l5-5 5 5v7H19ZM24 26v7',
+  },
+  'salle-de-bain': {
+    base: 'M6 26h36v5a9 9 0 0 1-9 9H15a9 9 0 0 1-9-9ZM12 40l-2 4M36 40l2 4M11 26V11a4 4 0 0 1 8 0',
+    accent: 'M16 15h6M19 18v2M16 21v1M22 21v1',
+  },
+  jardin: {
+    base: 'M24 44V22M24 30l-7-5M24 26l6-5M4 44h40',
+    accent: 'M24 4c7 0 12 5 12 11s-5 9-12 9-12-3-12-9S17 4 24 4Z',
+  },
+  terrasse: {
+    base: 'M4 38h40M8 38v6M40 38v6M4 34h40',
+    accent: 'M24 6v28M10 16c3-6 8-10 14-10s11 4 14 10ZM16 34l2-8h12l2 8',
+  },
+  'muret-cloture': {
+    base: 'M4 44V32h40v12M4 38h40M14 32v6M28 32v6M21 38v6M36 38v6',
+    accent: 'M8 32V14l3-3 3 3v18M20 32V14l3-3 3 3v18M32 32V14l3-3 3 3v18M6 19h32M6 26h32',
+  },
+  construction: {
+    base: 'M8 44V26l14-12 14 12v18M18 44V34h8v10',
+    accent: 'M4 8h40M34 8v36M34 8l-8 8M10 8l4 5M40 8v4',
+  },
+  agrandissement: {
+    base: 'M8 44V28l16-12 16 12v16M20 44v-9h8v9',
+    accent: 'M24 3v10M19 8l5-5 5 5M13 20V12M35 20V12',
+  },
+  'mise-aux-normes': {
+    base: 'M12 6h18l8 8v30H12ZM30 6v8h8',
+    accent: 'M18 28l5 5 9-10M18 18h8',
+  },
+  'economies-energie': {
+    base: 'M6 42V22L24 8l18 14v20Z',
+    accent: 'M24 20c5 0 9 4 9 9 0 6-5 9-9 9s-9-3-9-9c0-3 2-6 4-7 0 3 2 5 4 5 0-3-1-5 1-7Z',
+  },
+  autre: {
+    base: 'M8 8h32v32H8Z',
+    accent: 'M24 16v16M16 24h16',
+  },
+};
+
+interface Props {
+  id: ProjectTypeId | 'autre';
+  class?: string;
+}
+
+const { id, class: className } = Astro.props;
+const icon = ICONS[id];
+---
+<svg class:list={['picto', className]} viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+  <path class="picto__base" d={icon.base} />
+  <path class="picto__accent" d={icon.accent} />
+</svg>
+
+<style>
+  .picto {
+    width: 3rem;
+    height: 3rem;
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .picto__base {
+    stroke: currentColor;
+  }
+
+  .picto__accent {
+    stroke: var(--c-accent);
+  }
+</style>

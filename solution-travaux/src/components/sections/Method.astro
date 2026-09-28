@@ -1,0 +1,381 @@
+---
+import SectionHead from '../ui/SectionHead.astro';
+import Button from '../ui/Button.astro';
+import { STEPS } from '../../data/site';
+import { QUOTE_HREF } from '../../data/nav';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<section id="methode" class="section method" aria-labelledby="methode-title" data-method>
+  <div class="container">
+    <SectionHead index="02" label="La méthode" note={`${STEPS.length} étapes`} />
+
+    <div class="method__grid">
+      <div class="method__aside">
+        <div class="method__sticky">
+          <h2 id="methode-title" class="h1 method__title" data-reveal>
+            De la première visite au démarrage du chantier.
+          </h2>
+          <p class="lead muted method__lead" data-reveal>
+            Le courtier se déplace chez vous sous 48 heures maximum, puis vous accompagne jusqu'à la validation des devis.
+          </p>
+
+          <!-- Progress tracker: the project file filling up as you read. -->
+          <div class="dossier" aria-hidden="true">
+            <div class="dossier__head">
+              <span class="label">Votre dossier</span>
+              <span class="dossier__count label"><span data-method-current>01</span> / {pad(STEPS.length)}</span>
+            </div>
+            <ol class="dossier__list">
+              {
+                STEPS.map((s, i) => (
+                  <li class="dossier__item" data-dossier-item={i}>
+                    <span class="dossier__box" />
+                    <span>{s.tag}</span>
+                  </li>
+                ))
+              }
+            </ol>
+            <div class="dossier__bar"><span data-method-bar></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <span class="steps__rail" aria-hidden="true"><span class="steps__rail-fill" data-method-rail></span></span>
+        <ol class="steps__list" role="list">
+        {
+          STEPS.map((s, i) => (
+            <li class="step" data-step={i} id={`etape-${i + 1}`}>
+              <span class="step__node" aria-hidden="true" />
+              <span class="step__num" aria-hidden="true">{pad(i + 1)}</span>
+              <div class="step__body">
+                <p class="label step__tag">
+                  Étape {i + 1} · {s.tag}
+                </p>
+                <h3 class="h3 step__title">{s.title}</h3>
+                <p class="step__text">{s.text}</p>
+              </div>
+            </li>
+          ))
+        }
+        </ol>
+        <div class="step--cta">
+          <Button href={QUOTE_HREF} icon="arrow" size="lg">Commencer par la visite</Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .method__grid {
+    display: grid;
+    gap: var(--s-12);
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .method__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: clamp(3rem, 1rem + 5vw, 8rem);
+    }
+  }
+
+  .method__title {
+    max-width: 14ch;
+  }
+
+  .method__lead {
+    margin-top: var(--s-6);
+    max-width: 34rem;
+  }
+
+  @media (min-width: 64rem) {
+    .method__sticky {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-8));
+    }
+  }
+
+  /* ── Dossier tracker (desktop) ── */
+  .dossier {
+    display: none;
+    margin-top: var(--s-10);
+    padding: var(--s-6);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background: rgb(255 255 255 / 0.45);
+    box-shadow: var(--shadow-lift);
+    max-width: 26rem;
+  }
+
+  @media (min-width: 64rem) {
+    .dossier {
+      display: block;
+    }
+  }
+
+  .dossier__head {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .dossier__count {
+    color: var(--c-accent);
+  }
+
+  .dossier__list {
+    display: grid;
+    gap: var(--s-1);
+    margin: var(--s-4) 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .dossier__item {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding: 0.3rem 0;
+    font-weight: 560;
+    color: var(--c-muted);
+    transition: color var(--dur-2) ease;
+  }
+
+  .dossier__box {
+    position: relative;
+    width: 1rem;
+    height: 1rem;
+    border: 1.5px solid var(--c-line-strong);
+    border-radius: 3px;
+    transition: background-color var(--dur-2) ease, border-color var(--dur-2) ease;
+  }
+
+  .dossier__box::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0;
+    width: 5px;
+    height: 9px;
+    border-right: 2px solid var(--c-paper);
+    border-bottom: 2px solid var(--c-paper);
+    transform: rotate(45deg) scale(0);
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+
+  .dossier__item.is-done {
+    color: var(--c-ink);
+  }
+
+  .dossier__item.is-done .dossier__box {
+    background: var(--c-ink);
+    border-color: var(--c-ink);
+  }
+
+  .dossier__item.is-done .dossier__box::after {
+    transform: rotate(45deg) scale(1);
+  }
+
+  .dossier__item.is-current {
+    color: var(--c-ink);
+  }
+
+  .dossier__item.is-current .dossier__box {
+    border-color: var(--c-accent);
+    background: var(--c-accent);
+  }
+
+  .dossier__item.is-current .dossier__box::after {
+    transform: rotate(45deg) scale(1);
+  }
+
+  .dossier__bar {
+    height: 3px;
+    background: var(--c-line);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .dossier__bar span {
+    display: block;
+    height: 100%;
+    background: var(--c-accent);
+    transform-origin: left;
+    transform: scaleX(var(--p, 0.142));
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  /* ── Steps ── */
+  .steps {
+    position: relative;
+    padding-left: var(--s-12);
+  }
+
+  .steps__list {
+    margin: 0;
+  }
+
+  @media (min-width: 64rem) {
+    .steps {
+      padding-left: var(--s-16);
+    }
+  }
+
+  .steps__rail {
+    position: absolute;
+    left: 0.6875rem;
+    top: 0.5rem;
+    bottom: 5.5rem;
+    width: 2px;
+    background: var(--c-line);
+  }
+
+  .steps__rail-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--c-accent);
+    transform-origin: top;
+    transform: scaleY(var(--p, 0));
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  .step {
+    position: relative;
+    display: grid;
+    padding-bottom: clamp(2.5rem, 1.5rem + 4vw, 6rem);
+  }
+
+  .step__node {
+    position: absolute;
+    left: calc(-1 * var(--s-12) + 0.25rem);
+    top: 0.3rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--c-paper);
+    border: 2px solid var(--c-line-strong);
+    transition: border-color var(--dur-2) ease, background-color var(--dur-2) ease, transform var(--dur-3) var(--ease-out);
+  }
+
+  @media (min-width: 64rem) {
+    .step__node {
+      left: calc(-1 * var(--s-16) + 0.25rem);
+    }
+  }
+
+  .step.is-reached .step__node {
+    border-color: var(--c-accent);
+    background: var(--c-accent);
+  }
+
+  .step.is-current .step__node {
+    transform: scale(1.35);
+    box-shadow: 0 0 0 5px rgb(164 68 31 / 0.16);
+  }
+
+  .step__num {
+    font-size: clamp(3.5rem, 2rem + 5vw, 7rem);
+    font-weight: 800;
+    font-stretch: 125%;
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1.25px var(--c-line-strong);
+    transition: -webkit-text-stroke-color var(--dur-2) ease, color var(--dur-3) ease;
+    margin-bottom: var(--s-4);
+  }
+
+  .step.is-current .step__num {
+    -webkit-text-stroke-color: var(--c-accent);
+  }
+
+  .step__tag {
+    color: var(--c-accent);
+  }
+
+  .step__title {
+    margin-top: var(--s-2);
+  }
+
+  .step__text {
+    margin-top: var(--s-3);
+    max-width: 36rem;
+    color: var(--c-ink-3);
+    font-size: var(--fs-lg);
+    line-height: 1.55;
+  }
+
+  .step--cta {
+    padding-top: var(--s-2);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .js .step__body {
+      transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out);
+    }
+
+    .js .step:not(.is-reached) .step__body {
+      opacity: 0.45;
+    }
+  }
+</style>
+
+<script>
+  // Scroll-spy for the method: the step crossing the middle of the screen
+  // becomes current; the rail, the node dots and the dossier follow it.
+  const root = document.querySelector<HTMLElement>('[data-method]');
+  if (root && 'IntersectionObserver' in window) {
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    const items = [...root.querySelectorAll<HTMLElement>('[data-dossier-item]')];
+    const rail = root.querySelector<HTMLElement>('[data-method-rail]');
+    const bar = root.querySelector<HTMLElement>('[data-method-bar]');
+    const counter = root.querySelector<HTMLElement>('[data-method-current]');
+    const n = steps.length;
+
+    const track = rail?.parentElement;
+    let current = 0;
+
+    // Rail runs exactly from the first node to the last one.
+    const layout = () => {
+      if (!track || n < 2) return;
+      const first = steps[0].offsetTop;
+      const last = steps[n - 1].offsetTop;
+      track.style.top = `${first + 13}px`;
+      track.style.bottom = 'auto';
+      track.style.height = `${last - first}px`;
+      rail?.style.setProperty('--p', String((steps[current].offsetTop - first) / (last - first)));
+    };
+
+    const setCurrent = (index: number) => {
+      current = index;
+      steps.forEach((s, i) => {
+        s.classList.toggle('is-reached', i <= index);
+        s.classList.toggle('is-current', i === index);
+      });
+      items.forEach((it, i) => {
+        it.classList.toggle('is-done', i < index);
+        it.classList.toggle('is-current', i === index);
+      });
+      requestAnimationFrame(layout);
+      bar?.style.setProperty('--p', String((index + 1) / n));
+      if (counter) counter.textContent = String(index + 1).padStart(2, '0');
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) setCurrent(Number((e.target as HTMLElement).dataset.step));
+        }
+      },
+      // a thin band across the middle of the viewport
+      { rootMargin: '-45% 0px -50% 0px' },
+    );
+    steps.forEach((s) => io.observe(s));
+    setCurrent(0);
+    new ResizeObserver(() => requestAnimationFrame(layout)).observe(root);
+  }
+</script>

@@ -1,0 +1,89 @@
+---
+/**
+ * Clearly labelled stand-in for a photo that still has to be supplied
+ * (AUDIT.md §4). Drawn like an empty frame on a plan — a window opening
+ * with its diagonals — so it reads as "to be placed", never as content.
+ */
+interface Props {
+  label: string;
+  ratio?: string;
+  tone?: 'paper' | 'ink';
+  class?: string;
+}
+
+const { label, ratio = '4 / 3', tone = 'paper', class: className } = Astro.props;
+---
+<div class:list={['slot', `slot--${tone}`, className]} style={`aspect-ratio:${ratio}`} role="img" aria-label={`Emplacement photo : ${label}`}>
+  <svg class="slot__lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <line x1="0" y1="0" x2="100" y2="100" />
+    <line x1="100" y1="0" x2="0" y2="100" />
+  </svg>
+  <span class="slot__tag">
+    <span class="label slot__kicker">Photo à intégrer</span>
+    <span class="slot__label">{label}</span>
+  </span>
+</div>
+
+<style>
+  .slot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    border: 1px dashed var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background:
+      repeating-linear-gradient(-45deg, transparent 0 9px, rgb(20 28 33 / 0.035) 9px 10px),
+      var(--c-paper-2);
+    overflow: hidden;
+  }
+
+  .slot--ink {
+    border-color: var(--c-line-ink-strong);
+    background:
+      repeating-linear-gradient(-45deg, transparent 0 9px, rgb(233 228 217 / 0.05) 9px 10px),
+      var(--c-ink-2);
+  }
+
+  .slot__lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .slot__lines line {
+    stroke: var(--c-line);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .slot__tag {
+    position: relative;
+    display: grid;
+    gap: var(--s-1);
+    max-width: 80%;
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r);
+    background: var(--c-paper);
+    text-align: center;
+  }
+
+  .slot--ink .slot__tag {
+    background: var(--c-ink);
+  }
+
+  .slot__kicker {
+    color: var(--c-accent);
+  }
+
+  .slot--ink .slot__kicker {
+    color: var(--c-accent-soft);
+  }
+
+  .slot__label {
+    font-size: var(--fs-sm);
+    font-weight: 560;
+  }
+</style>

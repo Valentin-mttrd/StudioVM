@@ -1,0 +1,95 @@
+---
+import { Image } from 'astro:assets';
+import SectionHead from '../ui/SectionHead.astro';
+import Button from '../ui/Button.astro';
+import PhotoSlot from '../ui/PhotoSlot.astro';
+import { REALISATIONS } from '../../data/realisations';
+import { PROJECT_TYPES } from '../../data/site';
+
+const latest = REALISATIONS.slice(0, 3);
+const typeLabel = (id: string) => PROJECT_TYPES.find((t) => t.id === id)?.label ?? '';
+---
+<section class="section teaser" aria-labelledby="teaser-title">
+  <div class="container">
+    <SectionHead index="05" label="Réalisations" note="Nos derniers travaux" />
+
+    <div class="teaser__head">
+      <h2 id="teaser-title" class="h1" data-reveal>Des chantiers menés avec les entreprises du réseau.</h2>
+      <Button href="/nos-derniers-travaux/" variant="secondary" icon="arrow">Voir nos réalisations</Button>
+    </div>
+
+    <ul role="list" class="teaser__grid" data-reveal-group>
+      {
+        latest.length > 0
+          ? latest.map((r) => (
+              <li data-reveal>
+                <a class="teaser__card" href={`/nos-derniers-travaux/#${r.id}`}>
+                  <Image src={r.cover.src} alt={r.cover.alt} widths={[480, 800]} sizes="(min-width: 64rem) 33vw, 100vw" class="teaser__img" />
+                  <span class="label teaser__meta">
+                    {typeLabel(r.type)}
+                    {r.town && ` · ${r.town}`}
+                  </span>
+                  <span class="teaser__title">{r.title}</span>
+                </a>
+              </li>
+            ))
+          : [1, 2, 3].map((n) => (
+              <li data-reveal>
+                <PhotoSlot label={`Réalisation n°${n}, à reprendre du site actuel`} />
+              </li>
+            ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .teaser__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s-6);
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  .teaser__head .h1 {
+    max-width: 18ch;
+  }
+
+  .teaser__grid {
+    display: grid;
+    gap: var(--s-4);
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  @media (min-width: 48rem) {
+    .teaser__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .teaser__card {
+    display: grid;
+    gap: var(--s-2);
+    text-decoration: none;
+  }
+
+  .teaser__img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--r-lg);
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  .teaser__meta {
+    margin-top: var(--s-2);
+    color: var(--c-accent);
+  }
+
+  .teaser__title {
+    font-weight: 650;
+    font-size: var(--fs-lg);
+  }
+</style>

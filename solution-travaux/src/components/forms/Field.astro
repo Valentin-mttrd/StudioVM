@@ -1,0 +1,94 @@
+---
+/**
+ * Labelled text field with hint and error slot wired for assistive tech.
+ * Errors are written by src/scripts/forms.ts into [data-error-for].
+ */
+interface Props {
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'tel' | 'textarea' | 'select';
+  required?: boolean;
+  hint?: string;
+  autocomplete?: string;
+  placeholder?: string;
+  inputmode?: 'text' | 'tel' | 'email' | 'numeric';
+  pattern?: string;
+  rows?: number;
+  list?: string[];
+  options?: { label: string; options: string[] }[] | string[];
+  class?: string;
+  value?: string;
+}
+
+const {
+  name,
+  label,
+  type = 'text',
+  required = false,
+  hint,
+  autocomplete,
+  placeholder,
+  inputmode,
+  pattern,
+  rows = 5,
+  list,
+  options,
+  class: className,
+  value,
+} = Astro.props;
+
+const id = `f-${name}`;
+const describedBy = [hint && `${id}-hint`, `${id}-error`].filter(Boolean).join(' ');
+const listId = list ? `${id}-list` : undefined;
+const grouped = Array.isArray(options) && options.length > 0 && typeof options[0] === 'object';
+---
+<div class:list={['field', className]}>
+  <label class="field__label" for={id}>
+    {label}
+    {!required && <span class="optional"> (facultatif)</span>}
+  </label>
+  {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
+  {
+    type === 'textarea' ? (
+      <textarea class="input" id={id} name={name} rows={rows} required={required} placeholder={placeholder} aria-describedby={describedBy} />
+    ) : type === 'select' ? (
+      <select class="input" id={id} name={name} required={required} aria-describedby={describedBy}>
+        <option value="">{placeholder ?? 'Choisir…'}</option>
+        {grouped
+          ? (options as { label: string; options: string[] }[]).map((g) => (
+              <optgroup label={g.label}>
+                {g.options.map((o) => (
+                  <option value={o}>{o}</option>
+                ))}
+              </optgroup>
+            ))
+          : (options as string[] | undefined)?.map((o) => <option value={o}>{o}</option>)}
+      </select>
+    ) : (
+      <input
+        class="input"
+        id={id}
+        name={name}
+        type={type}
+        required={required}
+        autocomplete={autocomplete}
+        placeholder={placeholder}
+        inputmode={inputmode}
+        pattern={pattern}
+        list={listId}
+        value={value}
+        aria-describedby={describedBy}
+      />
+    )
+  }
+  {
+    list && (
+      <datalist id={listId}>
+        {list.map((o) => (
+          <option value={o} />
+        ))}
+      </datalist>
+    )
+  }
+  <p class="field__error" id={`${id}-error`} data-error-for={name} aria-live="polite"></p>
+</div>

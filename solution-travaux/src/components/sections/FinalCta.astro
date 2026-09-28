@@ -1,0 +1,108 @@
+---
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { SITE, MAPS_URL } from '../../data/site';
+import { QUOTE_HREF, CALLBACK_HREF } from '../../data/nav';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'Parlons de votre projet.' } = Astro.props;
+---
+<section class="cta" aria-labelledby="cta-title">
+  <div class="container cta__grid">
+    <div>
+      <p class="label cta__kicker">Première étape · visite sous 48 h</p>
+      <h2 id="cta-title" class="display cta__title">{title}</h2>
+    </div>
+
+    <div class="cta__actions">
+      <Button href={QUOTE_HREF} variant="light" size="lg" icon="arrow" block>Demander un devis</Button>
+      <Button href={CALLBACK_HREF} variant="secondary" size="lg" iconStart="callback" block class="cta__secondary">Être rappelé</Button>
+
+      <div class="cta__lines">
+        <a href={SITE.phone.href}><Icon name="phone" /> {SITE.phone.display}</a>
+        <a href={SITE.mobile.href}><Icon name="mobile" /> {SITE.mobile.display}</a>
+        <a href={`mailto:${SITE.email}`}><Icon name="mail" /> {SITE.email}</a>
+        <a href={MAPS_URL} target="_blank" rel="noopener">
+          <Icon name="pin" /> {SITE.address.street}, {SITE.address.postalCode} {SITE.address.city}<span class="sr-only"> (nouvel onglet)</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    padding-block: var(--section-y);
+    background: var(--c-accent);
+    color: var(--c-paper);
+    overflow: clip;
+    isolation: isolate;
+  }
+
+  .cta :focus-visible {
+    outline-color: var(--c-paper);
+  }
+
+  .cta__grid {
+    display: grid;
+    gap: var(--s-10);
+  }
+
+  @media (min-width: 64rem) {
+    .cta__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      align-items: end;
+      gap: var(--s-16);
+    }
+  }
+
+  .cta__title {
+    margin-top: var(--s-4);
+    max-width: 10ch;
+  }
+
+  .cta__actions {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .cta :global(.cta__secondary) {
+    --btn-fg: var(--c-paper);
+    --btn-border: rgb(243 240 233 / 0.55);
+  }
+
+  @media (hover: hover) {
+    .cta :global(.cta__secondary:hover) {
+      --btn-bg: var(--c-paper);
+      --btn-fg: var(--c-ink);
+      --btn-border: var(--c-paper);
+    }
+  }
+
+  .cta__lines {
+    display: grid;
+    gap: var(--s-1);
+    margin-top: var(--s-4);
+  }
+
+  .cta__lines a {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 2.5rem;
+    font-weight: 560;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  @media (hover: hover) {
+    .cta__lines a:hover {
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+  }
+</style>

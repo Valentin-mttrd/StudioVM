@@ -1,0 +1,57 @@
+---
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+---
+<section class="partner surface-2" aria-labelledby="partner-title">
+  <div class="container">
+    <div class="partner__card" data-reveal>
+      <Icon name="hardhat" size={44} strokeWidth={1.25} class="partner__icon" />
+      <div class="partner__text">
+        <p class="label partner__kicker">Artisans et entreprises du bâtiment</p>
+        <h2 id="partner-title" class="h2">Vous êtes artisan&nbsp;? Trouvez de nouveaux chantiers.</h2>
+        <p class="muted">Des projets pré-évalués, un budget contrôlé, et du temps rendu à vos chantiers.</p>
+      </div>
+      <Button href="/devenir-partenaire/" variant="dark" icon="arrow" class="partner__cta">Devenir partenaire</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .partner {
+    padding-block: 0 var(--section-y);
+  }
+
+  .partner__card {
+    display: grid;
+    gap: var(--s-6);
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3.5rem);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background: var(--c-paper);
+  }
+
+  @media (min-width: 56rem) {
+    .partner__card {
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: var(--s-10);
+    }
+  }
+
+  .partner__card :global(.partner__icon) {
+    color: var(--c-accent);
+  }
+
+  .partner__kicker {
+    color: var(--c-accent);
+  }
+
+  .partner__text {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .partner__text .h2 {
+    max-width: 22ch;
+  }
+</style>

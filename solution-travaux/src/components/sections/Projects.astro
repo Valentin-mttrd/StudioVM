@@ -1,0 +1,228 @@
+---
+import SectionHead from '../ui/SectionHead.astro';
+import ProjectIcon from '../ui/ProjectIcon.astro';
+import Icon from '../ui/Icon.astro';
+import { PROJECT_TYPES, COPY } from '../../data/site';
+import { QUOTE_HREF } from '../../data/nav';
+
+const href = (id: string) => QUOTE_HREF.replace('#', `?projet=${id}#`);
+---
+<section id="projets" class="section projects" aria-labelledby="projets-title">
+  <div class="container">
+    <SectionHead index="04" label="Vos projets" note="Quelle qu'en soit l'ampleur" />
+
+    <div class="projects__intro">
+      <h2 id="projets-title" class="h1" data-reveal>Quel est votre projet&nbsp;?</h2>
+      <p class="lead muted" data-reveal>{COPY.scope}</p>
+    </div>
+
+    <ul role="list" class="projects__grid" data-reveal-group>
+      {
+        PROJECT_TYPES.map((p, i) => (
+          <li class:list={['project', i < 2 && 'project--wide']} data-reveal>
+            <a class="project__link" href={href(p.id)}>
+              <ProjectIcon id={p.id} class="project__icon" />
+              <span class="project__text">
+                <span class="project__label">{p.label}</span>
+                <span class="project__hint">{p.hint}</span>
+              </span>
+              <span class="project__go label">
+                Décrire ce projet
+                <Icon name="arrow" size={16} />
+              </span>
+            </a>
+          </li>
+        ))
+      }
+      <li class="project project--other" data-reveal>
+        <a class="project__link" href={QUOTE_HREF}>
+          <ProjectIcon id="autre" class="project__icon" />
+          <span class="project__text">
+            <span class="project__label">Un autre projet&nbsp;?</span>
+            <span class="project__hint">Décrivez-le avec vos mots : nous trouvons les bons corps de métier.</span>
+          </span>
+          <span class="project__go label">
+            Nous écrire
+            <Icon name="arrow" size={16} />
+          </span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .projects__intro {
+    display: grid;
+    gap: var(--s-6);
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .projects__intro {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: end;
+      gap: var(--s-16);
+    }
+  }
+
+  .projects__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: 1px;
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background: var(--c-line-strong);
+    overflow: hidden;
+  }
+
+  @media (min-width: 64rem) {
+    .projects__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .project--wide {
+      grid-column: span 2;
+    }
+
+    .project--other {
+      grid-column: span 3;
+    }
+  }
+
+  .project {
+    display: flex;
+    background: var(--c-paper);
+  }
+
+  .project__link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+    width: 100%;
+    min-height: 15rem;
+    padding: var(--s-6);
+    text-decoration: none;
+    transition: background-color var(--dur-2) ease, color var(--dur-2) ease;
+  }
+
+  .project--wide .project__link {
+    min-height: 17rem;
+  }
+
+  .project__icon {
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  .project__text {
+    display: grid;
+    gap: var(--s-2);
+    margin-top: auto;
+  }
+
+  .project__label {
+    font-size: var(--fs-xl);
+    font-weight: 680;
+    font-stretch: 106%;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .project--wide .project__label {
+    font-size: var(--fs-2xl);
+  }
+
+  .project__hint {
+    color: var(--c-muted);
+    font-size: var(--fs-sm);
+    max-width: 30ch;
+    transition: color var(--dur-2) ease;
+  }
+
+  .project__go {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--c-accent);
+  }
+
+  .project__go :global(svg) {
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+
+  .project--other .project__link {
+    background: var(--c-paper-2);
+  }
+
+  @media (hover: hover) {
+    .project__link:hover {
+      background: var(--c-ink);
+      color: var(--c-paper);
+    }
+
+    .project__link:hover .project__hint {
+      color: var(--c-on-ink-muted);
+    }
+
+    .project__link:hover .project__go {
+      color: var(--c-accent-soft);
+    }
+
+    .project__link:hover .project__go :global(svg) {
+      transform: translateX(4px);
+    }
+
+    .project__link:hover .project__icon {
+      transform: translateY(-3px);
+    }
+  }
+
+  /* Phones: compact rows, so eleven projects stay one short scroll. */
+  @media (max-width: 47.99rem) {
+    .project__link,
+    .project--wide .project__link {
+      flex-direction: row;
+      align-items: center;
+      gap: var(--s-4);
+      min-height: 0;
+      padding: var(--s-4) var(--s-5);
+    }
+
+    .project__text {
+      margin-top: 0;
+      flex: 1;
+      gap: var(--s-1);
+    }
+
+    .project__label,
+    .project--wide .project__label {
+      font-size: var(--fs-lg);
+    }
+
+    .project__icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      flex: none;
+    }
+
+    .project__go {
+      font-size: 0;
+      gap: 0;
+    }
+
+    .project__go :global(svg) {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  .project__link:focus-visible {
+    outline-offset: -4px;
+  }
+
+  .project__link:active {
+    background: var(--c-paper-3);
+  }
+</style>

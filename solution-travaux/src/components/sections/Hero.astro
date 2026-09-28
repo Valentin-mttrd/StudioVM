@@ -1,0 +1,359 @@
+---
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import HouseElevation from './HouseElevation.astro';
+import { SITE } from '../../data/site';
+import { QUOTE_HREF, CALLBACK_HREF } from '../../data/nav';
+
+// Why choose Solution Travaux, in the current site's own facts.
+const FACTS = [
+  { icon: 'clock', text: 'Visite chez vous sous 48 h maximum' },
+  { icon: 'shield', text: 'Assurances et compétences vérifiées' },
+  { icon: 'users', text: "Des entreprises dans tous les corps d'état" },
+  { icon: 'compass', text: "50 km autour d'Étel, de Lorient à Vannes" },
+] as const;
+
+const LEGEND = [
+  ['combles', 'Aménagement de combles'],
+  ['salle-de-bain', 'Salle de bain'],
+  ['jardin', 'Jardin'],
+  ['extension', 'Extension'],
+  ['renovation', 'Rénovation'],
+  ['muret-cloture', 'Muret, clôture'],
+  ['terrasse', 'Terrasse'],
+] as const;
+---
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero__grid">
+    <div class="hero__head">
+      <p class="label hero__eyebrow">
+        <span class="hero__eyebrow-dot" aria-hidden="true"></span>
+        {SITE.name} · Depuis {SITE.foundedYear} · Morbihan
+      </p>
+      <h1 id="hero-title" class="display hero__title">
+        <span class="hero__line"><span>Courtier en travaux</span></span>
+        <span class="hero__line"><span>à Étel <span class="hero__dept">(56)</span></span></span>
+      </h1>
+    </div>
+
+    <div class="hero__body">
+      <p class="lead hero__lead">
+        Nous sélectionnons pour vous des professionnels du bâtiment pour tous vos travaux, quelle qu'en soit l'ampleur,
+        et vous accompagnons de la première visite jusqu'à la validation des devis — entre Lorient et Vannes.
+      </p>
+
+      <div class="hero__ctas">
+        <Button href={QUOTE_HREF} size="lg" icon="arrow">Demander un devis</Button>
+        <Button href={CALLBACK_HREF} size="lg" variant="secondary" iconStart="callback">Être rappelé</Button>
+      </div>
+
+      <p class="hero__call">
+        Ou appelez directement le <a href={SITE.phone.href}>{SITE.phone.display}</a>
+      </p>
+
+      <ul role="list" class="hero__facts">
+        {
+          FACTS.map((f) => (
+            <li>
+              <Icon name={f.icon} size={20} />
+              <span>{f.text}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="hero__drawing">
+      <HouseElevation />
+      <ol role="list" class="hero__legend" aria-label="Types de projets">
+        {
+          LEGEND.map(([id, label], i) => (
+            <li>
+              <a href={QUOTE_HREF.replace('#', `?projet=${id}#`)} class="chip hero__legend-chip">
+                <span class="label hero__legend-num">{i + 1}</span>
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+
+  <a href="#principe" class="hero__scroll label" aria-label="Découvrir le principe du courtage">
+    <span class="hero__scroll-line" aria-hidden="true"></span>
+    Découvrir
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-top: clamp(1.5rem, 0.5rem + 3vw, 3.5rem);
+    padding-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+    isolation: isolate;
+  }
+
+  /* graph paper, faint: the sheet the project is drawn on */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--header-h)) 0 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(to right, rgb(20 28 33 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(20 28 33 / 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: center top;
+    mask-image: linear-gradient(to bottom, #000 55%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+    pointer-events: none;
+  }
+
+  .hero__grid {
+    display: grid;
+    gap: var(--s-8);
+    grid-template-areas:
+      'head'
+      'drawing'
+      'body';
+  }
+
+  .hero__head {
+    grid-area: head;
+  }
+
+  .hero__body {
+    grid-area: body;
+  }
+
+  .hero__drawing {
+    grid-area: drawing;
+    min-width: 0;
+  }
+
+  @media (min-width: 64rem) {
+    .hero__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-template-areas:
+        'head head'
+        'body drawing';
+      column-gap: clamp(2rem, 1rem + 3vw, 5rem);
+      row-gap: var(--s-10);
+      align-items: end;
+    }
+
+    /* pull the drawing up beside the title's second line */
+    .hero__drawing {
+      margin-top: calc(-1 * (var(--fs-display) * 0.94 + var(--s-8)));
+    }
+  }
+
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin-bottom: var(--s-6);
+    color: var(--c-muted);
+  }
+
+  .hero__eyebrow-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--c-accent);
+    transform: rotate(45deg);
+  }
+
+  .hero__title {
+    display: grid;
+  }
+
+  .hero__line {
+    display: block;
+    overflow: clip;
+    padding-bottom: 0.06em;
+  }
+
+  .hero__line > span {
+    display: inline-block;
+  }
+
+  .hero__dept {
+    font-weight: 400;
+    font-stretch: 100%;
+    color: var(--c-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__line > span {
+      animation: rise 900ms var(--ease-out) both;
+    }
+
+    .hero__line:nth-child(2) > span {
+      animation-delay: 90ms;
+    }
+
+    .hero__body,
+    .hero__eyebrow {
+      animation: fade-up 800ms var(--ease-out) both;
+      animation-delay: 260ms;
+    }
+
+    .hero__eyebrow {
+      animation-delay: 0ms;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      transform: translateY(105%);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  .hero__lead {
+    max-width: 36rem;
+    color: var(--c-ink-3);
+  }
+
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-8);
+  }
+
+  @media (max-width: 30rem) {
+    .hero__ctas :global(.btn) {
+      width: 100%;
+    }
+  }
+
+  .hero__call {
+    margin-top: var(--s-4);
+    font-size: var(--fs-sm);
+    color: var(--c-muted);
+  }
+
+  .hero__call a {
+    color: var(--c-ink);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .hero__facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-4) var(--s-6);
+    margin-top: var(--s-10);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--c-line);
+    font-size: var(--fs-sm);
+    font-weight: 560;
+    line-height: 1.35;
+  }
+
+  .hero__facts li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-3);
+  }
+
+  .hero__facts :global(svg) {
+    flex: none;
+    color: var(--c-accent);
+    margin-top: -0.05em;
+  }
+
+  /* phones: one swipeable row naming the numbered pins */
+  .hero__legend {
+    display: flex;
+    gap: var(--s-2);
+    margin: var(--s-4) calc(-1 * var(--gutter)) 0;
+    padding: 0 var(--gutter) var(--s-2);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+
+  .hero__legend::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hero__legend li {
+    scroll-snap-align: start;
+  }
+
+  .hero__legend-chip {
+    text-decoration: none;
+    background: var(--c-paper);
+    min-height: 2.5rem;
+  }
+
+  .hero__legend-num {
+    color: var(--c-accent);
+  }
+
+  @media (min-width: 48rem) {
+    .hero__legend {
+      display: none;
+    }
+  }
+
+  .hero__scroll {
+    position: absolute;
+    left: var(--gutter);
+    bottom: var(--s-6);
+    display: none;
+    align-items: center;
+    gap: var(--s-3);
+    color: var(--c-muted);
+    text-decoration: none;
+  }
+
+  .hero__scroll-line {
+    position: relative;
+    width: 1px;
+    height: 2.5rem;
+    background: var(--c-line-strong);
+    overflow: hidden;
+  }
+
+  .hero__scroll-line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--c-accent);
+    transform: translateY(-100%);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__scroll-line::after {
+      animation: plumb 2.4s var(--ease-in-out) 3s infinite;
+    }
+  }
+
+  @keyframes plumb {
+    0% {
+      transform: translateY(-100%);
+    }
+    55%,
+    100% {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (min-width: 90rem) and (min-height: 50rem) {
+    .hero__scroll {
+      display: inline-flex;
+    }
+  }
+</style>

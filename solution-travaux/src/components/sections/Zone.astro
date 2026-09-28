@@ -1,0 +1,143 @@
+---
+import SectionHead from '../ui/SectionHead.astro';
+import ZoneMap from './ZoneMap.astro';
+import { COPY, TOWNS, ZONE_RADIUS_KM } from '../../data/site';
+import { kmFromEtel } from '../../lib/seo';
+
+const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]+/g, '-');
+const towns = [...TOWNS]
+  .map((t) => ({ ...t, km: Math.round(kmFromEtel(t.lat, t.lon)) }))
+  .sort((a, b) => a.km - b.km);
+---
+<section id="zone" class="section zone on-ink" aria-labelledby="zone-title" data-zone-section>
+  <div class="container">
+    <SectionHead index="06" label="Zone d'intervention" note={`Rayon de ${ZONE_RADIUS_KM} km`} />
+
+    <div class="zone__grid">
+      <div class="zone__text">
+        <h2 id="zone-title" class="h1" data-reveal>Entre Lorient et Vannes, autour d'Étel.</h2>
+        <p class="lead zone__lead" data-reveal>{COPY.zone}</p>
+
+        <ul role="list" class="zone__list" aria-label="Communes citées" data-reveal>
+          {
+            towns.map((t) => (
+              <li class="zone__town" data-town={slug(t.name)}>
+                <span>{t.name}</span>
+                <span class="zone__km label">{t.km} km</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="zone__note">Distances à vol d'oiseau depuis Étel. Votre commune n'apparaît pas&nbsp;? Appelez-nous&nbsp;: la zone s'étend dans un rayon de 50&nbsp;km environ.</p>
+      </div>
+
+      <div class="zone__map" data-reveal>
+        <ZoneMap />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .zone {
+    overflow: clip;
+  }
+
+  .zone__grid {
+    display: grid;
+    gap: var(--s-12);
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .zone__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: center;
+      gap: clamp(3rem, 1rem + 5vw, 7rem);
+    }
+  }
+
+  .zone__text .h1 {
+    max-width: 14ch;
+  }
+
+  .zone__lead {
+    margin-top: var(--s-6);
+    color: var(--c-on-ink-muted);
+  }
+
+  .zone__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s-6);
+    margin-top: var(--s-10);
+    border-top: 1px solid var(--c-line-ink);
+  }
+
+  .zone__town {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-3);
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--c-line-ink);
+    font-weight: 560;
+    cursor: default;
+    transition: color var(--dur-1) ease;
+  }
+
+  .zone__town:is(:hover, .is-hl) {
+    color: var(--c-accent-soft);
+  }
+
+  .zone__km {
+    color: var(--c-on-ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .zone__note {
+    margin-top: var(--s-6);
+    font-size: var(--fs-sm);
+    color: var(--c-on-ink-muted);
+    max-width: 44ch;
+  }
+
+  .zone__map {
+    max-width: 40rem;
+    width: 100%;
+    margin-inline: auto;
+    padding: var(--s-8) var(--s-2);
+  }
+</style>
+
+<script>
+  // Link the town list and the map: pointing at a town lights
+  // its dot, and the dots fade in when the map arrives on screen.
+  const root = document.querySelector<HTMLElement>('[data-zone-section]');
+  const map = root?.querySelector<SVGElement>('[data-zmap]');
+  if (root && map) {
+    const set = (slug: string | null) => {
+      map.querySelectorAll<SVGGElement>('[data-dot]').forEach((g) => g.classList.toggle('is-hl', g.dataset.dot === slug));
+      root.querySelectorAll<HTMLElement>('[data-town]').forEach((t) => t.classList.toggle('is-hl', t.dataset.town === slug));
+    };
+    root.querySelectorAll<HTMLElement>('[data-town]').forEach((t) => {
+      t.addEventListener('pointerenter', () => set(t.dataset.town ?? null));
+      t.addEventListener('pointerleave', () => set(null));
+    });
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        ([e]) => {
+          if (e.isIntersecting) {
+            map.classList.add('is-in');
+            io.disconnect();
+          }
+        },
+        { threshold: 0.3 },
+      );
+      io.observe(map);
+    } else {
+      map.classList.add('is-in');
+    }
+  }
+</script>
