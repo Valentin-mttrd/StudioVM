@@ -1,0 +1,93 @@
+---
+/**
+ * The institute's own words, read at the pace of the scroll: each word
+ * warms from pale to ink as the paragraph crosses the screen. Scroll-driven
+ * CSS only — browsers without it (and reduced motion) show it fully inked.
+ */
+import Button from '@/components/ui/Button.astro';
+
+const text =
+  'L’atypique vous accueille dans un cadre chaleureux pour un moment unique, dédié à votre bien-être : des soins adaptés à vos envies et à vos besoins, des produits 100 % naturels, et une équipe attentionnée qui allie expertise technique et écoute.';
+// Words to set in the italic accent.
+const accents = new Set(['chaleureux', 'unique,', 'naturels,', 'écoute.']);
+const words = text.split(' ');
+---
+
+<section class="manifesto section" aria-labelledby="manifesto-title">
+  <div class="container manifesto__grid">
+    <h2 class="label label--rule manifesto__label" id="manifesto-title">L’esprit de l’institut</h2>
+    <p class="display manifesto__text">
+      {
+        words.map((word, i) => (
+          <>
+            <span class:list={['w', accents.has(word) && 'w--accent']} style={`--i:${i}`}>
+              {word}
+            </span>{' '}
+          </>
+        ))
+      }
+    </p>
+    <div class="manifesto__cta" data-reveal>
+      <Button href="/institut" variant="ghost">Découvrir l’institut</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .manifesto__grid {
+    display: grid;
+    grid-template-columns: minmax(10rem, 1fr) minmax(0, 3.2fr);
+    gap: var(--s-5) var(--s-6);
+  }
+  .manifesto__label {
+    color: var(--c-argile);
+    padding-top: 0.9em;
+    align-self: start;
+  }
+  .manifesto__text {
+    font-size: var(--t-statement);
+    font-weight: 330;
+    line-height: 1.22;
+    letter-spacing: -0.02em;
+    text-wrap: pretty;
+  }
+  .w--accent {
+    font-style: italic;
+    color: var(--c-argile);
+  }
+  .manifesto__cta {
+    grid-column: 2;
+    margin-top: var(--s-5);
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .manifesto__text {
+        view-timeline: --manifesto block;
+      }
+      .w {
+        animation: ink linear both;
+        animation-timeline: --manifesto;
+        /* Each word inks a little after the previous one. */
+        animation-range: cover calc(12% + var(--i) * 0.9%) cover calc(22% + var(--i) * 0.9%);
+      }
+    }
+  }
+  @keyframes ink {
+    from {
+      opacity: 0.16;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .manifesto__grid {
+      grid-template-columns: 1fr;
+    }
+    .manifesto__cta {
+      grid-column: 1;
+    }
+  }
+</style>

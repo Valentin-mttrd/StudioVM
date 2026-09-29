@@ -1,0 +1,92 @@
+---
+/** Week table with today's row marked (in Europe/Paris) once JS runs. */
+import { hours } from '@/data/business';
+import { formatSlots } from '@/lib/hours';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<table class:list={['hours', className]} data-hours>
+  <caption class="sr-only">Horaires d’ouverture de l’institut</caption>
+  <tbody>
+    {
+      hours.map((day) => (
+        <tr data-day={day.day} class:list={[day.slots.length === 0 && 'is-closed']}>
+          <th scope="row">
+            {day.label}
+            <span class="hours__today">aujourd’hui</span>
+          </th>
+          <td>{formatSlots(day.slots)}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+<script>
+  import { parisNow } from '@/lib/hours';
+
+  const { day } = parisNow();
+  document.querySelectorAll('[data-hours]').forEach((table) => {
+    const row = table.querySelector(`[data-day="${day}"]`);
+    row?.classList.add('is-today');
+    row?.setAttribute('aria-current', 'date');
+  });
+</script>
+
+<style>
+  .hours {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.98rem;
+  }
+  .hours th,
+  .hours td {
+    padding: 0.7rem 0;
+    border-bottom: 1px dashed var(--line);
+    text-align: left;
+    font-weight: 400;
+  }
+  :global(.on-dark) .hours th,
+  :global(.on-dark) .hours td {
+    border-bottom-color: var(--line-on-dark);
+  }
+  .hours td {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .hours .is-closed td {
+    color: var(--c-ecorce-doux);
+  }
+  :global(.on-dark) .hours .is-closed td {
+    color: var(--c-creme-doux);
+  }
+  .hours__today {
+    display: none;
+    margin-left: 0.6rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--r-pill);
+    background: var(--c-argile);
+    color: var(--c-creme);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    vertical-align: 0.15em;
+  }
+  :global(.on-dark) .hours__today {
+    background: var(--c-mais-vif);
+    color: var(--c-mousse);
+  }
+  .hours .is-today th,
+  .hours .is-today td {
+    font-weight: 600;
+  }
+  .hours .is-today .hours__today {
+    display: inline-block;
+  }
+</style>

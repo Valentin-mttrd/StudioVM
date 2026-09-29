@@ -1,0 +1,85 @@
+---
+/**
+ * Thumb-zone action bar on phones and small tablets: the three things a
+ * visitor on the move wants — call, get there, book.
+ */
+import Icon from '@/components/ui/Icon.astro';
+import { business, mapLinks } from '@/data/business';
+---
+
+<nav class="mobilebar" aria-label="Actions rapides">
+  <a class="mobilebar__item" href={business.phone.href}>
+    <Icon name="phone" />
+    <span>Appeler</span>
+  </a>
+  <a class="mobilebar__item" href={mapLinks.google} target="_blank" rel="noopener">
+    <Icon name="route" />
+    <span>Itinéraire<span class="sr-only"> (nouvel onglet)</span></span>
+  </a>
+  <a class="mobilebar__item mobilebar__item--primary" href={business.booking.url} target="_blank" rel="noopener">
+    <Icon name="calendar" />
+    <span>Réserver<span class="sr-only"> un rendez-vous en ligne (nouvel onglet)</span></span>
+  </a>
+</nav>
+
+<style>
+  .mobilebar {
+    display: none;
+  }
+  @media (max-width: 55.99rem) {
+    .mobilebar {
+      position: fixed;
+      left: 50%;
+      bottom: calc(0.75rem + env(safe-area-inset-bottom));
+      width: min(100% - 1.5rem, 30rem);
+      translate: -50% 0;
+      z-index: 60;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.35fr;
+      gap: 0.35rem;
+      padding: 0.35rem;
+      border-radius: var(--r-pill);
+      background: rgb(38 48 42 / 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-lift);
+    }
+  }
+  .mobilebar__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 3rem;
+    border-radius: var(--r-pill);
+    color: var(--c-creme);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--d-quick) var(--ease-press),
+      transform var(--d-quick) var(--ease-press);
+  }
+  .mobilebar__item:active {
+    transform: scale(0.96);
+    background: rgb(245 239 230 / 0.08);
+  }
+  .mobilebar__item:focus-visible {
+    outline-color: var(--c-mais-vif);
+  }
+  .mobilebar__item--primary {
+    background: var(--c-creme);
+    color: var(--c-mousse);
+  }
+  .mobilebar__item--primary:active {
+    background: var(--c-mais-vif);
+  }
+  .mobilebar__item :global(.icon) {
+    width: 1.15em;
+    height: 1.15em;
+  }
+  :global(html.menu-open) .mobilebar {
+    display: none;
+  }
+</style>

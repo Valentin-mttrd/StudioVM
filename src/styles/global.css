@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* latypique/ is a separate site living in this repo — keep its markup out of
+   Tailwind's class detection for this one. */
+@source not "../../latypique";
 @import "@fontsource-variable/montserrat/wght.css";
 @import "@fontsource-variable/manrope/wght.css";
 @import "lenis/dist/lenis.css";

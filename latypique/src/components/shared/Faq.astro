@@ -1,0 +1,118 @@
+---
+/**
+ * Native <details> accordion: keyboard and screen-reader support built in,
+ * works without JS. `name` makes it exclusive (one open at a time) where
+ * supported; ::details-content animates the height where supported.
+ */
+import Icon from '@/components/ui/Icon.astro';
+import type { FaqItem } from '@/data/faq';
+
+interface Props {
+  items: FaqItem[];
+}
+const { items } = Astro.props;
+---
+
+<div class="faq" data-reveal-group>
+  {
+    items.map((item, i) => (
+      <details class="faq__item" name="faq" data-reveal open={i === 0}>
+        <summary class="faq__q">
+          <span class="faq__num num">{String(i + 1).padStart(2, '0')}</span>
+          <span class="faq__text">{item.question}</span>
+          <span class="faq__icon" aria-hidden="true">
+            <Icon name="plus" />
+          </span>
+        </summary>
+        <div class="faq__a">
+          <p>{item.answer}</p>
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .faq {
+    border-top: 1px solid var(--line-strong);
+  }
+  .faq__item {
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .faq__q {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) 2.75rem;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-5) 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq__q::-webkit-details-marker {
+    display: none;
+  }
+  .faq__num {
+    color: var(--c-argile);
+  }
+  .faq__text {
+    font-family: var(--f-display);
+    font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.6rem);
+    font-weight: 380;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .faq__icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    transition:
+      transform var(--d-base) var(--ease-settle),
+      background-color var(--d-base) var(--ease-settle),
+      color var(--d-base) var(--ease-settle);
+  }
+  .faq__item[open] .faq__icon {
+    transform: rotate(45deg);
+    background: var(--c-ecorce);
+    border-color: var(--c-ecorce);
+    color: var(--c-creme);
+  }
+  @media (hover: hover) {
+    .faq__q:hover .faq__text {
+      color: var(--c-argile);
+    }
+  }
+  .faq__a {
+    padding: 0 3.25rem var(--s-5) calc(2.5rem + var(--s-3));
+    color: var(--c-ecorce-doux);
+    max-width: 48rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .faq__item::details-content {
+      block-size: 0;
+      overflow: clip;
+      transition:
+        block-size 500ms var(--ease-settle),
+        content-visibility 500ms allow-discrete;
+    }
+    .faq__item[open]::details-content {
+      block-size: auto;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .faq__q {
+      grid-template-columns: 2rem minmax(0, 1fr) 2.5rem;
+    }
+    .faq__icon {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+    .faq__a {
+      padding: 0 0 var(--s-5) calc(2rem + var(--s-3));
+    }
+  }
+</style>

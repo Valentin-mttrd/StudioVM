@@ -1,0 +1,102 @@
+---
+/**
+ * A pebble of matter — clay, wax, cassava & corn, sage… The visual
+ * vocabulary of the site in place of stock photos: soft, organic, lit from
+ * the top-left like a product swatch on a linen cloth. Pure CSS gradients,
+ * so it costs nothing to load and stays crisp at any size.
+ */
+import type { Tone } from '@/data/soins';
+
+interface Props {
+  tone: Tone;
+  size?: string;
+  shape?: 1 | 2 | 3 | 4;
+  breathe?: boolean;
+  class?: string;
+  style?: string;
+  [attribute: `data-${string}`]: string;
+}
+
+const { tone, size = '10rem', shape = 1, breathe = false, class: className, style = '', ...rest } = Astro.props;
+---
+
+<span
+  class:list={['pebble', `pebble--${shape}`, breathe && 'pebble--breathe', className]}
+  style={`--pebble-size:${size};--pebble-c:var(--p-${tone});--pebble-d:var(--p-${tone}-deep);${style}`}
+  aria-hidden="true"
+  {...rest}
+>
+  <span class="pebble__body"></span>
+</span>
+
+<style>
+  .pebble {
+    position: relative;
+    display: block;
+    width: var(--pebble-size);
+    aspect-ratio: 1 / 0.64;
+    flex: none;
+    isolation: isolate;
+  }
+  /* Contact shadow on the cloth. */
+  .pebble::after {
+    content: '';
+    position: absolute;
+    left: 8%;
+    right: 6%;
+    bottom: -6%;
+    height: 20%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(42 34 28 / 0.28), transparent);
+    filter: blur(7px);
+    z-index: -1;
+  }
+  /* A flat, polished beach pebble seen from above: lit top face, the
+     rounded side falling into shade. */
+  .pebble__body {
+    position: absolute;
+    inset: 0;
+    border-radius: 50% 50% 47% 53% / 58% 55% 45% 42%;
+    background:
+      radial-gradient(60% 50% at 42% 32%, rgb(255 255 255 / 0.38), transparent 70%),
+      linear-gradient(180deg, var(--pebble-c) 0%, var(--pebble-c) 52%, var(--pebble-d) 100%);
+    box-shadow:
+      inset 0 -14px 20px -10px rgb(42 34 28 / 0.38),
+      inset 0 8px 12px -8px rgb(255 255 255 / 0.55),
+      inset 10px 0 18px -14px rgb(255 255 255 / 0.4);
+  }
+  /* Mineral grain, so it reads as matter rather than plastic. */
+  .pebble__body::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0.45;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .pebble--2 .pebble__body {
+    border-radius: 44% 56% 54% 46% / 62% 56% 44% 38%;
+  }
+  .pebble--3 .pebble__body {
+    border-radius: 56% 44% 42% 58% / 55% 64% 36% 45%;
+  }
+  .pebble--4 .pebble__body {
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pebble--breathe .pebble__body {
+      animation: breathe var(--breathe-d, 9s) var(--ease-breath) infinite alternate;
+      animation-delay: var(--breathe-delay, 0s);
+    }
+  }
+  @keyframes breathe {
+    from {
+      transform: scale(1) rotate(0deg);
+    }
+    to {
+      transform: scale(1.035, 1.025) rotate(2.5deg);
+    }
+  }
+</style>
