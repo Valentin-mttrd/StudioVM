@@ -1,0 +1,36 @@
+---
+/**
+ * Typographic logotype, set like the gilded lettering of a shop fascia:
+ * "Chez" in italic, "PiPon" upright — the spelling the restaurant uses on
+ * its own Instagram. Replace with the restaurant's real logo file if it
+ * has one.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+<span class:list={['wordmark', className]}>
+  <span class="wordmark__chez">Chez</span><span class="wordmark__name">PiPon</span>
+</span>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.18em;
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .wordmark__chez {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.62em;
+  }
+  .wordmark__name {
+    font-variation-settings: "opsz" 72;
+  }
+</style>

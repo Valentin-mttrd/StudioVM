@@ -1,0 +1,180 @@
+---
+import Photo from '../components/Photo.astro';
+import { STORY, TEAM } from '../data/site';
+
+/**
+ * The two people who are the restaurant. Sources: Gault&Millau 2026
+ * (profiles, awards, 35 covers per service), local press (opening date,
+ * Ferrandi, Café Parisien, starred kitchens), Le Télégramme (Paihia
+ * Kitchen taken over).
+ */
+const figures = [
+  { value: '01.12.25', label: 'Ouverture, avenue de la Perrière' },
+  { value: `${STORY.covers}`, label: 'couverts par service, à deux' },
+  { value: '2', label: 'distinctions Gault&Millau dès 2026' },
+];
+---
+<section id="duo" class="duo grain section-y" aria-labelledby="duo-title">
+  <div class="container-page">
+    <header class="duo__head">
+      <div>
+        <p class="eyebrow text-vert-700" data-reveal>Le duo</p>
+        <h2 id="duo-title" class="duo__title" data-reveal>
+          Victor en cuisine,<br /><em>Eileen en salle.</em>
+        </h2>
+      </div>
+      <p class="duo__story" data-reveal>
+        Ils se sont rencontrés dans le 5<sup>e</sup> arrondissement de Paris, puis ont quitté la capitale pour Lorient.
+        Le <Fragment set:html={STORY.openedLabel.replace(/^1er/, '1<sup>er</sup>')} />, ils ont repris l’ancien {STORY.predecessor} pour ouvrir Chez Pipon. À deux, ils assurent
+        jusqu’à {STORY.covers} couverts par service.
+      </p>
+    </header>
+
+    <div class="duo__people">
+      {
+        TEAM.map((person, i) => (
+          <article class:list={['person', i === 1 && 'person--offset']} aria-labelledby={`person-${person.id}`}>
+            <Photo slot={person.id} ratio="4 / 5" sizes="(min-width: 1024px) 36vw, 100vw" />
+            <div class="person__body">
+              <p class="person__role" data-reveal>{person.role}</p>
+              <h3 id={`person-${person.id}`} class="person__name" data-reveal>
+                {person.name}
+              </h3>
+              {person.bio.map((para) => (
+                <p class="person__bio" data-reveal>
+                  {para}
+                </p>
+              ))}
+              <p class="person__award" data-reveal>
+                <span class="person__award-mark" aria-hidden="true">✦</span>
+                {person.award}
+              </p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <dl class="figures">
+      {
+        figures.map((f) => (
+          <div class="figure" data-reveal data-reveal-group="figures">
+            <dt class="figure__label">{f.label}</dt>
+            <dd class="figure__value">{f.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .duo {
+    position: relative;
+    z-index: 1;
+    background: var(--color-lin);
+  }
+
+  .duo__head {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .duo__title {
+    margin: 1.25rem 0 0;
+    font-size: var(--text-display-xl);
+    line-height: var(--text-display-xl--line-height);
+    letter-spacing: var(--text-display-xl--letter-spacing);
+    font-weight: 380;
+  }
+  .duo__title em {
+    font-style: italic;
+    font-weight: 330;
+    color: var(--color-vert-700);
+  }
+  .duo__story {
+    max-width: 52ch;
+    margin: 0.5rem 0 0;
+    font-size: var(--text-lead);
+    line-height: 1.6;
+    color: var(--color-encre-soft);
+  }
+
+  .duo__people {
+    display: grid;
+    gap: clamp(3.5rem, 2rem + 5vw, 6rem);
+    margin-top: clamp(3.5rem, 2rem + 5vw, 7rem);
+  }
+
+  .person__body { margin-top: 1.75rem; max-width: 34rem; }
+  .person__role {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-potimarron-deep);
+  }
+  .person__name {
+    margin: 0.5rem 0 1rem;
+    font-size: var(--text-display-md);
+    line-height: var(--text-display-md--line-height);
+    letter-spacing: var(--text-display-md--letter-spacing);
+    font-weight: 420;
+  }
+  .person__bio {
+    margin: 0 0 0.85rem;
+    color: var(--color-encre-soft);
+  }
+  .person__award {
+    display: flex;
+    gap: 0.6rem;
+    margin: 1.25rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(27 29 26 / 0.14);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--color-vert-700);
+  }
+  .person__award-mark { color: var(--color-laiton-deep); font-style: normal; }
+
+  .figures {
+    display: grid;
+    gap: 0;
+    margin: clamp(4rem, 3rem + 4vw, 7rem) 0 0;
+    border-top: 1px solid rgb(27 29 26 / 0.18);
+  }
+  .figure {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.35rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgb(27 29 26 / 0.18);
+  }
+  .figure__value {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 2rem + 2.5vw, 4.5rem);
+    line-height: 1;
+    font-weight: 330;
+    letter-spacing: -0.03em;
+    font-variant-numeric: lining-nums;
+    color: var(--color-vert-700);
+  }
+  .figure__label {
+    font-size: 0.95rem;
+    color: var(--color-encre-mute);
+  }
+
+  @media (min-width: 768px) {
+    .duo__people { grid-template-columns: 1fr 1fr; gap: clamp(2rem, 4vw, 5rem); }
+    .person--offset { margin-top: clamp(4rem, 10vw, 10rem); }
+    .figures { grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid rgb(27 29 26 / 0.18); }
+    .figure { border-bottom: 0; padding: 2rem 2rem 2rem 0; }
+    .figure + .figure { border-left: 1px solid rgb(27 29 26 / 0.18); padding-left: 2rem; }
+  }
+  @media (min-width: 1024px) {
+    .duo__head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: end; }
+    .duo__story { margin: 0; }
+  }
+</style>

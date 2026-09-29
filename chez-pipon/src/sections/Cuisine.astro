@@ -1,0 +1,184 @@
+---
+import Photo from '../components/Photo.astro';
+import Icon, { type IconName } from '../components/Icon.astro';
+
+/**
+ * The cooking. Facts from the tourist office listing, the local press and
+ * Le Bouillon: fresh, local, seasonal, from local farming or "productions
+ * raisonnées"; no fixed menu — the chef works with what producers bring
+ * that day; everything homemade; eco-responsible values, zero waste aimed.
+ */
+const principles: { icon: IconName; title: string; text: string }[] = [
+  {
+    icon: 'sprout',
+    title: 'Frais & de saison',
+    text: 'Le chef travaille avec ce que les producteurs lui apportent le jour même. La carte suit les saisons — pas l’inverse.',
+  },
+  {
+    icon: 'basket',
+    title: 'Local & raisonné',
+    text: 'Des produits issus de l’agriculture locale ou de productions raisonnées, choisis pour leur qualité et leur durabilité.',
+  },
+  {
+    icon: 'pot',
+    title: 'Tout fait maison',
+    text: 'Des entrées aux desserts, tout est préparé sur place, dans la petite cuisine de l’avenue de la Perrière.',
+  },
+  {
+    icon: 'leaf',
+    title: 'Le zéro déchet en ligne de mire',
+    text: 'Gourmandise et conscience écologique vont ensemble : la maison vise le zéro déchet, jusque dans la vente à emporter.',
+  },
+];
+---
+<section id="cuisine" class="cuisine grain section-y" aria-labelledby="cuisine-title">
+  <div class="container-page">
+    <header class="cuisine__head">
+      <p class="eyebrow text-vert-700" data-reveal>La cuisine</p>
+      <h2 id="cuisine-title" class="cuisine__title" data-reveal>
+        Pas de carte figée. <em>Une méthode, et le marché du jour.</em>
+      </h2>
+    </header>
+
+    <div class="cuisine__grid">
+      <div class="cuisine__media">
+        <Photo slot="assiette" ratio="4 / 5" sizes="(min-width: 1024px) 38vw, 100vw" />
+        <p class="cuisine__caption" data-reveal>
+          Deux entrées, trois plats dont un végétarien, deux desserts : une carte volontairement courte, qui évolue au fil
+          des arrivages et de l’inspiration du chef.
+        </p>
+      </div>
+
+      <div class="cuisine__body">
+        <p class="cuisine__lead" data-reveal>
+          Chez Pipon, on cuisine des produits frais, locaux et de saison. Pas de menu imprimé une fois pour toutes&nbsp;:
+          Victor s’appuie sur une base solide de préparations, d’assaisonnements et de cuissons, et compose chaque jour
+          avec les produits disponibles. Chaque service raconte une histoire un peu différente.
+        </p>
+
+        <ol class="principles">
+          {
+            principles.map((p, i) => (
+              <li class="principle" data-reveal data-reveal-group="principles">
+                <span class="principle__num" aria-hidden="true">
+                  {['i', 'ii', 'iii', 'iv'][i]}.
+                </span>
+                <div>
+                  <h3 class="principle__title">
+                    <Icon name={p.icon} class="principle__icon" />
+                    {p.title}
+                  </h3>
+                  <p class="principle__text">{p.text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cuisine__grid > * { min-width: 0; }
+  .cuisine {
+    position: relative;
+    z-index: 1;
+    background: var(--color-creme);
+    box-shadow: 0 -40px 80px -40px rgb(10 20 15 / 0.55);
+  }
+
+  .cuisine__head { max-width: 62rem; }
+  .cuisine__title {
+    margin: 1.25rem 0 0;
+    font-size: var(--text-display-xl);
+    line-height: var(--text-display-xl--line-height);
+    letter-spacing: var(--text-display-xl--letter-spacing);
+    font-weight: 380;
+    color: var(--color-encre);
+  }
+  .cuisine__title em {
+    display: block;
+    font-style: italic;
+    font-weight: 330;
+    color: var(--color-vert-700);
+  }
+
+  .cuisine__grid {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 3vw, 6rem);
+    margin-top: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  .cuisine__caption {
+    max-width: 38ch;
+    margin: 1.1rem 0 0;
+    font-size: 0.92rem;
+    color: var(--color-encre-mute);
+  }
+
+  .cuisine__lead {
+    max-width: 40ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-display-sm);
+    line-height: 1.4;
+    font-weight: 360;
+    color: var(--color-encre);
+  }
+
+  .principles {
+    list-style: none;
+    margin: clamp(2.5rem, 2rem + 2vw, 3.5rem) 0 0;
+    padding: 0;
+    border-top: 1px solid rgb(27 29 26 / 0.14);
+  }
+  .principle {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1rem;
+    padding-block: 1.6rem;
+    border-bottom: 1px solid rgb(27 29 26 / 0.14);
+  }
+  .principle__num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.35rem;
+    line-height: 1.2;
+    color: var(--color-potimarron-deep);
+  }
+  .principle__title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+    font-size: 1.45rem;
+    line-height: 1.2;
+    font-weight: 450;
+  }
+  .principle__title :global(.principle__icon) {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--color-vert-600);
+    flex: none;
+  }
+  .principle__text {
+    max-width: 48ch;
+    margin: 0.5rem 0 0;
+    color: var(--color-encre-soft);
+  }
+
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .cuisine__media :global(.photo) { aspect-ratio: 3 / 2 !important; }
+  }
+  @media (min-width: 1024px) {
+    .cuisine__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: start;
+    }
+    .cuisine__media {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+    }
+  }
+</style>

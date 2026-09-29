@@ -1,0 +1,279 @@
+---
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+import { CONTACT, MENU, TAKEAWAY } from '../data/site';
+
+/**
+ * The slate. The menu changes every day and is posted on Instagram, so the
+ * site doesn't pretend to show "today's" dishes: it shows the format, the
+ * price, and two plates the Gault&Millau singled out — clearly labelled as
+ * past plates — then sends visitors to the live slate.
+ */
+---
+<section id="ardoise" class="ardoise on-dark section-y" aria-labelledby="ardoise-title">
+  <div class="container-page ardoise__grid">
+    <div class="ardoise__intro">
+      <p class="eyebrow text-laiton" data-reveal>L’ardoise</p>
+      <h2 id="ardoise-title" class="ardoise__title" data-reveal>
+        Deux entrées, trois plats, deux desserts.
+      </h2>
+      <p class="ardoise__text" data-reveal>
+        Une carte courte, c’est une carte fraîche. Elle change au gré des arrivages et de l’inspiration du chef — et parmi
+        les trois plats, il y a toujours une option végétarienne.
+      </p>
+      <div class="ardoise__ctas" data-reveal>
+        <Button href={CONTACT.instagramUrl} variant="brass" icon="instagram" arrow="external">
+          L’ardoise du jour sur Instagram
+        </Button>
+      </div>
+      <p class="ardoise__budget" data-reveal>
+        <Icon name="euro" class="h-4 w-4 flex-none" />
+        <span>Budget indicatif&nbsp;: {MENU.budget} par personne, {MENU.budgetNote} <span class="opacity-70">(Gault&amp;Millau 2026)</span></span>
+      </p>
+    </div>
+
+    <figure class="board" aria-labelledby="board-title">
+      <div class="board__slate" data-reveal="board">
+        <p id="board-title" class="board__heading" data-chalk>Le midi</p>
+
+        <p class="board__set" data-chalk style="--reveal-delay: 120ms">
+          <span>{MENU.lunchSet.label}</span>
+          <span class="leader" aria-hidden="true"></span>
+          <span class="board__price">{MENU.lunchSet.price}</span>
+        </p>
+
+        <ul class="board__format">
+          {
+            MENU.format.map((item, i) => (
+              <li data-chalk style={`--reveal-delay: ${240 + i * 120}ms`}>
+                <span class="board__count">{item.count}</span>
+                <span>
+                  {item.label}
+                  {'note' in item && <span class="board__note"> — {item.note}</span>}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="board__rule" aria-hidden="true"></div>
+
+        <p class="board__sub" data-chalk style="--reveal-delay: 700ms">Déjà passés à l’ardoise</p>
+        <ul class="board__dishes">
+          {
+            MENU.notedDishes.map((dish, i) => (
+              <li data-chalk style={`--reveal-delay: ${820 + i * 140}ms`}>
+                <span class="board__dish">{dish.title}</span>
+                <span class="board__dish-detail">{dish.detail}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <figcaption class="board__caption">
+        Plats remarqués par le Gault&amp;Millau 2026. L’ardoise change chaque jour&nbsp;: ceux-ci ne sont peut-être plus à la
+        carte.
+      </figcaption>
+    </figure>
+
+    <aside class="takeaway" aria-labelledby="takeaway-title" data-reveal>
+      <Icon name="jar" class="takeaway__icon" />
+      <div>
+        <h3 id="takeaway-title" class="takeaway__title">À emporter, en boîte consignée</h3>
+        <p class="takeaway__text">{TAKEAWAY.text}</p>
+        <a class="tlink text-laiton-soft" href={TAKEAWAY.url} target="_blank" rel="noopener">
+          En savoir plus sur {TAKEAWAY.network}
+          <Icon name="external" class="tlink__arrow" /><span class="sr-only"> (nouvel onglet)</span>
+        </a>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .ardoise__grid > * { min-width: 0; }
+  .ardoise {
+    position: relative;
+    z-index: 1;
+    background:
+      radial-gradient(80% 60% at 85% 20%, rgb(45 88 69 / 0.35), transparent 70%),
+      var(--color-ardoise);
+    color: var(--color-craie);
+  }
+
+  .ardoise__grid {
+    display: grid;
+    gap: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  .ardoise__title {
+    margin: 1.25rem 0 0;
+    max-width: 14ch;
+    font-size: var(--text-display-lg);
+    line-height: var(--text-display-lg--line-height);
+    letter-spacing: var(--text-display-lg--letter-spacing);
+    font-weight: 380;
+    color: var(--color-creme);
+  }
+  .ardoise__text {
+    max-width: 42ch;
+    margin: 1.5rem 0 0;
+    font-size: var(--text-lead);
+    line-height: 1.55;
+    color: rgb(236 232 222 / 0.8);
+  }
+  .ardoise__ctas { margin-top: 2rem; }
+  .ardoise__budget {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 1.5rem 0 0;
+    font-size: 0.9rem;
+    color: var(--color-craie-soft);
+  }
+
+  /* ---- The board -------------------------------------------------------- */
+  .board { margin: 0; }
+  .board__slate {
+    position: relative;
+    padding: clamp(1.75rem, 1rem + 3vw, 3.25rem);
+    border-radius: 4px;
+    background:
+      radial-gradient(120% 90% at 30% 20%, rgb(255 255 255 / 0.05), transparent 60%),
+      radial-gradient(60% 50% at 80% 90%, rgb(255 255 255 / 0.035), transparent 70%),
+      var(--color-ardoise-raised);
+    box-shadow:
+      inset 0 0 0 1px rgb(0 0 0 / 0.5),
+      inset 0 0 60px rgb(0 0 0 / 0.35),
+      0 0 0 10px #3a2c1f,
+      0 0 0 11px rgb(0 0 0 / 0.4),
+      0 40px 70px -30px rgb(0 0 0 / 0.8);
+    font-family: var(--font-display);
+    color: var(--color-craie);
+    /* chalk: slightly soft edges */
+    text-shadow: 0 0 1px rgb(236 232 222 / 0.45);
+  }
+  .board__slate::after {
+    /* smudges of old chalk */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--grain);
+    opacity: 0.12;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .board__heading {
+    margin: 0 0 1.25rem;
+    font-style: italic;
+    font-size: clamp(2.2rem, 1.6rem + 2vw, 3.2rem);
+    line-height: 1;
+    font-weight: 350;
+    color: var(--color-laiton-soft);
+  }
+  .board__set {
+    display: flex;
+    align-items: baseline;
+    margin: 0;
+    font-size: clamp(1.2rem, 1rem + 0.7vw, 1.55rem);
+  }
+  .board__price {
+    font-size: 1.6em;
+    font-weight: 500;
+    color: var(--color-laiton);
+  }
+
+  .board__format {
+    display: grid;
+    gap: 0.6rem;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.35rem);
+  }
+  .board__format li { display: flex; align-items: baseline; gap: 0.9rem; }
+  .board__count {
+    display: inline-grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border: 1px solid rgb(236 232 222 / 0.45);
+    border-radius: 50%;
+    font-style: italic;
+    font-size: 1.1rem;
+    flex: none;
+    translate: 0 0.35rem;
+  }
+  .board__note { font-style: italic; color: var(--color-craie-soft); }
+
+  .board__rule {
+    height: 1px;
+    margin-block: 1.9rem 1.6rem;
+    background: linear-gradient(90deg, rgb(236 232 222 / 0.5), rgb(236 232 222 / 0.1));
+  }
+
+  .board__sub {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-shadow: none;
+    color: var(--color-craie-soft);
+  }
+  .board__dishes {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .board__dishes li { display: grid; gap: 0.15rem; }
+  .board__dish { font-size: clamp(1.15rem, 1rem + 0.6vw, 1.45rem); line-height: 1.25; }
+  .board__dish-detail { font-style: italic; color: var(--color-craie-soft); }
+
+  .board__caption {
+    margin-top: 1.6rem;
+    font-size: 0.85rem;
+    color: var(--color-craie-soft);
+  }
+
+  /* ---- Takeaway ---------------------------------------------------------- */
+  .takeaway {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.25rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+    border: 1px solid rgb(207 171 105 / 0.28);
+    border-radius: var(--radius-card);
+    background: rgb(15 31 24 / 0.35);
+  }
+  .takeaway :global(.takeaway__icon) {
+    width: 2.25rem;
+    height: 2.25rem;
+    color: var(--color-laiton);
+  }
+  .takeaway__title {
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: var(--color-creme);
+  }
+  .takeaway__text {
+    max-width: 60ch;
+    margin: 0.6rem 0 1rem;
+    color: rgb(236 232 222 / 0.8);
+  }
+
+  @media (min-width: 1024px) {
+    .ardoise__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: center;
+    }
+    .takeaway { grid-column: 1 / -1; }
+    .board { rotate: -0.6deg; }
+  }
+</style>

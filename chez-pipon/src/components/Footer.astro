@@ -1,0 +1,179 @@
+---
+import Wordmark from './Wordmark.astro';
+import Icon from './Icon.astro';
+import Button from './Button.astro';
+import { ADDRESS, CONTACT, LEGAL, MAPS, NAV, SITE } from '../data/site';
+import { weekRows } from '../lib/hours';
+
+const rows = weekRows();
+const year = new Date().getFullYear();
+---
+<footer class="footer on-dark grain">
+  <div class="container-page">
+    <div class="footer__top">
+      <a href="/" class="footer__brand" aria-label="Chez Pipon — retour en haut de l’accueil">
+        <Wordmark class="text-[clamp(3rem,2rem+5vw,6.5rem)]" />
+      </a>
+      <p class="footer__tagline">
+        Cuisine maison, produits frais, locaux et de saison. {ADDRESS.situation}, à Lorient.
+      </p>
+    </div>
+
+    <div class="footer__rule double-rule" aria-hidden="true"></div>
+
+    <div class="footer__grid">
+      <div>
+        <h2 id="f-adresse" class="footer__title">Adresse</h2>
+        <address class="not-italic">
+          {SITE.name}<br />
+          {ADDRESS.street}<br />
+          {ADDRESS.postalCode} {ADDRESS.city}
+        </address>
+        <a class="footer__link" href={MAPS.google} target="_blank" rel="noopener">
+          Itinéraire <Icon name="external" class="h-3.5 w-3.5" /><span class="sr-only"> (Google Maps, nouvel onglet)</span>
+        </a>
+      </div>
+
+      <div>
+        <h2 id="f-horaires" class="footer__title">Horaires</h2>
+        <dl class="footer__hours">
+          {
+            rows.map((row) => (
+              <div class:list={['footer__hour', !row.services.length && 'is-closed']} data-day={row.day}>
+                <dt>{row.name}</dt>
+                <dd>{row.text}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+
+      <div>
+        <h2 id="f-contact" class="footer__title">Contact</h2>
+        <ul class="footer__list">
+          <li>
+            <a class="footer__link" href={CONTACT.phoneHref}><Icon name="phone" class="h-4 w-4" /> {CONTACT.phoneDisplay}</a>
+          </li>
+          <li>
+            <a class="footer__link" href={CONTACT.instagramUrl} target="_blank" rel="noopener">
+              <Icon name="instagram" class="h-4 w-4" /> @{CONTACT.instagramHandle}<span class="sr-only"> (nouvel onglet)</span>
+            </a>
+          </li>
+        </ul>
+        <Button href="/#reserver" variant="brass" size="sm" arrow class="mt-5">Réserver une table</Button>
+      </div>
+
+      <nav aria-labelledby="f-nav">
+        <h2 id="f-nav" class="footer__title">Sur le site</h2>
+        <ul class="footer__list">
+          {NAV.map((item) => (
+            <li><a class="footer__link" href={item.href}>{item.label}</a></li>
+          ))}
+          <li><a class="footer__link" href="/mentions-legales">Mentions légales</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {year} {SITE.name} — {LEGAL.company}, {LEGAL.form}</p>
+      <p>
+        <a href="/mentions-legales">Mentions légales</a>
+        <span aria-hidden="true"> · </span>
+        Site conçu par <a href={LEGAL.design.url} target="_blank" rel="noopener">{LEGAL.design.name}<span class="sr-only"> (nouvel onglet)</span></a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(4rem, 3rem + 4vw, 7rem) calc(6.5rem + env(safe-area-inset-bottom));
+    background: var(--color-vert-950);
+    color: var(--color-craie);
+  }
+  .footer.grain::after { mix-blend-mode: soft-light; opacity: 0.18; }
+
+  .footer__top {
+    display: grid;
+    gap: 1.25rem;
+    align-items: end;
+  }
+  .footer__brand {
+    color: var(--color-laiton);
+    text-decoration: none;
+    width: fit-content;
+  }
+  .footer__tagline {
+    max-width: 34ch;
+    margin: 0;
+    color: var(--color-craie-soft);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+  .footer__rule { margin-block: clamp(2.5rem, 2rem + 2vw, 4rem); color: var(--color-laiton); }
+
+  .footer__grid {
+    display: grid;
+    gap: 2.5rem 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  }
+  .footer__title {
+    margin: 0 0 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-laiton);
+  }
+  .footer address { line-height: 1.7; margin-bottom: 0.75rem; }
+  .footer__list {
+    display: grid;
+    gap: 0.35rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .footer__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.25rem;
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+  .footer__link:hover { color: var(--color-laiton-soft); }
+
+  .footer__hours { margin: 0; display: grid; gap: 0.3rem; font-size: 0.95rem; }
+  .footer__hour { display: flex; justify-content: space-between; gap: 1rem; }
+  .footer__hour dt { font-weight: 500; }
+  .footer__hour dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .footer__hour.is-closed { color: var(--color-craie-soft); }
+  .footer__hour.is-today { color: var(--color-laiton-soft); }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+    margin-top: clamp(3rem, 2rem + 3vw, 5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(236 232 222 / 0.12);
+    font-size: 0.85rem;
+    color: var(--color-craie-soft);
+  }
+  .footer__bottom p { margin: 0; }
+  .footer__bottom a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .footer__bottom a:hover { color: var(--color-craie); }
+
+  @media (min-width: 768px) {
+    .footer { padding-bottom: clamp(3rem, 2rem + 2vw, 4rem); }
+    .footer__top { grid-template-columns: auto 1fr; gap: 3rem; }
+    .footer__tagline { justify-self: end; text-align: right; }
+  }
+</style>

@@ -1,0 +1,27 @@
+---
+import { hoursSummary } from '../lib/hours';
+
+/**
+ * Live "open now" indicator. The static HTML can't know the time of the
+ * visit, so it ships the weekly summary; scripts/status.ts fills in the
+ * real state (Europe/Paris) on load and every minute after.
+ */
+interface Props {
+  class?: string;
+  /** "full": "Ouvert · Service du midi jusqu'à 15h" — "short": "Ouvert · jusqu'à 15h" */
+  variant?: 'full' | 'short';
+}
+const { class: className, variant = 'full' } = Astro.props;
+---
+<p class:list={['status', className]} data-status data-status-variant={variant}>
+  <span class="status__dot" aria-hidden="true"></span>
+  <span>
+    <span data-status-label>Horaires</span><span class="status__detail" data-status-detail>
+      {variant === 'full' && ` · ${hoursSummary().toLowerCase()}`}</span
+    >
+  </span>
+</p>
+
+<style>
+  .status__detail { opacity: 0.86; font-weight: 500; }
+</style>

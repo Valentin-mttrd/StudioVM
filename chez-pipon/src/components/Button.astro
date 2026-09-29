@@ -1,0 +1,67 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+/**
+ * One button for the whole site. States (hover glint, press, focus,
+ * disabled) live in global.css (.btn).
+ *
+ *   primary   bottle green — the main action of a block
+ *   brass     gilded — the main action on green grounds
+ *   accent    potimarron — reserved for the booking flow
+ *   ghost / ghost-light   secondary actions on light / dark grounds
+ */
+type Variant = 'primary' | 'brass' | 'accent' | 'ghost' | 'ghost-light';
+
+interface Props {
+  href?: string;
+  variant?: Variant;
+  icon?: IconName;
+  /** Trailing arrow; nudges on hover. */
+  arrow?: boolean | 'external';
+  size?: 'md' | 'sm';
+  block?: boolean;
+  class?: string;
+  type?: 'button' | 'submit';
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  variant = 'primary',
+  icon,
+  arrow = false,
+  size = 'md',
+  block = false,
+  class: className,
+  type = 'button',
+  ...rest
+} = Astro.props;
+
+const Tag = href ? 'a' : 'button';
+const external = href?.startsWith('http');
+---
+<Tag
+  href={href}
+  type={href ? undefined : type}
+  class:list={[
+    'btn',
+    variant !== 'primary' && `btn--${variant}`,
+    size === 'sm' && 'btn--sm',
+    block && 'btn--block',
+    className,
+  ]}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener' : undefined}
+  {...rest}
+>
+  {icon && <span class="btn__icon"><Icon name={icon} class="h-[1.1rem] w-[1.1rem]" stroke={1.7} /></span>}
+  <span><slot /></span>
+  {
+    arrow && (
+      <span class:list={['btn__icon', arrow === true && 'btn__icon--arrow']}>
+        <Icon name={arrow === 'external' ? 'external' : 'arrow'} class="h-4 w-4" stroke={1.7} />
+      </span>
+    )
+  }
+  {external && <span class="sr-only"> (nouvel onglet)</span>}
+</Tag>

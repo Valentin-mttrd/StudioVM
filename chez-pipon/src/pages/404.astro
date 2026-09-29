@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import { CONTACT } from '../data/site';
+---
+<Layout title="Page introuvable" description="Cette page n’existe pas ou plus." noindex>
+  <section class="notfound grain">
+    <div class="container-page notfound__inner">
+      <p class="eyebrow text-vert-700">Erreur 404</p>
+      <h1 class="notfound__title">Cette page n’est plus <em>à l’ardoise.</em></h1>
+      <p class="notfound__text">
+        Comme nos plats, elle a peut-être changé. Revenez à l’accueil, ou appelez-nous au
+        <a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a>.
+      </p>
+      <div class="notfound__ctas">
+        <Button href="/" arrow>Retour à l’accueil</Button>
+        <Button href="/#reserver" variant="ghost">Réserver une table</Button>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .notfound {
+    min-height: 80svh;
+    display: grid;
+    align-items: center;
+    padding-block: calc(var(--header-h) + 4rem) 5rem;
+    background: var(--color-creme);
+  }
+  .notfound__title {
+    max-width: 16ch;
+    margin: 1.25rem 0 0;
+    font-size: var(--text-display-xl);
+    line-height: var(--text-display-xl--line-height);
+    letter-spacing: var(--text-display-xl--letter-spacing);
+    font-weight: 380;
+  }
+  .notfound__title em { font-style: italic; color: var(--color-vert-700); }
+  .notfound__text { max-width: 44ch; margin: 1.5rem 0 0; font-size: var(--text-lead); color: var(--color-encre-soft); }
+  .notfound__text a { color: var(--color-vert-700); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  .notfound__ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+</style>

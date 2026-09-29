@@ -1,0 +1,77 @@
+---
+import Icon from './Icon.astro';
+import { CONTACT, MAPS } from '../data/site';
+
+/**
+ * Thumb-reach actions on phones: call, get directions, book. Shows once the
+ * hero (which has its own buttons) is out of view and hides over the
+ * booking section itself (scripts/header.ts).
+ */
+---
+<nav class="mbar on-dark" aria-label="Actions rapides" data-mbar>
+  <a href={CONTACT.phoneHref} class="mbar__item">
+    <Icon name="phone" class="h-5 w-5" />
+    <span>Appeler</span>
+  </a>
+  <a href={MAPS.google} class="mbar__item" target="_blank" rel="noopener">
+    <Icon name="pin" class="h-5 w-5" />
+    <span>Itinéraire<span class="sr-only"> (Google Maps, nouvel onglet)</span></span>
+  </a>
+  <a href="/#reserver" class="mbar__item mbar__item--main">
+    <span>Réserver</span>
+    <Icon name="arrow" class="h-4 w-4" />
+  </a>
+</nav>
+
+<style>
+  .mbar {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    z-index: 40;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.35fr;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    border-radius: 1.1rem;
+    background: rgb(20 42 32 / 0.92);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    box-shadow: 0 18px 40px -16px rgb(15 31 24 / 0.6), inset 0 0 0 1px rgb(207 171 105 / 0.18);
+    color: var(--color-creme);
+    translate: 0 calc(100% + 1.5rem);
+    transition: translate var(--duration-slow) var(--ease-out);
+  }
+  .mbar[data-visible] { translate: 0 0; }
+
+  .mbar__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    min-height: 3.35rem;
+    border-radius: 0.8rem;
+    color: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    transition: background-color var(--duration-fast) var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mbar__item:active { background: rgb(236 232 222 / 0.1); }
+  .mbar__item--main {
+    flex-direction: row;
+    gap: 0.5rem;
+    background: var(--color-laiton);
+    color: var(--color-vert-950);
+    font-size: 0.95rem;
+  }
+  .mbar__item--main:active { background: var(--color-laiton-soft); }
+
+  @media (min-width: 768px) {
+    .mbar { display: none; }
+  }
+</style>

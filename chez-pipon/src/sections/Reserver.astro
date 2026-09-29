@@ -1,0 +1,413 @@
+---
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+import Status from '../components/Status.astro';
+import { CONTACT } from '../data/site';
+
+/**
+ * Booking. Chez Pipon takes reservations by phone and by Instagram message
+ * (local press, tourist office) — there is no online booking system, and
+ * the site doesn't pretend otherwise. The helper (scripts/booking.ts) only
+ * lists services the restaurant is actually open for, writes the message,
+ * and hands it to one of those two real channels. Nothing is sent from the
+ * site and no data is stored.
+ */
+---
+<section id="reserver" class="reserve on-dark section-y" aria-labelledby="reserve-title">
+  <div class="container-page reserve__grid">
+    <div class="reserve__intro">
+      <p class="eyebrow text-laiton" data-reveal>Réservation</p>
+      <h2 id="reserve-title" class="reserve__title" data-reveal>Réserver une table</h2>
+      <p class="reserve__lead" data-reveal>
+        Le midi, la salle se remplit vite&nbsp;: mieux vaut réserver. Deux façons simples, un appel ou un message sur
+        Instagram.
+      </p>
+
+      <div class="reserve__phone-block" data-reveal>
+        <p class="reserve__label">Par téléphone</p>
+        <a href={CONTACT.phoneHref} class="reserve__phone">{CONTACT.phoneDisplay}</a>
+        <Status class="text-craie mt-3" />
+      </div>
+
+      <div class="reserve__ctas" data-reveal>
+        <Button href={CONTACT.phoneHref} variant="brass" icon="phone">Appeler</Button>
+        <Button href={CONTACT.instagramDmUrl} variant="ghost-light" icon="instagram" arrow="external">
+          Écrire sur Instagram
+        </Button>
+      </div>
+    </div>
+
+    <div class="booking-wrap" data-reveal>
+      <!-- Without JavaScript the two channels above are all that's needed. -->
+      <form class="booking" data-booking hidden novalidate aria-labelledby="booking-title">
+        <div class="booking__head">
+          <h3 id="booking-title" class="booking__title">Préparer ma demande</h3>
+          <p class="booking__intro">
+            Trois choix, et votre message est prêt à envoyer. La table n’est réservée qu’une fois votre demande confirmée
+            par le restaurant.
+          </p>
+        </div>
+
+        <fieldset class="field">
+          <legend class="field__label"><span class="field__step">1</span> Quel service&nbsp;?</legend>
+          <div class="chips chips--slots" data-slots></div>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend class="field__label"><span class="field__step">2</span> Arrivée vers…</legend>
+          <div class="chips" data-times></div>
+        </fieldset>
+
+        <div class="field field--row">
+          <div>
+            <p class="field__label" id="party-label"><span class="field__step">3</span> Combien de couverts&nbsp;?</p>
+            <div class="stepper" role="group" aria-labelledby="party-label">
+              <button type="button" class="stepper__btn" data-party="-1" aria-label="Un couvert de moins">
+                <Icon name="minus" class="h-4 w-4" />
+              </button>
+              <output class="stepper__value" data-party-value aria-live="polite">2</output>
+              <button type="button" class="stepper__btn" data-party="1" aria-label="Un couvert de plus">
+                <Icon name="plus" class="h-4 w-4" />
+              </button>
+            </div>
+            <p class="field__hint" data-party-hint hidden>Pour une grande tablée, le plus simple est d’appeler.</p>
+          </div>
+
+          <div class="field__grow">
+            <label class="field__label" for="booking-name">Au nom de</label>
+            <input
+              id="booking-name"
+              class="input"
+              name="name"
+              type="text"
+              autocomplete="name"
+              required
+              maxlength="60"
+              placeholder="Votre nom"
+              aria-describedby="booking-name-error"
+            />
+            <p id="booking-name-error" class="field__error" data-name-error hidden>
+              Indiquez un nom pour la réservation.
+            </p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="booking-note">Une précision&nbsp;? <span class="field__optional">facultatif</span></label>
+          <input
+            id="booking-note"
+            class="input"
+            name="note"
+            type="text"
+            maxlength="140"
+            placeholder="Allergie, poussette, occasion particulière…"
+          />
+        </div>
+
+        <div class="ticket" aria-labelledby="ticket-label">
+          <p class="ticket__label" id="ticket-label">Votre message</p>
+          <p class="ticket__text" data-message></p>
+        </div>
+
+        <div class="booking__actions">
+          <a
+            href={CONTACT.instagramDmUrl}
+            class="btn btn--accent btn--block"
+            target="_blank"
+            rel="noopener"
+            data-send-instagram
+          >
+            <span class="btn__icon"><Icon name="instagram" class="h-[1.1rem] w-[1.1rem]" stroke={1.7} /></span>
+            <span>Copier et envoyer sur Instagram</span>
+            <span class="sr-only"> (ouvre Instagram dans un nouvel onglet)</span>
+          </a>
+          <div class="booking__secondary">
+            <button type="button" class="btn btn--ghost btn--sm" data-copy>
+              <span class="btn__icon"><Icon name="copy" class="h-4 w-4" /></span>
+              <span>Copier le message</span>
+            </button>
+            <a href={CONTACT.phoneHref} class="btn btn--ghost btn--sm">
+              <span class="btn__icon"><Icon name="phone" class="h-4 w-4" /></span>
+              <span>Appeler plutôt</span>
+            </a>
+          </div>
+        </div>
+
+        <p class="booking__toast" data-toast role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .reserve__grid > * { min-width: 0; }
+  .reserve {
+    position: relative;
+    z-index: 1;
+    background:
+      radial-gradient(60% 70% at 100% 0%, rgb(45 88 69 / 0.55), transparent 70%),
+      radial-gradient(50% 50% at 0% 100%, rgb(201 103 47 / 0.12), transparent 70%),
+      var(--color-vert-800);
+    color: var(--color-craie);
+  }
+  .reserve__grid {
+    display: grid;
+    gap: clamp(3rem, 2rem + 4vw, 5rem);
+  }
+
+  .reserve__title {
+    margin: 1.25rem 0 0;
+    font-size: var(--text-display-xl);
+    line-height: var(--text-display-xl--line-height);
+    letter-spacing: var(--text-display-xl--letter-spacing);
+    font-weight: 380;
+    color: var(--color-creme);
+  }
+  .reserve__lead {
+    max-width: 40ch;
+    margin: 1.5rem 0 0;
+    font-size: var(--text-lead);
+    line-height: 1.55;
+    color: rgb(236 232 222 / 0.82);
+  }
+
+  .reserve__phone-block {
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(207 171 105 / 0.3);
+  }
+  .reserve__label {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-laiton);
+  }
+  .reserve__phone {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: clamp(2.3rem, 1.6rem + 3vw, 4.2rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-variant-numeric: lining-nums;
+    color: var(--color-creme);
+    text-decoration: none;
+    background: linear-gradient(var(--color-laiton), var(--color-laiton)) 0 100% / 0% 2px no-repeat;
+    transition: background-size var(--duration-slow) var(--ease-out), color var(--duration-base) var(--ease-out);
+  }
+  .reserve__phone:hover { background-size: 100% 2px; color: var(--color-laiton-soft); }
+
+  .reserve__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  /* ---- Helper card ------------------------------------------------------- */
+  .booking {
+    display: grid;
+    gap: 1.6rem;
+    padding: clamp(1.4rem, 1rem + 2vw, 2.5rem);
+    border-radius: 8px;
+    background: var(--color-lin);
+    color: var(--color-encre);
+    box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.7);
+  }
+  .booking[hidden] { display: none; }
+  .booking :focus-visible { outline-color: var(--color-potimarron); }
+
+  .booking__title {
+    margin: 0;
+    font-size: var(--text-display-sm);
+    line-height: 1.2;
+    font-weight: 450;
+  }
+  .booking__intro {
+    margin: 0.5rem 0 0;
+    font-size: 0.92rem;
+    color: var(--color-encre-mute);
+  }
+
+  .field { margin: 0; padding: 0; border: 0; min-width: 0; }
+  .field__label {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .field__step {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--color-vert-700);
+    color: var(--color-creme);
+    font-size: 0.75rem;
+  }
+  .field__optional { font-weight: 400; color: var(--color-encre-mute); font-size: 0.85rem; }
+  .field__hint { margin: 0.6rem 0 0; font-size: 0.85rem; color: var(--color-potimarron-deep); }
+  .field__error { margin: 0.5rem 0 0; font-size: 0.85rem; font-weight: 600; color: #a3321a; }
+  .field--row { display: grid; gap: 1.6rem; }
+
+  /* Chips (radio options) */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .chips--slots {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    margin-inline: -0.25rem;
+    padding: 0.25rem 0.25rem 0.6rem;
+    scrollbar-width: thin;
+  }
+  .chips :global(.chip) {
+    position: relative;
+    flex: none;
+    scroll-snap-align: start;
+  }
+  .chips :global(.chip input) {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .chips :global(.chip span) {
+    display: grid;
+    gap: 0.1rem;
+    min-height: 2.75rem;
+    align-content: center;
+    padding: 0.55rem 0.95rem;
+    border: 1px solid rgb(27 29 26 / 0.18);
+    border-radius: 10px;
+    background: var(--color-creme);
+    font-size: 0.9rem;
+    line-height: 1.2;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+  .chips :global(.chip small) {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .chips :global(.chip:hover span) { border-color: rgb(27 29 26 / 0.45); }
+  .chips :global(.chip input:checked + span) {
+    background: var(--color-vert-700);
+    border-color: var(--color-vert-700);
+    color: var(--color-creme);
+  }
+  .chips :global(.chip input:focus-visible + span) {
+    outline: 2px solid var(--color-potimarron);
+    outline-offset: 2px;
+  }
+
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid rgb(27 29 26 / 0.18);
+    border-radius: var(--radius-pill);
+    background: var(--color-creme);
+  }
+  .stepper__btn {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-encre);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+  .stepper__btn:hover { background: rgb(27 29 26 / 0.07); }
+  .stepper__btn:disabled { opacity: 0.3; cursor: not-allowed; background: none; }
+  .stepper__value {
+    min-width: 2.4rem;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid rgb(27 29 26 / 0.22);
+    border-radius: 10px;
+    background: var(--color-creme);
+    color: var(--color-encre);
+    font: inherit;
+    font-size: 1rem;
+    transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  }
+  .input::placeholder { color: var(--color-encre-mute); opacity: 0.8; }
+  .input:hover { border-color: rgb(27 29 26 / 0.4); }
+  .input:focus { outline: none; border-color: var(--color-vert-700); box-shadow: 0 0 0 3px rgb(34 68 53 / 0.18); }
+  .input[aria-invalid="true"] { border-color: #a3321a; box-shadow: 0 0 0 3px rgb(163 50 26 / 0.12); }
+
+  /* The message, as an order ticket */
+  .ticket {
+    position: relative;
+    padding: 1.1rem 1.25rem 1.25rem;
+    border-radius: 4px;
+    background: var(--color-creme);
+    box-shadow: inset 0 0 0 1px rgb(27 29 26 / 0.1);
+    background-image: linear-gradient(90deg, rgb(27 29 26 / 0.18) 50%, transparent 50%);
+    background-size: 10px 1px;
+    background-repeat: repeat-x;
+    background-position: 0 0;
+  }
+  .ticket__label {
+    margin: 0 0 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-encre-mute);
+  }
+  .ticket__text {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+
+  .booking__actions { display: grid; gap: 0.6rem; }
+  .booking__secondary { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .booking__secondary :global(.btn) { flex: 1 1 auto; }
+
+  .booking__toast {
+    margin: 0;
+    min-height: 1.4em;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-vert-700);
+  }
+
+  @media (min-width: 640px) {
+    .field--row { grid-template-columns: auto 1fr; align-items: start; }
+  }
+  @media (min-width: 1024px) {
+    .reserve__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: start; }
+    .reserve__intro { position: sticky; top: calc(var(--header-h) + 2rem); }
+  }
+</style>

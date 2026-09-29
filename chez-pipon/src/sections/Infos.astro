@@ -1,0 +1,316 @@
+---
+import Icon from '../components/Icon.astro';
+import Status from '../components/Status.astro';
+import Button from '../components/Button.astro';
+import { ACCESS, ADDRESS, HOURS_NOTE, MAPS, MENU, SITE, TAKEAWAY } from '../data/site';
+import { formatService, weekRows } from '../lib/hours';
+
+const rows = weekRows();
+---
+<section id="infos" class="infos section-y" aria-labelledby="infos-title">
+  <div class="container-page">
+    <header class="infos__head">
+      <p class="eyebrow text-vert-700" data-reveal>Infos pratiques</p>
+      <h2 id="infos-title" class="infos__title" data-reveal>Venir Chez Pipon</h2>
+    </header>
+
+    <div class="infos__grid">
+      <!-- Hours ----------------------------------------------------------- -->
+      <section class="card card--hours" aria-labelledby="hours-title" data-reveal data-reveal-group="cards">
+        <div class="card__top">
+          <h3 id="hours-title" class="card__title"><Icon name="clock" /> Horaires</h3>
+          <Status class="card__status" />
+        </div>
+        <dl class="hours">
+          {
+            rows.map((row) => (
+              <div class:list={['hours__row', !row.services.length && 'is-closed']} data-day={row.day}>
+                <dt>{row.name}</dt>
+                <span class="leader" aria-hidden="true" />
+                <dd>
+                  {row.services.length
+                    ? row.services.map((s, i) => (
+                        <>
+                          {i > 0 && <span class="hours__sep"> · </span>}
+                          <span class="hours__service">
+                            <span class="sr-only">{s.name} : </span>
+                            {formatService(s)}
+                          </span>
+                        </>
+                      ))
+                    : 'Fermé'}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p class="card__note">{HOURS_NOTE}</p>
+      </section>
+
+      <!-- Address & map ---------------------------------------------------- -->
+      <section class="card card--map" aria-labelledby="address-title" data-reveal data-reveal-group="cards">
+        <h3 id="address-title" class="card__title"><Icon name="pin" /> Adresse</h3>
+        <address class="address">
+          <span class="address__name">{SITE.name}</span>
+          {ADDRESS.street}<br />
+          {ADDRESS.postalCode} {ADDRESS.city}
+        </address>
+        <p class="card__muted">{ADDRESS.situation}.</p>
+
+        <div class="map" data-map data-src={MAPS.embed}>
+          <div class="map__placeholder">
+            <span class="map__pin" aria-hidden="true"><Icon name="pin" class="h-7 w-7" /></span>
+            <p class="map__text">
+              La carte est fournie par Google Maps&nbsp;: elle ne se charge que si vous le demandez.
+            </p>
+            <button type="button" class="btn btn--ghost btn--sm" data-map-load>Afficher la carte</button>
+          </div>
+        </div>
+
+        <ul class="routes" aria-label="Itinéraire">
+          <li><a href={MAPS.google} target="_blank" rel="noopener">Google Maps<span class="sr-only"> (nouvel onglet)</span></a></li>
+          <li><a href={MAPS.apple} target="_blank" rel="noopener">Plans<span class="sr-only"> (Apple, nouvel onglet)</span></a></li>
+          <li><a href={MAPS.waze} target="_blank" rel="noopener">Waze<span class="sr-only"> (nouvel onglet)</span></a></li>
+        </ul>
+      </section>
+
+      <!-- Access ---------------------------------------------------------- -->
+      <section class="card card--access" aria-labelledby="access-title" data-reveal data-reveal-group="cards">
+        <h3 id="access-title" class="card__title"><Icon name="door" /> Accès</h3>
+        <ul class="access">
+          <li><Icon name="bus" class="access__icon" /><span><strong>En bus</strong> — {ACCESS.bus}.</span></li>
+          <li><Icon name="parking" class="access__icon" /><span><strong>En voiture</strong> — {ACCESS.parking}.</span></li>
+          <li><Icon name="step" class="access__icon" /><span><strong>À l’entrée</strong> — {ACCESS.step} ; {ACCESS.entrance.charAt(0).toLowerCase() + ACCESS.entrance.slice(1)}.</span></li>
+        </ul>
+        <a class="tlink text-sm text-vert-700" href={ACCESS.sourceUrl} target="_blank" rel="noopener">
+          {ACCESS.sourceLabel} (accessibilité)
+          <Icon name="external" class="tlink__arrow" /><span class="sr-only"> (nouvel onglet)</span>
+        </a>
+      </section>
+
+      <!-- Good to know ------------------------------------------------------ -->
+      <section class="card card--know" aria-labelledby="know-title" data-reveal data-reveal-group="cards">
+        <h3 id="know-title" class="card__title"><Icon name="euro" /> Bon à savoir</h3>
+        <dl class="know">
+          <div class="know__row">
+            <dt>{MENU.lunchSet.label}</dt>
+            <span class="leader" aria-hidden="true"></span>
+            <dd>{MENU.lunchSet.price}</dd>
+          </div>
+          <div class="know__row">
+            <dt>Budget par personne</dt>
+            <span class="leader" aria-hidden="true"></span>
+            <dd>{MENU.budget}</dd>
+          </div>
+        </dl>
+        <ul class="know__list">
+          <li>Prix {MENU.budgetNote} ; formule {MENU.lunchSet.when}.</li>
+          <li>Une option végétarienne parmi les plats, chaque jour.</li>
+          <li>À emporter en boîte en verre consignée ({TAKEAWAY.network}).</li>
+          <li>Le midi, la salle se remplit vite&nbsp;: pensez à réserver.</li>
+        </ul>
+        <Button href="#reserver" variant="primary" arrow block>Réserver une table</Button>
+      </section>
+    </div>
+  </div>
+</section>
+
+<style>
+  .infos {
+    position: relative;
+    z-index: 1;
+    background: var(--color-lin);
+  }
+  .infos__title {
+    margin: 1.25rem 0 0;
+    font-size: var(--text-display-lg);
+    line-height: var(--text-display-lg--line-height);
+    letter-spacing: var(--text-display-lg--letter-spacing);
+    font-weight: 380;
+  }
+
+  .infos__grid {
+    display: grid;
+    gap: clamp(1rem, 0.75rem + 1vw, 1.5rem);
+    margin-top: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+  }
+
+  .card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: clamp(1.5rem, 1.1rem + 1.6vw, 2.5rem);
+    border-radius: var(--radius-card);
+    background: var(--color-creme);
+    box-shadow: inset 0 0 0 1px rgb(27 29 26 / 0.08);
+  }
+  .card__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+  }
+  .card__title {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 450;
+    line-height: 1.15;
+  }
+  .card__title :global(svg) { width: 1.3rem; height: 1.3rem; color: var(--color-vert-600); }
+  .card__top :global(.card__status) { color: var(--color-encre); }
+  .card__note, .card__muted {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--color-encre-mute);
+  }
+
+  /* Hours as a menu card: day ........ time */
+  .hours { margin: 0; display: grid; gap: 0.1rem; }
+  .hours__row {
+    display: flex;
+    align-items: baseline;
+    padding: 0.55rem 0.75rem;
+    margin-inline: -0.75rem;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .hours__row dt { font-weight: 500; }
+  .hours__row dd { margin: 0; text-align: right; }
+  .hours__row :global(.leader) { min-width: 0.75rem; }
+  .hours__row.is-closed { color: var(--color-encre-mute); }
+  .hours__row.is-today {
+    background: rgb(34 68 53 / 0.08);
+    color: var(--color-vert-700);
+    font-weight: 600;
+  }
+  .hours__row.is-today dt::after {
+    content: "aujourd’hui";
+    margin-left: 0.6rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-vert-700);
+    color: var(--color-creme);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    vertical-align: 0.1em;
+  }
+
+  .address {
+    font-style: normal;
+    font-size: 1.15rem;
+    line-height: 1.5;
+  }
+  .address__name {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+  }
+
+  .map {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: 4px;
+    overflow: hidden;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 27px, rgb(27 29 26 / 0.05) 27px 28px),
+      repeating-linear-gradient(90deg, transparent 0 27px, rgb(27 29 26 / 0.05) 27px 28px),
+      var(--color-creme-200);
+  }
+  .map :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .map__placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.9rem;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .map__pin { color: var(--color-potimarron-deep); }
+  .map__text { max-width: 30ch; margin: 0; font-size: 0.88rem; color: var(--color-encre-soft); }
+
+  .routes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .routes a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.6rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgb(27 29 26 / 0.2);
+    color: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+  }
+  .routes a:hover { background: rgb(27 29 26 / 0.05); border-color: rgb(27 29 26 / 0.4); }
+
+  .access { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+  .access li { display: grid; grid-template-columns: auto 1fr; gap: 0.85rem; }
+  .access :global(.access__icon) { width: 1.35rem; height: 1.35rem; color: var(--color-vert-600); margin-top: 0.1rem; }
+  .access strong { font-weight: 600; }
+
+  .know { margin: 0; display: grid; gap: 0.4rem; }
+  .know__row { display: flex; align-items: baseline; font-size: 1.05rem; }
+  .know__row dd {
+    margin: 0;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    color: var(--color-vert-700);
+  }
+  .know__list {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0 0 0.5rem;
+    padding: 0;
+    list-style: none;
+    color: var(--color-encre-soft);
+  }
+  .know__list li { position: relative; padding-left: 1.2rem; }
+  .know__list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.45rem;
+    height: 1px;
+    background: var(--color-potimarron);
+  }
+  .card--know :global(.btn) { margin-top: auto; }
+
+  @media (min-width: 768px) {
+    .infos__grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (min-width: 1200px) {
+    .infos__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+    .card--hours { grid-column: span 5; }
+    .card--map { grid-column: span 7; grid-row: span 2; }
+    .card--access { grid-column: span 5; }
+    .card--know {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: auto minmax(21rem, 1fr) minmax(0, 1.2fr) auto;
+      align-items: center;
+      gap: 2rem 3rem;
+    }
+    .card--map .map { flex: 1 1 auto; aspect-ratio: auto; min-height: 18rem; }
+    .card--know :global(.btn) { margin-top: 0; width: auto; }
+  }
+</style>

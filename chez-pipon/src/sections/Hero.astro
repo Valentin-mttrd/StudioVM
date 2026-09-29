@@ -1,0 +1,536 @@
+---
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+import Status from '../components/Status.astro';
+import { ADDRESS, AWARDS, MENU } from '../data/site';
+import { hoursSummary } from '../lib/hours';
+
+/**
+ * The storefront. Gault&Millau describes "a corner restaurant with a large
+ * green, glazed shopfront": the hero IS that shopfront — the fascia with
+ * its gilded sign (the H1), glass bays lit from inside, and on the door
+ * the sign every passer-by reads first, here live: open or closed now.
+ */
+---
+<section class="hero on-dark" aria-labelledby="hero-title" data-hero>
+  <div class="hero__facade" data-glass>
+    <div class="hero__fascia">
+      <h1 id="hero-title" class="hero__sign">
+        <span class="hero__sign-side">Restaurant</span>
+        <span class="hero__sign-name">
+          <span class="gild gild--italic">Chez</span>
+          <span class="gild">PiPon</span>
+        </span>
+        <span class="hero__sign-side">{ADDRESS.city}</span>
+      </h1>
+    </div>
+
+    <div class="hero__bays">
+      <div class="pane pane--transom" aria-hidden="true">
+        <span class="pane__glass"></span>
+        <span class="pane__lettering">Cuisine maison · Produits frais, locaux &amp; de saison</span>
+      </div>
+      <div class="pane pane--transom pane--door-transom" aria-hidden="true">
+        <span class="pane__glass"></span>
+      </div>
+
+      <div class="pane pane--main">
+        <span class="pane__glass" aria-hidden="true"></span>
+        <div class="pane__content">
+          <p class="hero__lead">Une carte courte, qui change avec les arrivages.</p>
+          <p class="hero__text">
+            Cuisine créative et faite maison, à partir de produits frais, locaux et de saison&nbsp;: deux entrées, trois
+            plats dont un végétarien, deux desserts.
+          </p>
+          <p class="hero__price">
+            <span>{MENU.lunchSet.label}<span class="hero__price-when">, {MENU.lunchSet.when}</span></span>
+            <span class="leader" aria-hidden="true"></span>
+            <strong>{MENU.lunchSet.price}</strong>
+          </p>
+
+          <div class="hero__ctas">
+            <Button href="#reserver" variant="brass" arrow>Réserver une table</Button>
+            <Button href="#ardoise" variant="ghost-light">Découvrir l’ardoise</Button>
+          </div>
+
+          <Status class="hero__status-mobile" />
+
+          <div class="hero__proofs">
+            <p class="proof__source" id="hero-awards">{AWARDS[0].source} 2026</p>
+            <ul aria-labelledby="hero-awards">
+              {
+                AWARDS.map((award) => (
+                  <li class="proof">
+                    <span class="proof__mark" aria-hidden="true">✦</span>
+                    {award.title}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pane pane--door">
+        <span class="pane__glass" aria-hidden="true"></span>
+        <a href="#infos" class="door-sign" data-status data-door-sign>
+          <span class="door-sign__nail" aria-hidden="true"></span>
+          <span class="door-sign__strings" aria-hidden="true"></span>
+          <span class="door-sign__card">
+            <span class="door-sign__over">Aujourd’hui</span>
+            <span class="door-sign__label" data-status-label>Bienvenue</span>
+            <span class="door-sign__detail" data-status-detail>{hoursSummary()}</span>
+          </span>
+          <span class="sr-only"> — voir les horaires</span>
+        </a>
+        <span class="door__handle" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="hero__sill">
+      <p class="hero__sill-item"><Icon name="pin" class="h-4 w-4" /> {ADDRESS.street}, {ADDRESS.city}</p>
+      <p class="hero__sill-item hero__sill-hours"><Icon name="clock" class="h-4 w-4" /> {hoursSummary()}</p>
+      <a href="#cuisine" class="hero__enter">
+        Entrer <Icon name="down" class="h-4 w-4" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    --frame: var(--color-vert-800);
+    --mullion: clamp(6px, 0.8vw, 12px);
+    position: relative;
+    z-index: 0;
+    background:
+      linear-gradient(90deg, rgb(0 0 0 / 0.18), transparent 12%, transparent 88%, rgb(0 0 0 / 0.18)),
+      var(--frame);
+    color: var(--color-creme);
+  }
+
+  /* The shopfront sits on the same grid as the header and the sections. */
+  .hero__facade {
+    --gx: 0;
+    --gy: 0;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100svh;
+    max-width: var(--container-page);
+    margin-inline: auto;
+    padding: calc(var(--header-h) + 0.25rem) var(--gutter) 0;
+  }
+
+  /* ---- Fascia & gilded sign -------------------------------------------- */
+  .hero__fascia {
+    position: relative;
+    padding-block: clamp(0.5rem, 1.6svh, 1.75rem) clamp(0.9rem, 2.4svh, 2rem);
+  }
+  .hero__fascia::after {
+    /* brass fillet under the sign */
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.45rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(207 171 105 / 0.55) 15%, rgb(207 171 105 / 0.55) 85%, transparent);
+  }
+
+  .hero__sign {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    text-align: center;
+  }
+  .hero__sign-side {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--color-laiton);
+    padding-left: 0.34em;
+  }
+  .hero__sign-side:last-child { display: none; }
+  .hero__sign-name {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.16em;
+    font-size: clamp(3.6rem, min(1.4rem + 9vw, 15svh), 10rem);
+    font-weight: 450;
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+    font-variation-settings: "opsz" 144;
+  }
+
+  .gild {
+    background: linear-gradient(
+      178deg,
+      #f6e7ba 0%,
+      #dcbd7c 34%,
+      #a88040 52%,
+      #e8d197 66%,
+      #c49c57 84%,
+      #efdcaa 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0.04em 0 rgb(10 20 15 / 0.55));
+    padding-inline: 0.02em;
+  }
+  .gild--italic {
+    font-style: italic;
+    font-weight: 380;
+    font-size: 0.55em;
+    letter-spacing: -0.02em;
+  }
+  @media (forced-colors: active) {
+    .gild { color: CanvasText; background: none; filter: none; }
+  }
+
+  /* ---- Glass bays ------------------------------------------------------- */
+  .hero__bays {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    gap: var(--mullion);
+    min-height: 0;
+  }
+
+  .pane {
+    position: relative;
+    min-width: 0;
+    border-radius: var(--radius-pane);
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 0 1px rgb(0 0 0 / 0.5),
+      0 0 0 1px rgb(207 171 105 / 0.12);
+  }
+  .pane.pane--door,
+  .pane.pane--door-transom { display: none; }
+
+  /* Warm room behind the glass, out-of-focus lights, and the reflection of
+     the street sliding over it as the pointer moves (scripts/glass.ts). */
+  .pane__glass {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(40% 55% at 18% 8%, rgb(244 194 122 / 0.28), transparent 70%),
+      radial-gradient(22% 30% at 62% 14%, rgb(244 194 122 / 0.22), transparent 70%),
+      radial-gradient(30% 40% at 92% 30%, rgb(244 194 122 / 0.14), transparent 70%),
+      radial-gradient(70% 60% at 40% 110%, rgb(120 70 30 / 0.35), transparent 70%),
+      linear-gradient(180deg, #2c2016 0%, #221911 55%, #17120d 100%);
+  }
+  .pane__glass::before,
+  .pane__glass::after {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    pointer-events: none;
+  }
+  .pane__glass::before {
+    background: linear-gradient(
+      112deg,
+      transparent 18%,
+      rgb(255 255 255 / 0.075) 26%,
+      rgb(255 255 255 / 0.02) 33%,
+      transparent 38%,
+      transparent 58%,
+      rgb(255 255 255 / 0.05) 63%,
+      transparent 70%
+    );
+    translate: calc(var(--gx) * -4%) calc(var(--gy) * -2%);
+    transition: translate 1.2s var(--ease-out);
+  }
+  .pane__glass::after {
+    /* a hint of the green frame and street reflected at the base */
+    inset: auto 0 0 0;
+    height: 35%;
+    background: linear-gradient(0deg, rgb(26 52 41 / 0.35), transparent);
+  }
+
+  .pane--transom {
+    min-height: clamp(2.6rem, 5.5svh, 3.1rem);
+    display: grid;
+    place-items: center;
+    padding: 0.6rem 1rem;
+  }
+  .pane__lettering {
+    position: relative;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(0.92rem, 0.8rem + 0.45vw, 1.2rem);
+    letter-spacing: 0.01em;
+    text-align: center;
+    color: var(--color-laiton-soft);
+    text-shadow: 0 1px 0 rgb(0 0 0 / 0.5);
+  }
+
+  .pane--main { display: grid; }
+  .pane__content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(0.85rem, 1.9svh, 1.6rem);
+    padding: clamp(1.5rem, 4.5svh, 3.5rem) clamp(1.25rem, 0.5rem + 3.5vw, 4rem);
+  }
+
+  .hero__lead {
+    max-width: 17ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, min(1rem + 3.2vw, 6.6svh), 4rem);
+    font-weight: 380;
+    line-height: 1.02;
+    letter-spacing: -0.028em;
+    color: var(--color-creme);
+    text-wrap: balance;
+  }
+  .hero__text {
+    max-width: 46ch;
+    margin: 0;
+    font-size: var(--text-lead);
+    line-height: 1.5;
+    color: rgb(236 232 222 / 0.82);
+  }
+
+  .hero__price {
+    display: flex;
+    align-items: baseline;
+    max-width: 30rem;
+    margin: 0;
+    color: var(--color-laiton-soft);
+    font-size: 0.98rem;
+    font-weight: 500;
+  }
+  .hero__price strong {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--color-laiton);
+  }
+  .hero__price-when { display: none; }
+
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .hero__proofs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1.25rem;
+  }
+  .hero__proofs ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .proof {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    color: var(--color-creme);
+  }
+  .proof__mark { color: var(--color-laiton); font-size: 0.8em; }
+  .proof__source {
+    margin: 0;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-laiton);
+  }
+
+  .pane__content :global(.hero__status-mobile) { color: var(--color-craie); }
+
+  /* ---- Door & its live sign -------------------------------------------- */
+  .pane--door {
+    display: none;
+    justify-items: center;
+  }
+  .door-sign {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    align-content: start;
+    align-self: start;
+    justify-items: center;
+    margin-top: clamp(1.5rem, 6svh, 3.5rem);
+    color: var(--color-encre);
+    text-decoration: none;
+    transform-origin: 50% 0;
+  }
+  .door-sign__nail {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f6e7ba, #8a6a33);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+  }
+  .door-sign__strings {
+    width: 9rem;
+    height: 2.4rem;
+    margin-top: -0.25rem;
+    background:
+      linear-gradient(to bottom right, transparent calc(50% - 0.7px), rgb(236 232 222 / 0.6) 50%, transparent calc(50% + 0.7px)) left / 50% 100% no-repeat,
+      linear-gradient(to bottom left, transparent calc(50% - 0.7px), rgb(236 232 222 / 0.6) 50%, transparent calc(50% + 0.7px)) right / 50% 100% no-repeat;
+  }
+  .door-sign__card {
+    display: grid;
+    justify-items: center;
+    gap: 0.25rem;
+    width: 11.5rem;
+    max-width: 100%;
+    margin-top: -0.15rem;
+    padding: 0.9rem 0.9rem 1rem;
+    border-radius: 3px;
+    background: var(--color-lin);
+    box-shadow:
+      inset 0 0 0 4px var(--color-lin),
+      inset 0 0 0 5px rgb(26 52 41 / 0.5),
+      0 18px 30px -12px rgb(0 0 0 / 0.65);
+    text-align: center;
+    transition: box-shadow var(--duration-base) var(--ease-out);
+  }
+  .door-sign:hover .door-sign__card {
+    box-shadow:
+      inset 0 0 0 4px var(--color-lin),
+      inset 0 0 0 5px var(--color-potimarron),
+      0 22px 36px -12px rgb(0 0 0 / 0.7);
+  }
+  .door-sign__over {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-encre-mute);
+  }
+  .door-sign__label {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--color-vert-700);
+  }
+  .door-sign[data-state="closed"] .door-sign__label { color: var(--color-potimarron-deep); }
+  .door-sign__detail {
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--color-encre-soft);
+  }
+  /* The sign swings once when it flips to the real state — the one moment
+     the page draws the eye to whether you can come now. */
+  .door-sign[data-swing] { animation: sign-swing 1.6s var(--ease-out) both; }
+  @keyframes sign-swing {
+    0% { rotate: 0deg; }
+    18% { rotate: -7deg; }
+    40% { rotate: 4.5deg; }
+    60% { rotate: -2.2deg; }
+    78% { rotate: 1deg; }
+    100% { rotate: 0deg; }
+  }
+
+  .door__handle {
+    position: absolute;
+    left: 1.1rem;
+    top: 50%;
+    width: 0.5rem;
+    height: clamp(6rem, 22svh, 11rem);
+    translate: 0 -30%;
+    border-radius: 0.3rem;
+    background: linear-gradient(90deg, #7d5f2c, #f0dca8 40%, #b89150 70%, #6d5124);
+    box-shadow: 2px 3px 6px rgb(0 0 0 / 0.5);
+  }
+
+  /* ---- Sill ------------------------------------------------------------ */
+  .hero__sill {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-block: 1rem calc(1rem + env(safe-area-inset-bottom));
+    font-size: 0.88rem;
+    color: rgb(236 232 222 / 0.8);
+  }
+  .hero__sill-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+  }
+  .hero__sill-hours { display: none; }
+  .hero__enter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    color: var(--color-laiton);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .hero__enter :global(svg) { transition: translate var(--duration-base) var(--ease-out); }
+  .hero__enter:hover :global(svg) { translate: 0 3px; }
+
+  /* ---- Tablet & up ------------------------------------------------------- */
+  @media (min-width: 768px) {
+    .hero__sign { flex-direction: row; justify-content: center; gap: clamp(1.25rem, 3vw, 3rem); }
+    .hero__sign-side:last-child { display: inline; }
+    .hero__bays { grid-template-columns: minmax(0, 1fr) clamp(12.5rem, 21vw, 19rem); }
+    .pane.pane--door,
+    .pane.pane--door-transom { display: grid; }
+    .pane__content :global(.hero__status-mobile) { display: none; }
+    .hero__price-when { display: inline; }
+    .hero__sill-hours { display: inline-flex; }
+  }
+
+  /* ---- Desktop: the shopfront stays put while the room slides over it -- */
+  /* scripts/hero-stick.ts sets a negative top when the shopfront is taller
+     than the window, so it scrolls to its sill before holding still —
+     nothing is ever cut off. */
+  @media (min-width: 1024px) and (min-height: 600px) {
+    .hero {
+      position: sticky;
+      top: var(--hero-stick, 0px);
+    }
+    @supports (animation-timeline: scroll()) {
+      .hero__facade {
+        animation-name: hero-recede;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+      }
+      /* Kept in a separate rule: merged into the \`animation\` shorthand by
+         the minifier, the timeline would make the declaration invalid. */
+      .hero .hero__facade {
+        animation-timeline: scroll(root block);
+        animation-range: 0 100svh;
+      }
+    }
+  }
+  @keyframes hero-recede {
+    to {
+      opacity: 0.25;
+      scale: 0.965;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__facade { animation: none !important; }
+    .door-sign[data-swing] { animation: none; }
+  }
+</style>

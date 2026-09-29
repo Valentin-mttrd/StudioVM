@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../sections/Hero.astro';
+import Cuisine from '../sections/Cuisine.astro';
+import Ardoise from '../sections/Ardoise.astro';
+import Duo from '../sections/Duo.astro';
+import Distinctions from '../sections/Distinctions.astro';
+import Lieu from '../sections/Lieu.astro';
+import Infos from '../sections/Infos.astro';
+import Reserver from '../sections/Reserver.astro';
+---
+<Layout
+  isHome
+  headerTheme="dark"
+  title="Chez Pipon — Restaurant de cuisine maison à Lorient"
+  description="Restaurant à Lorient, avenue de la Perrière : cuisine maison, produits frais, locaux et de saison, carte courte qui change chaque jour. Midi 22 €. Une toque Gault&Millau."
+>
+  <Hero />
+  <Cuisine />
+  <Ardoise />
+  <Duo />
+  <Distinctions />
+  <Lieu />
+  <Infos />
+  <Reserver />
+</Layout>

@@ -1,0 +1,98 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { ADDRESS, CONTACT, LEGAL, SITE } from '../data/site';
+
+const todo = '[à compléter avant la mise en ligne]';
+---
+<Layout
+  title="Mentions légales"
+  description="Mentions légales et informations sur les données personnelles du site de Chez Pipon, restaurant à Lorient."
+  noindex
+>
+  <article class="legal">
+    <div class="container-page legal__inner">
+      <p class="eyebrow text-vert-700">Informations légales</p>
+      <h1 class="legal__title">Mentions légales</h1>
+
+      <section aria-labelledby="l-editeur">
+        <h2 id="l-editeur">Éditeur du site</h2>
+        <p>
+          Le site {SITE.name} est édité par la société <strong>{LEGAL.company}</strong>, {LEGAL.form}, exploitant le
+          restaurant sous le nom commercial «&nbsp;{SITE.name}&nbsp;».
+        </p>
+        <ul>
+          <li>Siège social&nbsp;: {LEGAL.headOffice}</li>
+          <li>SIREN&nbsp;: {LEGAL.siren} — {LEGAL.rcs}</li>
+          <li>Téléphone&nbsp;: <a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a></li>
+          <li>Directeur de la publication&nbsp;: {LEGAL.publicationDirector ?? todo}</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="l-hebergeur">
+        <h2 id="l-hebergeur">Hébergement</h2>
+        <p>
+          {LEGAL.host.name}, {LEGAL.host.address} — <a href={LEGAL.host.url} target="_blank" rel="noopener">{LEGAL.host.url.replace('https://', '')}</a>.
+        </p>
+      </section>
+
+      <section aria-labelledby="l-conception">
+        <h2 id="l-conception">Conception et réalisation</h2>
+        <p>
+          <a href={LEGAL.design.url} target="_blank" rel="noopener">{LEGAL.design.name}</a>, Lorient.
+        </p>
+      </section>
+
+      <section aria-labelledby="l-contenus">
+        <h2 id="l-contenus">Contenus et propriété intellectuelle</h2>
+        <p>
+          Les textes, photographies et éléments graphiques de ce site sont la propriété de {LEGAL.company} ou de leurs
+          auteurs respectifs, et ne peuvent être reproduits sans autorisation. Les distinctions citées («&nbsp;Gault&amp;Millau&nbsp;»)
+          appartiennent à leurs titulaires&nbsp;; les liens vers des sites tiers sont fournis à titre d’information.
+        </p>
+        <p>Crédits photographiques&nbsp;: {todo}</p>
+      </section>
+
+      <section aria-labelledby="l-donnees">
+        <h2 id="l-donnees">Données personnelles et cookies</h2>
+        <p>
+          Ce site ne dépose aucun cookie et n’utilise aucun outil de mesure d’audience. Il ne collecte aucune donnée&nbsp;:
+          l’outil «&nbsp;Préparer ma demande&nbsp;» de la page d’accueil fonctionne entièrement dans votre navigateur et se
+          contente de rédiger un message, que vous choisissez ensuite d’envoyer vous-même par Instagram ou de lire au
+          téléphone. Rien n’est transmis ni conservé par le site.
+        </p>
+        <p>
+          La carte de la rubrique «&nbsp;Infos pratiques&nbsp;» est fournie par Google Maps et ne se charge que si vous
+          cliquez sur «&nbsp;Afficher la carte&nbsp;»&nbsp;; Google peut alors déposer ses propres cookies, selon sa
+          <a href="https://policies.google.com/privacy?hl=fr" target="_blank" rel="noopener">politique de confidentialité</a>.
+          Il en va de même pour Instagram lorsque vous suivez un lien vers {`@${CONTACT.instagramHandle}`}.
+        </p>
+        <p>
+          Pour toute question, vous pouvez contacter le restaurant au {CONTACT.phoneDisplay} ou à l’adresse {ADDRESS.street},
+          {ADDRESS.postalCode} {ADDRESS.city}. Vous disposez également du droit d’introduire une réclamation auprès de la
+          <a href="https://www.cnil.fr" target="_blank" rel="noopener">CNIL</a>.
+        </p>
+      </section>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .legal {
+    padding-block: calc(var(--header-h) + clamp(3rem, 2rem + 4vw, 6rem)) clamp(4rem, 3rem + 4vw, 7rem);
+    background: var(--color-lin);
+  }
+  .legal__inner { max-width: 50rem; }
+  .legal__title {
+    margin: 1.25rem 0 clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    font-size: var(--text-display-lg);
+    line-height: var(--text-display-lg--line-height);
+    letter-spacing: var(--text-display-lg--letter-spacing);
+    font-weight: 380;
+  }
+  .legal section { padding-block: 1.75rem; border-top: 1px solid rgb(27 29 26 / 0.12); }
+  .legal h2 { margin: 0 0 0.9rem; font-size: 1.5rem; font-weight: 450; }
+  .legal p, .legal li { color: var(--color-encre-soft); }
+  .legal p { margin: 0 0 0.8rem; }
+  .legal ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.3rem; }
+  .legal a { color: var(--color-vert-700); text-decoration: underline; text-underline-offset: 3px; }
+</style>
