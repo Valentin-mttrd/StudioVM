@@ -1,0 +1,199 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import QuoteForm from '../components/forms/QuoteForm.astro';
+import CallbackForm from '../components/forms/CallbackForm.astro';
+import Icon from '../components/ui/Icon.astro';
+import { SITE, COPY, MAPS_URL, TOWNS_TEXT, ZONE_RADIUS_KM } from '../data/site';
+import { breadcrumbSchema } from '../lib/seo';
+
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'Contact', path: '/contact/' },
+];
+---
+<Layout
+  title="Nous contacter - PRO PAYSAGES"
+  description="Contactez PRO PAYSAGES, paysagiste à Ploemeur : devis gratuit pour la création ou l’entretien de votre jardin. 06 16 46 75 24 · propaysages56@orange.fr"
+  structuredData={[breadcrumbSchema(crumbs)]}
+  footerCta={false}
+>
+  <PageHero crumbs={crumbs} kicker="Devis gratuit · Réponse rapide" lead={COPY.contact} compact>
+    <Fragment slot="title">Nous <em>contacter</em></Fragment>
+  </PageHero>
+
+  <section class="contact" aria-label="Formulaires et coordonnées">
+    <div class="container contact__grid">
+      <div class="contact__main">
+        <div class="contact__card" id="devis">
+          <p class="label kicker">Demande de devis gratuit</p>
+          <h2 class="h2 contact__title">Votre projet <em>en trois étapes.</em></h2>
+          <QuoteForm />
+        </div>
+      </div>
+
+      <aside class="contact__aside" aria-label="Coordonnées de PRO PAYSAGES">
+        <div class="contact__info on-ink">
+          <p class="label kicker">Par téléphone</p>
+          <a class="contact__phone" href={SITE.phone.href}>
+            <Icon name="phone" size={26} />
+            {SITE.phone.display}
+          </a>
+          <ul role="list" class="contact__list">
+            <li>
+              <Icon name="mail" size={20} />
+              <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+            </li>
+            <li>
+              <Icon name="pin" size={20} />
+              <a href={MAPS_URL} target="_blank" rel="noopener">
+                {SITE.address.street}, {SITE.address.area}
+                <br />
+                {SITE.address.postalCode} {SITE.address.city}
+                <span class="sr-only"> (plan, nouvel onglet)</span>
+              </a>
+            </li>
+            {
+              SITE.hours && (
+                <li>
+                  <Icon name="clock" size={20} />
+                  <span>
+                    {SITE.hours.map((h) => (
+                      <span class="contact__hour">
+                        <strong>{h.days}</strong> {h.time}
+                      </span>
+                    ))}
+                  </span>
+                </li>
+              )
+            }
+          </ul>
+          <p class="small muted contact__zone">
+            Intervention à {TOWNS_TEXT}, dans un rayon de {ZONE_RADIUS_KM}&nbsp;km autour de Ploemeur.
+          </p>
+        </div>
+
+        <div class="contact__card contact__card--small" id="rappel">
+          <p class="label kicker">Pas le temps d’écrire&nbsp;?</p>
+          <h2 class="h3">Être rappelé</h2>
+          <p class="muted small">Laissez votre numéro, nous vous rappelons.</p>
+          <CallbackForm />
+        </div>
+      </aside>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .contact {
+    padding-bottom: var(--section);
+  }
+
+  .contact__grid {
+    display: grid;
+    gap: var(--s-6);
+    align-items: start;
+  }
+
+  @media (min-width: 64rem) {
+    .contact__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      gap: var(--s-8);
+    }
+
+    .contact__aside {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-4));
+    }
+  }
+
+  .contact__card {
+    display: grid;
+    gap: var(--s-4);
+    padding: clamp(1.25rem, 0.8rem + 2.4vw, 3rem);
+    border-radius: var(--r-xl);
+    background: var(--c-white);
+    box-shadow: var(--shadow-1);
+  }
+
+  .contact__title {
+    margin-bottom: var(--s-4);
+    font-size: clamp(1.875rem, 1.4rem + 1.8vw, 2.75rem);
+  }
+
+  .contact__aside {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .contact__info {
+    display: grid;
+    gap: var(--s-5);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border-radius: var(--r-xl);
+  }
+
+  .contact__phone {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-family: var(--f-display);
+    font-size: clamp(1.875rem, 1.5rem + 1.4vw, 2.5rem);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    color: var(--c-accent);
+  }
+
+  @media (hover: hover) {
+    .contact__phone:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+    }
+  }
+
+  .contact__list {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .contact__list li {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    gap: var(--s-3);
+    align-items: start;
+  }
+
+  .contact__list :global(.icon) {
+    margin-top: 0.15rem;
+    color: var(--c-sage);
+  }
+
+  .contact__list a {
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .contact__list a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .contact__hour {
+    display: block;
+  }
+
+  .contact__hour strong {
+    font-weight: 650;
+  }
+
+  .contact__zone {
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--c-line-ink);
+  }
+
+  .contact__card--small {
+    gap: var(--s-2);
+  }
+</style>

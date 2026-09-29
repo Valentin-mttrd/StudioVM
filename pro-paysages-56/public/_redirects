@@ -1,0 +1,27 @@
+# Every URL indexed today keeps its exact address:
+#   /  ·  /contact/
+#   /creation-de-jardin-ploemeur-pose-de-cloture-larmor-plage-queven-hennebont/
+#   /entretien-de-jardin-taille-de-haie-ploemeur-larmor-plage-queven-hennebont/
+# These 301 rules only catch variants and likely old addresses.
+/creation-de-jardin-ploemeur-pose-de-cloture-larmor-plage-queven-hennebont    /creation-de-jardin-ploemeur-pose-de-cloture-larmor-plage-queven-hennebont/    301
+/entretien-de-jardin-taille-de-haie-ploemeur-larmor-plage-queven-hennebont    /entretien-de-jardin-taille-de-haie-ploemeur-larmor-plage-queven-hennebont/    301
+/contact                 /contact/     301
+/nous-contacter          /contact/     301
+/nous-contacter/         /contact/     301
+/contactez-nous          /contact/     301
+/contactez-nous/         /contact/     301
+/devis                   /contact/     301
+/devis/                  /contact/     301
+/creation-de-jardin      /creation-de-jardin-ploemeur-pose-de-cloture-larmor-plage-queven-hennebont/    301
+/creation-de-jardin/     /creation-de-jardin-ploemeur-pose-de-cloture-larmor-plage-queven-hennebont/    301
+/pose-de-cloture         /creation-de-jardin-ploemeur-pose-de-cloture-larmor-plage-queven-hennebont/    301
+/pose-de-cloture/        /creation-de-jardin-ploemeur-pose-de-cloture-larmor-plage-queven-hennebont/    301
+/entretien-de-jardin     /entretien-de-jardin-taille-de-haie-ploemeur-larmor-plage-queven-hennebont/    301
+/entretien-de-jardin/    /entretien-de-jardin-taille-de-haie-ploemeur-larmor-plage-queven-hennebont/    301
+/taille-de-haie          /entretien-de-jardin-taille-de-haie-ploemeur-larmor-plage-queven-hennebont/    301
+/taille-de-haie/         /entretien-de-jardin-taille-de-haie-ploemeur-larmor-plage-queven-hennebont/    301
+/mentions-legales        /mentions-legales/    301
+/accueil                 /    301
+/accueil/                /    301
+/index.php               /    301
+/index.html              /    301

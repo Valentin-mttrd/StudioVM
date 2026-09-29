@@ -1,0 +1,69 @@
+---
+/**
+ * Section heading block: numbered kicker, title (slot), optional intro.
+ */
+interface Props {
+  kicker: string;
+  index?: string;
+  id?: string;
+  as?: 'h1' | 'h2';
+  align?: 'start' | 'split';
+  class?: string;
+}
+
+const { kicker, index, id, as: Tag = 'h2', align = 'start', class: className } = Astro.props;
+const hasIntro = Astro.slots.has('intro');
+---
+<header class:list={['shead', `shead--${align}`, className]}>
+  <div class="shead__main">
+    <p class="label kicker" data-reveal>
+      {index && <span class="shead__index">{index}</span>}
+      {kicker}
+    </p>
+    <Tag class="h2 shead__title" id={id} data-reveal style="--i:1"><slot /></Tag>
+  </div>
+  {
+    hasIntro && (
+      <div class="shead__intro lead muted" data-reveal style="--i:2">
+        <slot name="intro" />
+      </div>
+    )
+  }
+</header>
+
+<style>
+  .shead {
+    display: grid;
+    gap: var(--s-6);
+    margin-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  .shead__main {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .shead__title {
+    max-width: 18ch;
+  }
+
+  .shead__index {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .shead__intro {
+    max-width: 46ch;
+  }
+
+  @media (min-width: 60rem) {
+    .shead--split {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      align-items: end;
+      gap: var(--s-16);
+    }
+
+    .shead--split .shead__intro {
+      padding-bottom: 0.6rem;
+    }
+  }
+</style>

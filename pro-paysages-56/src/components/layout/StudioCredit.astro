@@ -1,0 +1,50 @@
+---
+/**
+ * Maker's credit: "Site réalisé par Studio VM", the Studio VM mark linking
+ * to studiovm-design.fr. Same component in every site built by the studio.
+ */
+import rawMark from '../../assets/studio-vm/mark.svg?raw';
+
+const mark = rawMark
+  .replace('<svg ', '<svg class="credit__mark" aria-hidden="true" focusable="false" ')
+  .replace(/ width="[^"]*" height="[^"]*"/, '');
+---
+<a class="credit" href="https://www.studiovm-design.fr" target="_blank" rel="noopener">
+  <span class="credit__text">Site réalisé par</span>
+  <span class="credit__logo" set:html={mark} />
+  <span class="credit__name">Studio VM</span>
+  <span class="sr-only"> (nouvel onglet)</span>
+</a>
+
+<style>
+  .credit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    text-decoration: none;
+    color: inherit;
+    transition: color var(--dur-1, 160ms) ease;
+  }
+
+  .credit__logo {
+    display: inline-flex;
+    height: 0.95rem;
+  }
+
+  .credit__logo :global(.credit__mark) {
+    height: 100%;
+    width: auto;
+  }
+
+  .credit__name {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  @media (hover: hover) {
+    .credit:hover {
+      color: var(--c-on-ink, currentColor);
+    }
+  }
+</style>

@@ -1,0 +1,149 @@
+---
+/**
+ * Before/after slider. A native range input drives the split, so it works
+ * with keyboard, touch and screen readers without custom gesture code.
+ */
+import { Image } from 'astro:assets';
+import type { Photo } from '../../data/realisations';
+
+interface Props {
+  before: Photo;
+  after: Photo;
+  label: string;
+}
+
+const { before, after, label } = Astro.props;
+---
+<div class="compare" data-compare style="--pos: 50%">
+  <Image src={after.src} alt={after.alt} widths={[640, 1024, 1440]} sizes="(min-width: 64rem) 60vw, 100vw" class="compare__img" />
+  <div class="compare__before" aria-hidden="true">
+    <Image src={before.src} alt="" widths={[640, 1024, 1440]} sizes="(min-width: 64rem) 60vw, 100vw" class="compare__img" />
+  </div>
+  <span class="compare__tag compare__tag--before label">Avant</span>
+  <span class="compare__tag compare__tag--after label">Après</span>
+  <span class="compare__handle" aria-hidden="true"><span></span></span>
+  <input
+    class="compare__range"
+    type="range"
+    min="0"
+    max="100"
+    value="50"
+    aria-label={`Comparer avant et après : ${label}`}
+    aria-valuetext="50 % avant"
+    data-compare-range
+  />
+  <p class="sr-only">Avant : {before.alt}</p>
+</div>
+
+<style>
+  .compare {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--r-lg);
+    aspect-ratio: 4 / 3;
+    touch-action: pan-y;
+  }
+
+  .compare :global(.compare__img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .compare__before {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+  }
+
+  .compare__handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--pos);
+    width: 2px;
+    margin-left: -1px;
+    background: var(--c-paper);
+    pointer-events: none;
+  }
+
+  .compare__handle span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2.75rem;
+    height: 2.75rem;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--c-paper);
+    box-shadow: 0 6px 18px -6px rgb(0 0 0 / 0.45);
+  }
+
+  .compare__handle span::before,
+  .compare__handle span::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-left: 2px solid var(--c-ink);
+    border-bottom: 2px solid var(--c-ink);
+  }
+
+  .compare__handle span::before {
+    left: 0.7rem;
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .compare__handle span::after {
+    right: 0.7rem;
+    transform: translateY(-50%) rotate(-135deg);
+  }
+
+  .compare__range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+  }
+
+  .compare:has(.compare__range:focus-visible) .compare__handle span {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 3px;
+  }
+
+  .compare__tag {
+    position: absolute;
+    top: var(--s-3);
+    padding: var(--s-1) var(--s-2);
+    border-radius: var(--r);
+    background: rgb(20 36 28 / 0.78);
+    color: var(--c-paper);
+    pointer-events: none;
+  }
+
+  .compare__tag--before {
+    left: var(--s-3);
+  }
+
+  .compare__tag--after {
+    right: var(--s-3);
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-compare]').forEach((root) => {
+    const range = root.querySelector<HTMLInputElement>('[data-compare-range]');
+    if (!range) return;
+    const update = () => {
+      root.style.setProperty('--pos', `${range.value}%`);
+      range.setAttribute('aria-valuetext', `${range.value} % avant`);
+    };
+    range.addEventListener('input', update);
+    update();
+  });
+</script>

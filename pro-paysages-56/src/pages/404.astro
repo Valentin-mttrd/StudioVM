@@ -1,0 +1,116 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/ui/Icon.astro';
+import { SITE, SERVICE_GROUPS } from '../data/site';
+
+const PAGES = [
+  { href: '/', label: 'Accueil' },
+  { href: SERVICE_GROUPS.creation.path, label: 'Création de jardin et pose de clôture' },
+  { href: SERVICE_GROUPS.entretien.path, label: 'Entretien de jardin et taille de haie' },
+  { href: '/contact/', label: 'Contact et devis gratuit' },
+];
+---
+<Layout title="Page introuvable – PRO PAYSAGES" description="Cette page n’existe pas ou a changé d’adresse." noindex>
+  <section class="nf">
+    <div class="container nf__grid">
+      <div class="nf__text">
+        <p class="label kicker">Erreur 404</p>
+        <h1 class="display nf__title">Ce chemin <em>n’est pas tracé.</em></h1>
+        <p class="lead muted nf__lead">
+          La page demandée n’existe pas ou a changé d’adresse. Voici les pages du site — ou appelez le{' '}
+          <a href={SITE.phone.href}>{SITE.phone.display}</a>.
+        </p>
+        <div class="cluster">
+          <a class="btn btn--lg" href="/">
+            <span>Retour à l’accueil</span>
+            <Icon name="arrow" class="btn__icon btn__icon--arrow" />
+          </a>
+          <a class="btn btn--ghost btn--lg" href="/contact/">Demander un devis</a>
+        </div>
+      </div>
+      <nav aria-label="Pages principales" class="nf__nav">
+        <ul role="list">
+          {
+            PAGES.map((p) => (
+              <li>
+                <a href={p.href}>
+                  {p.label}
+                  <Icon name="arrow" size={18} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .nf {
+    padding: calc(var(--header-h) + clamp(3rem, 2rem + 6vw, 8rem)) 0 var(--section);
+  }
+
+  .nf__grid {
+    display: grid;
+    gap: var(--s-12);
+  }
+
+  @media (min-width: 64rem) {
+    .nf__grid {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: end;
+    }
+  }
+
+  .nf__text {
+    display: grid;
+    gap: var(--s-6);
+    justify-items: start;
+  }
+
+  .nf__title {
+    max-width: 11ch;
+  }
+
+  .nf__title em {
+    color: var(--c-moss);
+  }
+
+  .nf__lead {
+    max-width: 44ch;
+  }
+
+  .nf__lead a {
+    font-weight: 650;
+    color: var(--c-text);
+  }
+
+  .nf__nav ul {
+    border-top: 1px solid var(--c-line-strong);
+  }
+
+  .nf__nav li {
+    border-bottom: 1px solid var(--c-line-strong);
+  }
+
+  .nf__nav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    min-height: 3.75rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .nf__nav a :global(.icon) {
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .nf__nav a:hover :global(.icon) {
+      transform: translateX(4px);
+    }
+  }
+</style>

@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/sections/Hero.astro';
+import Trades from '../components/sections/Trades.astro';
+import Storyline from '../components/sections/Storyline.astro';
+import Commitment from '../components/sections/Commitment.astro';
+import Realisations from '../components/sections/Realisations.astro';
+import Zone from '../components/sections/Zone.astro';
+import Faq from '../components/sections/Faq.astro';
+import { faqFor } from '../data/site';
+import { faqSchema } from '../lib/seo';
+
+const faq = faqFor('home');
+---
+<Layout
+  title="Paysagiste à Ploemeur, Larmor-Plage, Quéven, Hennebont"
+  brandTitle
+  description="PRO PAYSAGES, paysagiste à Ploemeur depuis 2012 : création et entretien de jardins, clôtures, taille de haie à Larmor-Plage, Quéven, Hennebont. Devis gratuit."
+  structuredData={[faqSchema(faq)]}
+>
+  <Hero />
+  <Trades />
+  <Storyline />
+  <Commitment />
+  <Realisations index="03" />
+  <Zone index="04" />
+  <Faq items={faq} index="05" />
+</Layout>

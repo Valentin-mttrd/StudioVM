@@ -1,0 +1,34 @@
+---
+/** Landing page for forms submitted without JavaScript (Netlify Forms). */
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import Icon from '../components/ui/Icon.astro';
+import { SITE, SERVICE_GROUPS } from '../data/site';
+---
+<Layout title="Merci – PRO PAYSAGES" description="Votre demande a bien été envoyée à PRO PAYSAGES." noindex>
+  <PageHero
+    crumbs={[
+      { name: 'Accueil', path: '/' },
+      { name: 'Merci', path: '/merci/' },
+    ]}
+    kicker="Demande envoyée"
+    lead={`Merci. ${SITE.name} vous recontacte dans les plus brefs délais. Une question en attendant ? Appelez le ${SITE.phone.display}.`}
+    compact
+  >
+    <Fragment slot="title">Votre demande <em>est bien partie.</em></Fragment>
+    <div class="cluster thanks">
+      <a class="btn btn--lg" href="/">
+        <span>Retour à l’accueil</span>
+        <Icon name="arrow" class="btn__icon btn__icon--arrow" />
+      </a>
+      <a class="btn btn--ghost btn--lg" href={SERVICE_GROUPS.entretien.path}>L’entretien de jardin</a>
+    </div>
+  </PageHero>
+</Layout>
+
+<style>
+  .thanks {
+    margin-top: var(--s-4);
+    padding-bottom: var(--s-16);
+  }
+</style>

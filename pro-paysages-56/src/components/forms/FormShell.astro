@@ -1,0 +1,341 @@
+---
+/**
+ * Form wrapper: Netlify Forms attributes, spam honeypot, the success and
+ * failure panels, and the consent line. Behaviour lives in
+ * src/scripts/forms.ts; without JS the form posts natively to /merci/.
+ */
+import Icon from '../ui/Icon.astro';
+import { SITE } from '../../data/site';
+
+interface Props {
+  name: string;
+  subject: string;
+  submitLabel: string;
+  successTitle: string;
+  successText: string;
+  steps?: string[];
+  /** The form carries a file input: sent as multipart. */
+  files?: boolean;
+  class?: string;
+}
+
+const { name, subject, submitLabel, successTitle, successText, steps, files = false, class: className } = Astro.props;
+---
+<div class:list={['form-shell', className]} data-form-shell>
+  <form
+    name={name}
+    method="POST"
+    action="/merci/"
+    data-netlify="true"
+    netlify-honeypot="bot-field"
+    data-form
+    data-subject={subject}
+    data-steps={steps ? '' : undefined}
+    style={steps ? `--steps:${steps.length}` : undefined}
+    enctype={files ? 'multipart/form-data' : undefined}
+    novalidate
+  >
+    <input type="hidden" name="form-name" value={name} />
+    <input type="hidden" name="subject" value={subject} />
+    <p class="hp" aria-hidden="true">
+      <label>Ne pas remplir <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+    </p>
+
+    {
+      steps && (
+        <ol class="form-progress" role="list" data-progress aria-label="Étapes du formulaire">
+          {steps.map((s, i) => (
+            <li class="form-progress__item" data-progress-item={i}>
+              <span class="form-progress__num label">{String(i + 1).padStart(2, '0')}</span>
+              <span class="form-progress__name">{s}</span>
+            </li>
+          ))}
+        </ol>
+      )
+    }
+
+    <div class="form-body">
+      <slot />
+    </div>
+
+    <div class="form-foot" data-form-foot>
+      <label class="check form-consent">
+        <input type="checkbox" name="consentement" value="oui" required data-consent />
+        <span>
+          J’accepte que les informations saisies soient utilisées par {SITE.name} pour répondre à ma demande.{' '}
+          <a href="/mentions-legales/#donnees">En savoir plus</a>.
+        </span>
+      </label>
+      <p class="field__error" data-error-for="consentement" aria-live="polite"></p>
+
+      <div class="form-actions">
+        {
+          steps && (
+            <button type="button" class="btn btn--ghost btn--lg" data-prev hidden>
+              Retour
+            </button>
+          )
+        }
+        {
+          steps && (
+            <button type="button" class="btn btn--lg" data-next>
+              <span>Continuer</span>
+              <Icon name="arrow" class="btn__icon btn__icon--arrow" />
+            </button>
+          )
+        }
+        <button type="submit" class="btn btn--accent btn--lg" data-submit>
+          <span class="form-spinner" aria-hidden="true"></span>
+          <span data-submit-label>{submitLabel}</span>
+          <Icon name="arrow" class="btn__icon btn__icon--arrow" />
+        </button>
+      </div>
+      <p class="form-note">Vos informations servent uniquement à répondre à votre demande.</p>
+    </div>
+
+    <div class="form-alert" data-form-error hidden tabindex="-1">
+      <p class="form-alert__title">L’envoi n’a pas abouti.</p>
+      <p>
+        Votre demande n’est pas perdue&nbsp;: <a href="#" data-mailto>envoyez-la par e-mail</a> (elle est déjà rédigée),
+        ou appelez le <a href={SITE.phone.href}>{SITE.phone.display}</a>.
+      </p>
+    </div>
+  </form>
+
+  <div class="form-success" data-form-success hidden tabindex="-1">
+    <span class="form-success__icon"><Icon name="check" size={28} strokeWidth={2.2} /></span>
+    <h2 class="h2 form-success__title">{successTitle}</h2>
+    <p class="lead">{successText}</p>
+    <p class="muted">
+      Une question en attendant&nbsp;? Appelez le <a href={SITE.phone.href}>{SITE.phone.display}</a>.
+    </p>
+  </div>
+  <p class="sr-only" role="status" data-form-status></p>
+</div>
+
+<style>
+  .form-shell {
+    position: relative;
+  }
+
+  .form-body {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  /* ── Progress (stepped forms) ── */
+  .form-progress {
+    display: none;
+  }
+
+  :global(form.is-stepped) .form-progress {
+    display: grid;
+    grid-template-columns: repeat(var(--steps, 4), minmax(0, 1fr));
+    gap: var(--s-2);
+    margin: 0 0 var(--s-8);
+  }
+
+  .form-progress__item {
+    display: grid;
+    gap: var(--s-2);
+    padding-top: var(--s-3);
+    border-top: 3px solid var(--c-line);
+    color: var(--c-muted);
+    font-size: var(--fs-sm);
+    font-weight: 560;
+    transition: border-color var(--dur-2) ease, color var(--dur-2) ease;
+  }
+
+  .form-progress__item.is-done {
+    border-top-color: var(--c-ink);
+    color: var(--c-ink);
+  }
+
+  .form-progress__item.is-current {
+    border-top-color: var(--c-accent);
+    color: var(--c-ink);
+  }
+
+  .form-progress__num {
+    color: inherit;
+  }
+
+  @media (max-width: 40rem) {
+    .form-progress__name {
+      display: none;
+    }
+
+    .form-progress__item.is-current .form-progress__name {
+      display: inline;
+      white-space: nowrap;
+    }
+  }
+
+  /* ── Steps ──
+     Before forms.ts runs (but with JS on), lay the form out as it will be
+     once stepped, so nothing jumps: only step 1, « Continuer », no consent. */
+  :global(.js form[data-steps]:not(.is-stepped) [data-step] ~ [data-step]),
+  :global(.js form[data-steps]:not(.is-stepped)) .form-consent,
+  :global(.js form[data-steps]:not(.is-stepped)) [data-submit],
+  :global(.js form[data-steps]:not(.is-stepped)) .form-note {
+    display: none;
+  }
+
+  :global(.js form[data-steps]) .form-progress {
+    display: grid;
+    grid-template-columns: repeat(var(--steps, 3), minmax(0, 1fr));
+    gap: var(--s-2);
+    margin: 0 0 var(--s-8);
+  }
+
+  :global(html:not(.js)) [data-next] {
+    display: none;
+  }
+
+  :global(form.is-stepped) :global([data-step]:not(.is-current)) {
+    display: none;
+  }
+
+  :global(form.is-stepped [data-step].is-current) {
+    animation: step-in var(--dur-3) var(--ease-out);
+  }
+
+  @keyframes step-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  .form-foot {
+    display: grid;
+    gap: var(--s-4);
+    margin-top: var(--s-8);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--c-line);
+  }
+
+  :global(form.is-stepped:not(.is-last)) .form-consent,
+  :global(form.is-stepped:not(.is-last)) [data-submit],
+  :global(form.is-stepped:not(.is-last)) .form-note {
+    display: none;
+  }
+
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: center;
+  }
+
+  .form-actions [data-next],
+  .form-actions [data-submit] {
+    margin-left: auto;
+  }
+
+  @media (max-width: 30rem) {
+    .form-actions > :global(*) {
+      flex: 1 1 100%;
+    }
+
+    .form-actions [data-prev] {
+      order: 2;
+    }
+  }
+
+  .form-note {
+    font-size: var(--fs-sm);
+    color: var(--c-muted);
+  }
+
+  .form-consent a {
+    font-weight: 600;
+  }
+
+  /* ── Submit loading ── */
+  .form-spinner {
+    display: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 700ms linear infinite;
+  }
+
+  [data-submit][aria-busy='true'] .form-spinner {
+    display: inline-block;
+  }
+
+  [data-submit][aria-busy='true'] :global(.btn__icon) {
+    display: none;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
+  /* ── Alerts ── */
+  .form-alert {
+    margin-top: var(--s-6);
+    padding: var(--s-5);
+    border: 1px solid var(--c-error);
+    border-left-width: 4px;
+    border-radius: var(--r);
+    background: var(--c-error-bg);
+  }
+
+  .form-alert__title {
+    font-weight: 700;
+    margin-bottom: var(--s-2);
+  }
+
+  .form-alert a {
+    font-weight: 650;
+  }
+
+  .form-success {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-4);
+    padding: var(--s-8) 0;
+  }
+
+  .form-success:focus {
+    outline: none;
+  }
+
+  .form-success__icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--c-pine);
+    color: var(--c-accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .form-success:not([hidden]) .form-success__icon {
+      animation: pop-in 600ms var(--ease-out);
+    }
+  }
+
+  @keyframes pop-in {
+    from {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+  }
+
+  .form-success a {
+    font-weight: 650;
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  import '../../scripts/forms';
+</script>

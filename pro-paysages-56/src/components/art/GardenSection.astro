@@ -1,0 +1,836 @@
+---
+/**
+ * « Coupe de principe » — a landscape architect's section through a
+ * garden, drawn around the services the current site lists: paving on its
+ * bed, a low stone wall, a raised planting bed on a bank, lawn over an
+ * automatic watering line, a tree, a clipped hedge, a fence on footings.
+ *
+ * One drawing, three states (data-state), driven by scripts/garden.ts:
+ *   plan   — ink lines on squared paper, annotated: « concevoir »
+ *   build  — materials and plants filled in: « réaliser »   (default, no-JS)
+ *   care   — the garden has grown wild; a maintenance line sweeps across
+ *            (--cut) and leaves it trimmed: « entretenir »
+ *
+ * Modes: "scroll" (home storyline), "intro" (draws itself once on view),
+ * "slider" (the visitor drags the maintenance line).
+ */
+import { rng, range, n, blob, tuft, hedge, leaf, circle } from '../../lib/botany';
+
+interface Props {
+  mode?: 'scroll' | 'intro' | 'slider';
+  state?: 'plan' | 'build' | 'care';
+  id: string;
+  class?: string;
+  /** Accessible description of what the drawing shows. */
+  label?: string;
+}
+
+const {
+  mode = 'intro',
+  state = 'build',
+  id,
+  class: className,
+  label = 'Coupe de principe d’un jardin : dallage, muret en pierre, massif planté sur un talus, pelouse avec arrosage automatique enterré, arbre, haie taillée et clôture en bois.',
+} = Astro.props;
+
+const r = rng(2012);
+const G = 400; // ground level
+// Visible window of the drawing: from just above the canopy to the title block.
+const VB_Y = 112;
+const VB_H = 438;
+/** Position of a drawing coordinate inside the figure, in %. */
+const px = (x: number) => `${((x / 1200) * 100).toFixed(2)}%`;
+const py = (y: number) => `${(((y - VB_Y) / VB_H) * 100).toFixed(2)}%`;
+
+// ── Terrace: slabs on sand and gravel, kerb ──
+const slabs = [24, 92, 160, 228].map((x) => ({ x, w: 64 }));
+let pebbles = '';
+for (let i = 0; i < 70; i++) pebbles += circle(range(r, 26, 296), range(r, 423, 446), range(r, 1.4, 3.2));
+
+// ── Low stone wall: three courses, staggered joints ──
+const wallStones: { x: number; y: number; w: number; h: number }[] = [];
+const courses = [
+  { y: 344, h: 18, joints: [306, 322, 334] },
+  { y: 362, h: 19, joints: [306, 316, 334] },
+  { y: 381, h: 19, joints: [306, 325, 334] },
+  { y: 400, h: 32, joints: [304, 336] },
+];
+for (const c of courses) {
+  for (let i = 0; i < c.joints.length - 1; i++) {
+    wallStones.push({ x: c.joints[i] + 0.8, y: c.y + 0.8, w: c.joints[i + 1] - c.joints[i] - 1.6, h: c.h - 1.6 });
+  }
+}
+
+// ── Raised bed on a bank ──
+const bedTop = 360;
+const bed = `M334 ${bedTop}H520Q552 ${bedTop + 8} 584 ${G}V432H334Z`;
+const mulch = `M336 ${bedTop - 4}H518Q524 ${bedTop - 3} 528 ${bedTop}H336Z`;
+const shrubs = [
+  { cx: 392, cy: 318, rx: 46, ry: 42 },
+  { cx: 484, cy: 326, rx: 36, ry: 33 },
+];
+const shrubPaths = shrubs.map((s) => blob(r, s.cx, s.cy, s.rx, s.ry, 36, 0.06));
+const shrubStems = shrubs.map((s) => `M${s.cx - 6} ${bedTop}L${s.cx - 2} ${s.cy + s.ry * 0.5}M${s.cx + 5} ${bedTop}L${s.cx + 2} ${s.cy + s.ry * 0.55}`).join('');
+const flowers = [
+  { x: 348, h: 34, c: 'hydrangea' },
+  { x: 436, h: 42, c: 'gorse' },
+  { x: 446, h: 30, c: 'white' },
+  { x: 524, h: 22, c: 'hydrangea' },
+  { x: 356, h: 22, c: 'white' },
+  { x: 428, h: 26, c: 'hydrangea' },
+];
+
+// ── Lawn: blades along the surface, on the bank too ──
+let lawnBlades = '';
+for (let x = 586; x < 890; x += 5.5) lawnBlades += `M${n(x)} ${G}l${n(range(r, -1.2, 1.2))} ${n(-range(r, 4, 7))}`;
+for (let x = 524; x < 584; x += 6) {
+  const y = bedTop + ((x - 520) / 64) ** 1.6 * (G - bedTop);
+  lawnBlades += `M${n(x)} ${n(y)}l${n(range(r, -1, 1))} ${n(-range(r, 3.5, 6))}`;
+}
+
+// ── Tree ──
+const trunk = `M718 ${G}C721 360 724 310 727 262L733 262C736 310 739 360 744 ${G}Z`;
+const boughs = 'M729 290Q705 262 686 244M731 276Q758 250 782 238M730 262Q731 236 734 214';
+let canopy = '';
+[
+  [735, 218, 70, 56],
+  [690, 236, 48, 40],
+  [784, 232, 52, 42],
+  [742, 176, 56, 44],
+  [700, 196, 40, 34],
+  [778, 194, 42, 34],
+].forEach(([cx, cy, rx, ry]) => (canopy += blob(r, cx, cy, rx, ry, 30, 0.08)));
+const roots = 'M722 400Q712 424 694 442M731 400Q733 430 728 462M740 400Q752 422 772 438M726 410Q740 428 758 452';
+
+// ── Hedge: crisp (clipped) and wild (before the visit) ──
+const hedgeCrisp = hedge(r, 902, 228, 138, 172, 16, 0);
+const hedgeWild = hedge(r, 902, 228, 138, 172, 16, 24);
+let hedgeTexture = '';
+for (let y = 246; y < 396; y += 15) {
+  for (let x = 913; x < 1034; x += 16) {
+    hedgeTexture += leaf([x + range(r, -3, 3), y + range(r, -3, 3)], range(r, -2.6, -0.5), range(r, 5, 8), 1.6);
+  }
+}
+
+// ── Fence: posts on concrete footings, vertical boards, two rails ──
+const posts = [1062, 1120, 1176];
+const boards: number[] = [];
+for (let x = 1073; x <= 1170; x += 9.4) boards.push(x);
+
+// ── Watering: pipe, two pop-up heads, spray arcs ──
+const heads = [640, 822];
+
+// ── Care: what grows between two visits ──
+let tallGrass = '';
+for (let x = 588; x < 886; x += range(r, 11, 17)) tallGrass += tuft(r, x, G, range(r, 16, 38), 5, 1.4, 0.5);
+let edgeGrass = '';
+for (let x = 250; x < 300; x += 10) edgeGrass += tuft(r, x, G + 1, range(r, 8, 16), 3, 1.2, 0.7);
+edgeGrass += tuft(r, 296, 397, 22, 5, 1.4, 0.9);
+const shrubWild = shrubs.map((s) => blob(r, s.cx, s.cy - 6, s.rx + 15, s.ry + 13, 52, 0.11)).join('');
+let brambles = '';
+for (let i = 0; i < 5; i++) {
+  const x = 530 + i * 12;
+  const y = bedTop + ((x - 520) / 64) ** 1.6 * (G - bedTop);
+  brambles += `M${n(x)} ${n(y)}q${n(range(r, -16, 16))} ${n(-range(r, 30, 52))} ${n(range(r, 12, 30))} ${n(-range(r, 18, 34))}`;
+}
+let bramblesLeaves = '';
+for (let i = 0; i < 14; i++) bramblesLeaves += leaf([range(r, 526, 598), range(r, 318, 380)], range(r, -3, 0), range(r, 6, 9), 2.2);
+const shoots = 'M930 214q-8-26-22-36M1004 212q6-30 22-40M1042 300q22-8 36-20M388 262q-10-22-4-40M478 282q16-18 30-20';
+let shootLeaves = '';
+[
+  [908, 178],
+  [1026, 172],
+  [1078, 280],
+  [384, 222],
+  [508, 262],
+].forEach(([x, y]) => {
+  shootLeaves += leaf([x, y], range(r, -2.8, -0.4), 9, 2.6) + leaf([x, y], range(r, -2.8, -0.4), 7, 2);
+});
+const leafColors = ['#c9772e', '#d9a441', '#9a5f2c'];
+const fallen: { d: string; c: string }[] = [];
+for (let i = 0; i < 18; i++) {
+  const x = i < 5 ? range(r, 40, 280) : range(r, 590, 880);
+  fallen.push({ d: leaf([x, G - range(r, 0.5, 2.5)], range(r, -0.5, 0.5) + (r() > 0.5 ? Math.PI : 0), range(r, 7, 11), 2.8), c: leafColors[i % 3] });
+}
+const branch = 'M760 398L812 394M786 396l14-10M798 395l10 4';
+
+// Maintenance tags: text, anchor x (checked once the line passes it), position.
+const careTags = [
+  { t: 'Découpe de bordures', x: 300, px: 214, py: 346 },
+  { t: 'Taille d’arbustes', x: 440, px: 384, py: 244 },
+  { t: 'Débroussaillage', x: 560, px: 520, py: 300 },
+  { t: 'Tonte', x: 660, px: 612, py: 352 },
+  { t: 'Ramassage', x: 820, px: 774, py: 352 },
+  { t: 'Taille de haie', x: 1000, px: 918, py: 158 },
+].map((c) => ({ ...c, w: Math.round(c.t.length * 7.1 + 34) }));
+
+// Plan annotations: label, leader from (x1,y1) to (x2,y2), text anchor.
+const notes: { t: string; x1: number; y1: number; x2: number; y2: number; ty: number; anchor?: 'start' | 'end' }[] = [
+  { t: 'Dallage', x1: 160, y1: 406, x2: 160, y2: 498, ty: 514 },
+  { t: 'Maçonnerie paysagère', x1: 320, y1: 342, x2: 320, y2: 290, ty: 280 },
+  { t: 'Massif', x1: 436, y1: 280, x2: 436, y2: 228, ty: 218 },
+  { t: 'Talus', x1: 556, y1: 380, x2: 556, y2: 330, ty: 320 },
+  { t: 'Gazon', x1: 660, y1: 396, x2: 660, y2: 350, ty: 340 },
+  { t: 'Arrosage automatique', x1: 760, y1: 428, x2: 760, y2: 498, ty: 514 },
+  { t: 'Plantation', x1: 676, y1: 200, x2: 630, y2: 160, ty: 150, anchor: 'end' },
+  { t: 'Haie', x1: 972, y1: 226, x2: 972, y2: 184, ty: 174 },
+  { t: 'Clôture', x1: 1124, y1: 248, x2: 1124, y2: 206, ty: 196 },
+];
+---
+<figure
+  class:list={['gs', className]}
+  data-garden={mode}
+  data-state={state}
+  style="--cut: 0"
+  id={id}
+>
+  <svg viewBox={`0 ${VB_Y} 1200 ${VB_H}`} role="img" aria-labelledby={`${id}-title`} focusable="false">
+    <title id={`${id}-title`}>{label}</title>
+    <defs>
+      <pattern id={`${id}-grid`} width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M20 0H0V20" fill="none" stroke="rgb(29 58 44 / 0.1)" stroke-width="1" />
+      </pattern>
+      <pattern id={`${id}-hatch`} width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <path d="M0 0V10" stroke="rgb(90 70 45 / 0.16)" stroke-width="1.4" />
+      </pattern>
+      <clipPath id={`${id}-cut`}>
+        <rect x="0" y="0" width="1200" height="560" data-cut-rect />
+      </clipPath>
+      <clipPath id={`${id}-frame`}>
+        <rect x="0" y="0" width="1200" height="560" />
+      </clipPath>
+    </defs>
+
+    <g clip-path={`url(#${id}-frame)`}>
+      <!-- Squared paper (plan) -->
+      <rect class="gs-grid" width="1200" height="560" fill={`url(#${id}-grid)`} />
+
+      <!-- Soil -->
+      <g class="gs-el" style="--d:0">
+        <path class="f ln gs-subsoil" d="M0 432H1200V560H0Z" pathLength="1" />
+        <rect class="gs-hatch" x="0" y="432" width="1200" height="128" fill={`url(#${id}-hatch)`} />
+        <path class="f ln gs-topsoil" d={`M0 ${G}H1200V432H0Z`} pathLength="1" />
+      </g>
+
+      <!-- Terrace -->
+      <g class="gs-el" style="--d:1">
+        <path class="f ln gs-gravel" d="M20 420H300V448H20Z" pathLength="1" />
+        <path class="f gs-pebbles" d={pebbles} />
+        <path class="f ln gs-sand" d="M22 412H298V420H22Z" pathLength="1" />
+        {slabs.map((s, i) => <path class:list={['f ln gs-slab', i % 2 && 'gs-slab--alt']} d={`M${s.x} ${G}h${s.w}v12h-${s.w}Z`} pathLength="1" />)}
+        <path class="f ln gs-stone" d="M296 396H306V440H296Z" pathLength="1" />
+      </g>
+
+      <!-- Wall -->
+      <g class="gs-el" style="--d:2">
+        {wallStones.map((s, i) => <path class:list={['f ln gs-stone', i % 3 === 1 && 'gs-stone--alt']} d={`M${n(s.x)} ${n(s.y)}h${n(s.w)}v${n(s.h)}h-${n(s.w)}Z`} pathLength="1" />)}
+      </g>
+
+      <!-- Raised bed + bank -->
+      <g class="gs-el" style="--d:3">
+        <path class="f ln gs-topsoil" d={bed} pathLength="1" />
+        <path class="f gs-mulch" d={mulch} />
+        <path class="ln gs-stem" d={shrubStems} pathLength="1" />
+        {shrubPaths.map((d, i) => <path class:list={['f ln gs-shrub', i && 'gs-shrub--alt']} d={d} pathLength="1" />)}
+        {
+          flowers.map((fl) => (
+            <g>
+              <path class="ln gs-stem" d={`M${fl.x} ${bedTop - 3}V${bedTop - fl.h}`} pathLength="1" />
+              <path class={`f ln gs-flower gs-flower--${fl.c}`} d={circle(fl.x, bedTop - fl.h - 4, 5.5)} pathLength="1" />
+            </g>
+          ))
+        }
+      </g>
+
+      <!-- Lawn + watering -->
+      <g class="gs-el" style="--d:4">
+        <path class="f ln gs-lawn" d={`M520 ${bedTop}Q552 ${bedTop + 8} 584 ${G}H898V${G + 5}H584Q550 ${bedTop + 12} 520 ${bedTop + 5}Z`} pathLength="1" />
+        <path class="ln gs-blades" d={lawnBlades} />
+        <path class="ln gs-pipe" d="M350 426H880M350 426V436" pathLength="1" />
+        {heads.map((x) => <path class="f ln gs-head" d={`M${x - 3.5} ${G - 2}h7v28h-7Z`} pathLength="1" />)}
+        {
+          heads.map((x) => (
+            <path class="gs-spray" d={`M${x - 2} ${G - 6}Q${x - 38} ${G - 70} ${x - 82} ${G - 4}M${x + 2} ${G - 6}Q${x + 38} ${G - 70} ${x + 82} ${G - 4}`} />
+          ))
+        }
+      </g>
+
+      <!-- Tree -->
+      <g class="gs-el" style="--d:5">
+        <path class="ln gs-root" d={roots} pathLength="1" />
+        <path class="ln gs-bough" d={boughs} pathLength="1" />
+        <path class="f ln gs-trunk" d={trunk} pathLength="1" />
+        <path class="f ln gs-canopy" d={canopy} pathLength="1" />
+      </g>
+
+      <!-- Hedge -->
+      <g class="gs-el" style="--d:6">
+        <path class="ln gs-root" d="M930 400q-6 24-18 40M970 400q2 30-4 50M1010 400q8 22 20 36" pathLength="1" />
+        <path class="f ln gs-hedge" d={hedgeCrisp} pathLength="1" />
+        <path class="f gs-hedge-tex" d={hedgeTexture} id={`${id}-tex`} />
+      </g>
+
+      <!-- Fence -->
+      <g class="gs-el" style="--d:7">
+        {posts.map((x) => <path class="f ln gs-footing" d={`M${x - 4} ${G}h18l4 52h-26Z`} pathLength="1" />)}
+        <path class="ln gs-rail" d="M1062 282H1186M1062 378H1186" pathLength="1" />
+        {boards.map((x, i) => <path class:list={['f ln gs-board', i % 2 && 'gs-board--alt']} d={`M${n(x)} 396V266l3.5-5 3.5 5V396Z`} pathLength="1" />)}
+        {posts.map((x) => <path class="f ln gs-post" d={`M${x} 250h10v150h-10Z`} pathLength="1" />)}
+      </g>
+
+      <!-- Ground line and section break -->
+      <path class="ln gs-ground" d={`M0 ${G}H22M298 ${G}H306M584 ${G}H1200`} pathLength="1" />
+      <path class="ln gs-break" d="M0 560V540l8-6-8-6V432M1200 560V540l-8-6 8-6V432" pathLength="1" />
+
+      <!-- ── Care: grown wild, clipped away by the maintenance line ── -->
+      <g class="gs-wild" clip-path={`url(#${id}-cut)`}>
+        <path class="gs-wild-hedge" d={hedgeWild} />
+        <use href={`#${id}-tex`} class="gs-hedge-tex" />
+        <path class="gs-wild-shrub" d={shrubWild} />
+        <path class="gs-shoot" d={shoots} />
+        <path class="gs-wild-leaf" d={shootLeaves} />
+        <path class="gs-bramble" d={brambles} />
+        <path class="gs-wild-leaf" d={bramblesLeaves} />
+        <path class="gs-tallgrass" d={tallGrass} />
+        <path class="gs-tallgrass" d={edgeGrass} />
+        {fallen.map((l) => <path d={l.d} fill={l.c} />)}
+        <path class="gs-branch" d={branch} />
+      </g>
+
+      <!-- Plan annotation leaders (labels are HTML, see below) -->
+      <g class="gs-notes" aria-hidden="true">
+        {
+          notes.map((a) => (
+            <g>
+              <path d={`M${a.x1} ${a.y1}L${a.x2} ${a.y2}`} class="gs-leader" />
+              <circle cx={a.x1} cy={a.y1} r="2.6" class="gs-dot" />
+            </g>
+          ))
+        }
+      </g>
+
+      <!-- Maintenance line -->
+      <g class="gs-cutline" data-cutline aria-hidden="true">
+        <path d="M0 110V468" class="gs-cutline__line" />
+        <circle cx="0" cy="468" r="15" class="gs-cutline__knob" />
+        <path d="M-5 463l-5 5 5 5M5 463l5 5-5 5" class="gs-cutline__arrows" />
+      </g>
+
+      <!-- Title block -->
+      <g class="gs-cartouche" aria-hidden="true">
+        <rect x="902" y="466" width="282" height="72" rx="3" />
+        <path d="M902 494H1184" />
+        <text x="916" y="485" class="gs-cartouche__k">Coupe de principe</text>
+        <text x="916" y="524" class="gs-cartouche__t">Jardin — Pro Paysages</text>
+      </g>
+    </g>
+  </svg>
+
+  <div class="gs-labels" aria-hidden="true">
+    {
+      notes.map((a) => (
+        <span
+          class:list={['gs-note', a.anchor && `gs-note--${a.anchor}`, a.ty > G && 'gs-note--below']}
+          style={`left:${px(a.anchor === 'start' ? a.x2 + 6 : a.anchor === 'end' ? a.x2 - 6 : a.x2)};top:${py(a.y2)}`}
+        >
+          {a.t}
+        </span>
+      ))
+    }
+    {
+      careTags.map((c) => (
+        <span class="gs-tag" data-tag-x={c.x} style={`left:${px(c.px)};top:${py(c.py)}`}>
+          <svg class="gs-tag__tick" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="m5 12.5 4.5 4.5L19 7.5" />
+          </svg>
+          {c.t}
+        </span>
+      ))
+    }
+  </div>
+  {
+    mode === 'slider' && (
+      <>
+        <input
+          class="gs-slider__range"
+          id={`${id}-range`}
+          type="range"
+          min="0"
+          max="100"
+          value="0"
+          aria-label="Entretenir le jardin : faites glisser la ligne d’entretien"
+          aria-valuetext="Jardin avant entretien"
+          data-garden-range
+        />
+        <p class="gs-slider__hint label" aria-hidden="true">
+          <span class="gs-slider__arrows">⟷</span> Glissez sur le dessin pour entretenir le jardin
+        </p>
+      </>
+    )
+  }
+</figure>
+
+<style>
+  .gs {
+    position: relative;
+    margin: 0;
+  }
+
+  .gs > svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* ── Palette ── */
+  .gs-subsoil {
+    fill: #e2d7bf;
+  }
+  .gs-topsoil {
+    fill: #b8a07e;
+  }
+  .gs-gravel {
+    fill: #dcd3bf;
+  }
+  .gs-pebbles {
+    fill: #b6aa91;
+  }
+  .gs-sand {
+    fill: #eadfc4;
+  }
+  .gs-slab {
+    fill: #b9b8b0;
+  }
+  .gs-slab--alt {
+    fill: #aaa9a0;
+  }
+  .gs-stone {
+    fill: #a7a498;
+  }
+  .gs-stone--alt {
+    fill: #bdb9ac;
+  }
+  .gs-mulch {
+    fill: #6e5236;
+  }
+  .gs-shrub {
+    fill: #4a6a3c;
+  }
+  .gs-shrub--alt {
+    fill: #5f8249;
+  }
+  .gs-stem {
+    stroke: #4a6a3c;
+    stroke-width: 1.6;
+    fill: none;
+  }
+  .gs-flower--hydrangea {
+    fill: #8d9fd4;
+  }
+  .gs-flower--gorse {
+    fill: #e3b23c;
+  }
+  .gs-flower--white {
+    fill: #f7f4ea;
+  }
+  .gs-lawn {
+    fill: #7fa05a;
+  }
+  .gs-blades {
+    stroke: #6b8c4a;
+    stroke-width: 1.2;
+    fill: none;
+  }
+  .gs-pipe {
+    fill: none;
+    stroke: var(--c-sea);
+    stroke-width: 3.4;
+    stroke-linecap: round;
+  }
+  .gs-head {
+    fill: var(--c-sea);
+  }
+  .gs-spray {
+    fill: none;
+    stroke: #6f93a3;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 0.1 7;
+    opacity: 0;
+  }
+  .gs-trunk {
+    fill: #6f5a43;
+  }
+  .gs-bough {
+    fill: none;
+    stroke: #6f5a43;
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+  .gs-root {
+    fill: none;
+    stroke: #7d6446;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .gs-canopy {
+    fill: #74925a;
+  }
+  .gs-hedge {
+    fill: #2d5140;
+  }
+  .gs-hedge-tex {
+    fill: #416d55;
+  }
+  .gs-footing {
+    fill: #cfcac0;
+  }
+  .gs-post {
+    fill: #7f6143;
+  }
+  .gs-board {
+    fill: #c29a68;
+  }
+  .gs-board--alt {
+    fill: #b88f5d;
+  }
+  .gs-rail {
+    fill: none;
+    stroke: #8e6f4c;
+    stroke-width: 6;
+  }
+  .gs-ground {
+    fill: none;
+    stroke: var(--c-ink);
+    stroke-width: 1.6;
+  }
+  .gs-break {
+    fill: none;
+    stroke: rgb(20 36 28 / 0.4);
+    stroke-width: 1.2;
+  }
+  .gs-hatch {
+    pointer-events: none;
+  }
+
+  /* Outlines: ink in plan, a soft contour once built */
+  .ln {
+    stroke: rgb(20 36 28 / 0.42);
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+  }
+
+  /* ── Wild growth ── */
+  .gs-wild-hedge {
+    fill: #2d5140;
+  }
+  .gs-wild-shrub {
+    fill: #56783f;
+    opacity: 0.92;
+  }
+  .gs-shoot,
+  .gs-bramble {
+    fill: none;
+    stroke: #4a6a3c;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .gs-bramble {
+    stroke: #6c4a3a;
+    stroke-width: 1.6;
+  }
+  .gs-wild-leaf {
+    fill: #5a7d45;
+  }
+  .gs-tallgrass {
+    fill: #86a55f;
+  }
+  .gs-branch {
+    fill: none;
+    stroke: #7a5c3e;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+  }
+
+  /* ── Annotations ── */
+  .gs-leader {
+    stroke: var(--c-pine);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+  .gs-dot {
+    fill: var(--c-pine);
+  }
+  /* HTML labels over the drawing: readable at any size */
+  .gs-labels {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .gs-note {
+    position: absolute;
+    transform: translate(-50%, calc(-100% - 6px));
+    font-size: clamp(0.5625rem, 0.4rem + 0.35vw, 0.6875rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--c-pine);
+    opacity: 0;
+    transition: opacity var(--dur-3) var(--ease-out);
+  }
+
+  .gs-note--start {
+    transform: translate(0, -50%);
+  }
+
+  .gs-note--end {
+    transform: translate(-100%, -50%);
+  }
+
+  .gs-note--below {
+    transform: translate(-50%, 6px);
+  }
+
+  .gs[data-state='plan'] .gs-note {
+    opacity: 1;
+  }
+
+  .gs-tag {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem 0.2rem 0.4rem;
+    border: 1px solid rgb(20 36 28 / 0.18);
+    border-radius: var(--r-pill);
+    background: var(--c-white);
+    box-shadow: var(--shadow-1);
+    font-size: clamp(0.625rem, 0.45rem + 0.35vw, 0.75rem);
+    font-weight: 650;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition:
+      opacity var(--dur-3) var(--ease-out),
+      transform var(--dur-3) var(--ease-out),
+      background-color var(--dur-2) ease,
+      color var(--dur-2) ease,
+      border-color var(--dur-2) ease;
+  }
+
+  .gs-tag__tick {
+    width: 0.95em;
+    height: 0.95em;
+    fill: none;
+    stroke: var(--c-muted);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.35;
+  }
+
+  .gs[data-state='care'] .gs-tag {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .gs-tag.is-done {
+    background: var(--c-pine);
+    border-color: var(--c-pine);
+    color: var(--c-on-ink);
+  }
+
+  .gs-tag.is-done .gs-tag__tick {
+    stroke: var(--c-accent);
+    opacity: 1;
+  }
+
+  @media (max-width: 47.99rem) {
+    .gs-labels {
+      display: none;
+    }
+  }
+
+  .gs-cutline__line {
+    stroke: var(--c-ink);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 5;
+    vector-effect: non-scaling-stroke;
+  }
+  .gs-cutline__knob {
+    fill: var(--c-accent);
+    stroke: var(--c-ink);
+    stroke-width: 1.5;
+  }
+  .gs-cutline__arrows {
+    fill: none;
+    stroke: var(--c-ink);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .gs-cartouche rect,
+  .gs-cartouche path {
+    fill: rgb(251 250 245 / 0.86);
+    stroke: rgb(20 36 28 / 0.5);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+  .gs-cartouche path {
+    fill: none;
+  }
+  .gs-cartouche__k {
+    font-family: var(--f-text);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    fill: var(--c-muted);
+  }
+  .gs-cartouche__t {
+    font-family: var(--f-display);
+    font-size: 22px;
+    fill: var(--c-ink);
+  }
+
+  /* ── States ── */
+  .gs-grid,
+  .gs-notes,
+  .gs-wild,
+  .gs-cutline {
+    opacity: 0;
+    transition: opacity var(--dur-3) var(--ease-out);
+  }
+
+  .gs-wild,
+  .gs-cutline {
+    visibility: hidden;
+  }
+
+  .f {
+    transition: fill-opacity var(--dur-4) var(--ease-out);
+    transition-delay: calc(var(--d, 0) * 90ms);
+  }
+
+  .gs-hatch,
+  .gs-pebbles,
+  .gs-hedge-tex,
+  .gs-blades,
+  .gs-mulch {
+    transition: opacity var(--dur-4) var(--ease-out);
+  }
+
+  /* plan: ink on squared paper */
+  .gs[data-state='plan'] .gs-grid,
+  .gs[data-state='plan'] .gs-notes {
+    opacity: 1;
+  }
+
+  .gs[data-state='plan'] .f {
+    fill-opacity: 0;
+    transition-delay: 0ms;
+  }
+
+  .gs[data-state='plan'] .gs-hatch,
+  .gs[data-state='plan'] .gs-pebbles,
+  .gs[data-state='plan'] .gs-hedge-tex,
+  .gs[data-state='plan'] .gs-mulch {
+    opacity: 0;
+  }
+
+  .gs[data-state='plan'] .ln {
+    stroke: var(--c-pine);
+    stroke-width: 1.3;
+  }
+
+  /* care: wild growth, tags, the maintenance line */
+  .gs[data-state='care'] .gs-wild,
+  .gs[data-state='care'] .gs-cutline {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Lines wait, then draw themselves the first time the plan appears. */
+    .gs.is-pre .ln {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+
+    .gs.is-drawing .ln {
+      stroke-dasharray: 1;
+      animation: gs-draw 1.4s var(--ease-in-out) both;
+      animation-delay: calc(var(--d, 0) * 80ms);
+    }
+
+    .gs[data-state='build'] .gs-spray,
+    .gs[data-state='care'] .gs-spray {
+      opacity: 1;
+      animation: gs-spray 1.6s linear infinite;
+    }
+
+    .gs.is-paused .gs-spray {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes gs-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes gs-spray {
+    to {
+      stroke-dashoffset: -14;
+    }
+  }
+
+  /* ── Slider (entretien page): an invisible range input over the drawing,
+     so the line follows the finger or the mouse, and arrow keys work. ── */
+  .gs-slider__range {
+    position: absolute;
+    inset: 0 0 auto;
+    width: 100%;
+    height: calc(100% - 2.5rem);
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+
+  .gs:has(.gs-slider__range:focus-visible) .gs-cutline__knob {
+    stroke: var(--c-accent-deep);
+    stroke-width: 5;
+  }
+
+  .gs-slider__hint {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin-top: var(--s-4);
+    color: var(--c-moss);
+  }
+
+  .gs-slider__arrows {
+    font-size: 1.1rem;
+    letter-spacing: 0;
+  }
+
+  .gs.is-touched .gs-slider__hint {
+    opacity: 0.55;
+  }
+</style>
+
+<script>
+  import '../../scripts/garden';
+</script>

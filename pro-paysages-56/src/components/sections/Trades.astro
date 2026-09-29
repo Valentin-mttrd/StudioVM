@@ -1,0 +1,201 @@
+---
+/**
+ * The two trades of the current site, as two doors: creation (the
+ * /creation-de-jardin-… page) and upkeep (/entretien-de-jardin-…).
+ */
+import PlanView from '../art/PlanView.astro';
+import Icon from '../ui/Icon.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import { SERVICE_GROUPS, servicesOf } from '../../data/site';
+
+const doors = [
+  {
+    group: 'creation' as const,
+    index: 'A',
+    text: 'De la conception à la réalisation : pose de clôture, création de massifs, maçonnerie paysagère, dallage, gazon et arrosage automatique.',
+    items: servicesOf('creation').slice(1, 5),
+  },
+  {
+    group: 'entretien' as const,
+    index: 'B',
+    text: 'Taille de haie, tonte de pelouse et bien d’autres interventions, pour garder votre espace extérieur dans un état optimal.',
+    items: servicesOf('entretien').slice(0, 4),
+  },
+];
+---
+<section class="trades section" aria-labelledby="trades-title">
+  <div class="container">
+    <SectionHead kicker="Nos métiers" id="trades-title" align="split">
+      Créer votre jardin, <em>puis en prendre soin.</em>
+      <Fragment slot="intro">
+        Deux savoir-faire, un seul interlocuteur&nbsp;: PRO PAYSAGES prend en charge tous vos projets de création et
+        d’entretien de jardin.
+      </Fragment>
+    </SectionHead>
+
+    <ul role="list" class="trades__list">
+      {
+        doors.map((d, i) => {
+          const g = SERVICE_GROUPS[d.group];
+          return (
+            <li class="door" data-reveal style={`--i:${i}`}>
+              <a class="door__link" href={g.path}>
+                <span class="door__art">
+                  <PlanView variant={d.group} />
+                </span>
+                <span class="door__body">
+                  <span class="label door__kicker">
+                    {d.index} — {g.kicker}
+                  </span>
+                  <span class="h2 door__title">{g.title}</span>
+                  <span class="door__text muted">{d.text}</span>
+                  <span class="door__items">
+                    {d.items.map((s) => (
+                      <span class="door__item">
+                        <Icon name={s.icon} size={18} />
+                        {s.title}
+                      </span>
+                    ))}
+                  </span>
+                  <span class="door__cta">
+                    Découvrir
+                    <span class="door__arrow">
+                      <Icon name="arrow" size={18} />
+                    </span>
+                  </span>
+                </span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .trades__list {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  @media (min-width: 60rem) {
+    .trades__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s-8);
+    }
+  }
+
+  .door__link {
+    display: grid;
+    height: 100%;
+    border-radius: var(--r-xl);
+    background: var(--c-white);
+    box-shadow: var(--shadow-1);
+    text-decoration: none;
+    overflow: hidden;
+    transition:
+      box-shadow var(--dur-3) var(--ease-out),
+      transform var(--dur-3) var(--ease-out);
+  }
+
+  .door__art {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .door__art :global(.plan) {
+    width: 100%;
+    height: 100%;
+    transition: transform 1.2s var(--ease-out);
+  }
+
+  .door__body {
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  }
+
+  .door__kicker {
+    color: var(--c-moss);
+  }
+
+  .door__title {
+    font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  .door__text {
+    max-width: 44ch;
+  }
+
+  .door__items {
+    display: grid;
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--c-line);
+  }
+
+  .door__item {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .door__item :global(.icon) {
+    color: var(--c-moss);
+    flex: none;
+  }
+
+  .door__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+    font-weight: 650;
+  }
+
+  .door__arrow {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--c-pine);
+    color: var(--c-on-ink);
+    transition:
+      transform var(--dur-3) var(--ease-out),
+      background-color var(--dur-2) ease;
+  }
+
+  @media (hover: hover) {
+    .door__link:hover {
+      box-shadow: var(--shadow-2);
+      transform: translateY(-4px);
+    }
+
+    .door__link:hover .door__art :global(.plan) {
+      transform: scale(1.04);
+    }
+
+    .door__link:hover .door__arrow {
+      transform: translateX(4px);
+      background: var(--c-accent);
+      color: var(--c-ink);
+    }
+  }
+
+  .door__link:active {
+    transform: scale(0.99);
+  }
+
+  .door__link:focus-visible {
+    outline-offset: 4px;
+    border-radius: var(--r-xl);
+  }
+</style>

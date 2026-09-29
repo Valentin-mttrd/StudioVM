@@ -1,0 +1,110 @@
+---
+/**
+ * The current site's commitment sentence, read word by word as it
+ * scrolls into view (scripts/readline.ts), then what it means in four
+ * points — each restating the site.
+ */
+import { COPY, SITE } from '../../data/site';
+
+const words = COPY.commitment.split(' ');
+
+const pillars = [
+  { t: 'À l’écoute', d: COPY.listening },
+  { t: 'Sur mesure', d: 'Un espace extérieur qui reflète votre style et répond à vos besoins.' },
+  {
+    t: 'Un seul interlocuteur',
+    d: 'De la conception à la réalisation, en passant par l’entretien régulier de votre espace vert.',
+  },
+  {
+    t: `Depuis ${SITE.foundedYear}`,
+    d: 'Un paysagiste et des artisans qualifiés, au service des particuliers et des professionnels.',
+  },
+];
+---
+<section class="commit on-ink section" aria-labelledby="commit-title">
+  <div class="container">
+    <p class="label kicker" data-reveal>02 Notre engagement</p>
+    <h2 class="sr-only" id="commit-title">Notre engagement</h2>
+    <p class="commit__read" data-readline style={`--n:${words.length}`}>
+      {
+        words.map((w, k) => (
+          <span class="commit__w" style={`--k:${k}`}>
+            {w}{' '}
+          </span>
+        ))
+      }
+    </p>
+
+    <ol role="list" class="commit__pillars">
+      {
+        pillars.map((p, i) => (
+          <li class="commit__pillar" data-reveal style={`--i:${i}`}>
+            <span class="commit__num label">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="h3 commit__t">{p.t}</h3>
+            <p class="muted">{p.d}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .commit {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .commit__read {
+    max-width: 24ch;
+    margin: var(--s-8) 0 clamp(3.5rem, 2rem + 5vw, 7rem);
+    font-family: var(--f-display);
+    font-size: clamp(2rem, 1.2rem + 3.6vw, 4.5rem);
+    font-weight: 380;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+
+  /* Words not yet read sit in a sage grey that still passes the large-text
+     contrast ratio on pine (≈ 4:1), and warm up to full cream as you read. */
+  :global(.js) .commit__w {
+    color: color-mix(
+      in oklab,
+      var(--c-on-ink) calc(clamp(0, var(--p, 1) * var(--n) - var(--k), 1) * 100%),
+      #8a9e8f
+    );
+    transition: color 160ms linear;
+  }
+
+  .commit__pillars {
+    display: grid;
+    gap: var(--s-10) var(--s-8);
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+
+  .commit__pillar {
+    display: grid;
+    gap: var(--s-3);
+    align-content: start;
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--c-line-ink-strong);
+  }
+
+  .commit__num {
+    color: var(--c-accent);
+  }
+
+  .commit__t {
+    font-size: clamp(1.5rem, 1.3rem + 0.6vw, 1.875rem);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .commit__w {
+      color: inherit;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/readline';
+</script>

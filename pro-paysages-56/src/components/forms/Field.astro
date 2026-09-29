@@ -1,0 +1,96 @@
+---
+/**
+ * Labelled field with hint and error slot wired for assistive tech.
+ * Errors are written by src/scripts/forms.ts into [data-error-for].
+ */
+interface Props {
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'file';
+  required?: boolean;
+  hint?: string;
+  autocomplete?: string;
+  placeholder?: string;
+  inputmode?: 'text' | 'tel' | 'email' | 'numeric';
+  pattern?: string;
+  rows?: number;
+  options?: string[];
+  accept?: string;
+  prefix?: string;
+  class?: string;
+}
+
+const {
+  name,
+  label,
+  type = 'text',
+  required = false,
+  hint,
+  autocomplete,
+  placeholder,
+  inputmode,
+  pattern,
+  rows = 5,
+  options,
+  accept,
+  prefix = 'f',
+  class: className,
+} = Astro.props;
+
+const id = `${prefix}-${name}`;
+const describedBy = [hint && `${id}-hint`, `${id}-error`].filter(Boolean).join(' ');
+---
+<div class:list={['field', className]}>
+  <label class="field__label" for={id}>
+    {label}
+    {!required && <span class="field__opt"> (facultatif)</span>}
+  </label>
+  {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
+  {
+    type === 'textarea' ? (
+      <textarea class="input" id={id} name={name} rows={rows} required={required} placeholder={placeholder} aria-describedby={describedBy} />
+    ) : type === 'select' ? (
+      <select class="input" id={id} name={name} required={required} aria-describedby={describedBy}>
+        <option value="">{placeholder ?? 'Choisir…'}</option>
+        {options?.map((o) => (
+          <option value={o}>{o}</option>
+        ))}
+      </select>
+    ) : (
+      <input
+        class:list={['input', type === 'file' && 'input--file']}
+        id={id}
+        name={name}
+        type={type}
+        required={required}
+        autocomplete={autocomplete}
+        placeholder={placeholder}
+        inputmode={inputmode}
+        pattern={pattern}
+        accept={accept}
+        aria-describedby={describedBy}
+      />
+    )
+  }
+  <p class="field__error" id={`${id}-error`} data-error-for={name} aria-live="polite"></p>
+</div>
+
+<style>
+  .input--file {
+    padding: var(--s-3);
+    background: var(--c-white);
+    font-size: var(--fs-sm);
+    cursor: pointer;
+  }
+
+  .input--file::file-selector-button {
+    margin-right: var(--s-3);
+    padding: var(--s-2) var(--s-4);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-pill);
+    background: var(--c-paper);
+    font: inherit;
+    font-weight: 650;
+    cursor: pointer;
+  }
+</style>

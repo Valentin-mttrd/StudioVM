@@ -1,0 +1,121 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import GardenSection from '../components/art/GardenSection.astro';
+import ServiceGrid from '../components/sections/ServiceGrid.astro';
+import Process from '../components/sections/Process.astro';
+import Realisations from '../components/sections/Realisations.astro';
+import Zone from '../components/sections/Zone.astro';
+import Faq from '../components/sections/Faq.astro';
+import CrossLink from '../components/sections/CrossLink.astro';
+import Icon from '../components/ui/Icon.astro';
+import { COPY, SERVICE_GROUPS, faqFor } from '../data/site';
+import { breadcrumbSchema, faqSchema, serviceSchema } from '../lib/seo';
+
+const path = SERVICE_GROUPS.entretien.path;
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'Entretien de jardin', path },
+];
+const faq = faqFor('entretien');
+const description =
+  'Entretien de jardin et taille de haie à Ploemeur, Larmor-Plage, Quéven, Hennebont et dans tout le Morbihan : tonte, débroussaillage, bordures. Devis gratuit.';
+
+const audiences = [
+  {
+    t: 'Particuliers',
+    d: 'L’entretien de votre jardin : haies, pelouse, massifs, arbustes, talus. En intervention ponctuelle ou en entretien régulier.',
+  },
+  {
+    t: 'Professionnels',
+    d: 'L’entretien de vos espaces verts et de vos parcs, pour les maintenir dans un état optimal.',
+  },
+];
+---
+<Layout
+  title="Entretien de jardin et Taille de haie Ploemeur, Larmor-Plage, Quéven Hennebont"
+  description={description}
+  structuredData={[breadcrumbSchema(crumbs), serviceSchema('entretien', description), faqSchema(faq)]}
+>
+  <PageHero crumbs={crumbs} kicker="Entretenir, saison après saison" lead={COPY.maintenance} quoteHref="/contact/?projet=taille-haie">
+    <Fragment slot="title">
+      Entretien de jardin <em>et taille de haie</em> à Ploemeur
+      <span class="phero__sub">Larmor-Plage, Quéven, Hennebont et tout le Morbihan</span>
+    </Fragment>
+    <GardenSection slot="visual" id="gs-entretien" mode="slider" state="care" />
+  </PageHero>
+
+  <ServiceGrid group="entretien" kicker="Nos prestations" index="01">
+    <Fragment slot="title">Un extérieur <em>dans un état optimal.</em></Fragment>
+    <Fragment slot="intro">{COPY.maintenanceFull}</Fragment>
+  </ServiceGrid>
+
+  <section class="aud section--tight" aria-labelledby="aud-title">
+    <div class="container">
+      <h2 class="sr-only" id="aud-title">Pour qui</h2>
+      <ul role="list" class="aud__list">
+        {
+          audiences.map((a, i) => (
+            <li class="aud__item" data-reveal style={`--i:${i}`}>
+              <span class="aud__icon">
+                <Icon name={i === 0 ? 'garden' : 'hedge'} size={26} />
+              </span>
+              <h3 class="h3">{a.t}</h3>
+              <p class="muted">{a.d}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Process index="02" only={['echange', 'devis', 'entretien']}>
+    <Fragment slot="title">Simple, <em>du premier appel au jardin net.</em></Fragment>
+    <Fragment slot="intro">Pour un devis gratuit ou plus d’informations, un appel ou un message suffit.</Fragment>
+  </Process>
+
+  <Realisations group="entretien" index="03" title="Jardins entretenus" />
+  <Zone index="04" id="zone-entretien" />
+  <Faq items={faq} index="05" />
+  <CrossLink
+    to="creation"
+    kicker="Un nouveau projet"
+    text="Pose de clôture, massifs, maçonnerie paysagère, gazon, arrosage automatique : nous créons aussi votre jardin."
+  />
+</Layout>
+
+<style>
+  .aud {
+    padding-top: 0;
+  }
+
+  .aud__list {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  @media (min-width: 48rem) {
+    .aud__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .aud__item {
+    display: grid;
+    gap: var(--s-3);
+    align-content: start;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-xl);
+  }
+
+  .aud__icon {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--c-pine);
+    color: var(--c-accent);
+  }
+</style>

@@ -1,0 +1,58 @@
+---
+/**
+ * Short "call me back" form: name, phone, preferred time of day. The
+ * slots follow the opening hours (morning / afternoon).
+ */
+import FormShell from './FormShell.astro';
+import Field from './Field.astro';
+import Choices from './Choices.astro';
+---
+<FormShell
+  name="rappel"
+  subject="Demande de rappel — site PRO PAYSAGES"
+  submitLabel="Être rappelé"
+  successTitle="C’est noté."
+  successText="Nous vous rappelons dans les plus brefs délais."
+  class="callback"
+>
+  <div class="callback__grid">
+    <Field name="nom" label="Nom" required autocomplete="name" prefix="r" />
+    <Field
+      name="telephone"
+      label="Téléphone"
+      type="tel"
+      required
+      autocomplete="tel"
+      inputmode="tel"
+      pattern="^(?:\+33\s?|0)[1-9](?:[\s.\-]?\d{2}){4}$"
+      placeholder="06 12 34 56 78"
+      prefix="r"
+    />
+    <Choices
+      name="moment"
+      legend="Plutôt"
+      prefix="r"
+      columns={3}
+      choices={[
+        { value: 'Le matin', label: 'Le matin' },
+        { value: 'L’après-midi', label: 'L’après-midi' },
+        { value: 'Peu importe', label: 'Peu importe' },
+      ]}
+    />
+  </div>
+</FormShell>
+
+<style>
+  .callback__grid {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .callback :global(.form-foot) {
+    margin-top: var(--s-5);
+  }
+
+  .callback :global(.choices__grid) {
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  }
+</style>

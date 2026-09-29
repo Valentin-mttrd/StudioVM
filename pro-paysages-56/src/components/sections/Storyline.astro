@@ -1,0 +1,220 @@
+---
+/**
+ * « De la conception à la réalisation, en passant par l'entretien » — the
+ * sentence the current site uses to describe its scope, told as three
+ * steps next to one drawing that follows the scroll (scripts/storyline.ts).
+ */
+import GardenSection from '../art/GardenSection.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import Icon from '../ui/Icon.astro';
+import { COPY, SERVICE_GROUPS, servicesOf } from '../../data/site';
+
+const steps = [
+  {
+    state: 'plan',
+    index: '01',
+    title: 'Concevoir',
+    lead: COPY.listening,
+    text: 'Nous concevons avec vous un aménagement qui vous ressemble : un espace extérieur qui reflète votre style et répond à vos besoins.',
+    chips: [] as string[],
+    link: null,
+  },
+  {
+    state: 'build',
+    index: '02',
+    title: 'Réaliser',
+    lead: 'Nos artisans qualifiés réalisent votre jardin de A à Z.',
+    text: COPY.creationAtoZ,
+    chips: servicesOf('creation').slice(1).map((s) => s.title),
+    link: { href: SERVICE_GROUPS.creation.path, label: 'La création de jardin' },
+  },
+  {
+    state: 'care',
+    index: '03',
+    title: 'Entretenir',
+    lead: COPY.maintenanceFull,
+    text: COPY.maintenance,
+    chips: servicesOf('entretien').map((s) => s.title),
+    link: { href: SERVICE_GROUPS.entretien.path, label: 'L’entretien de jardin' },
+  },
+];
+---
+<section class="story section" id="savoir-faire" aria-labelledby="story-title" data-story>
+  <div class="container">
+    <SectionHead kicker="Notre savoir-faire" index="01" id="story-title" align="split">
+      De la conception à la réalisation, <em>en passant par l’entretien.</em>
+      <Fragment slot="intro">{COPY.scope}</Fragment>
+    </SectionHead>
+
+    <div class="story__grid">
+      <div class="story__stage">
+        <div class="story__sticky">
+          <GardenSection id="gs-story" mode="scroll" state="build" />
+        </div>
+      </div>
+
+      <ol role="list" class="story__steps">
+        {
+          steps.map((step) => (
+            <li class:list={['story__step', `story__step--${step.state}`]} data-step-state={step.state}>
+              <p class="label story__index">
+                <span>{step.index}</span> / 03
+              </p>
+              <h3 class="display story__title">{step.title}</h3>
+              <p class="lead story__lead">{step.lead}</p>
+              <p class="muted">{step.text}</p>
+              {step.chips.length > 0 && (
+                <ul role="list" class="cluster story__chips">
+                  {step.chips.map((c) => (
+                    <li class="chip">{c}</li>
+                  ))}
+                </ul>
+              )}
+              {step.link && (
+                <a class="link story__link" href={step.link.href}>
+                  {step.link.label}
+                  <Icon name="arrow" size={18} class="btn__icon btn__icon--arrow" />
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .story {
+    position: relative;
+  }
+
+  .story__grid {
+    display: grid;
+  }
+
+  /* Phones: drawing and steps share one cell; the drawing stays pinned at
+     the top of the screen while the steps pass beneath it. */
+  .story__stage,
+  .story__steps {
+    grid-area: 1 / 1;
+  }
+
+  .story__stage {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .story__sticky {
+    position: sticky;
+    top: var(--s-2);
+    padding: var(--s-3) 0 var(--s-8);
+    background: linear-gradient(var(--c-paper) 78%, rgb(244 241 232 / 0));
+    pointer-events: auto;
+  }
+
+  .story__steps {
+    display: grid;
+    padding-top: calc(36vw + var(--s-8));
+  }
+
+  .story__step {
+    display: grid;
+    gap: var(--s-4);
+    align-content: center;
+    justify-items: start;
+    min-height: 70vh;
+    padding-block: var(--s-12);
+    transition: opacity var(--dur-3) var(--ease-out);
+  }
+
+  .story__step--care {
+    min-height: 125vh;
+    align-content: start;
+    padding-top: 22vh;
+  }
+
+  /* The step being told reads in full ink; the others step back in the
+     muted text colour (still AA) instead of fading out. */
+  .story__title {
+    transition: color var(--dur-3) var(--ease-out);
+  }
+
+  :global(.js) .story__step:not(.is-active) .story__title,
+  :global(.js) .story__step:not(.is-active) .story__lead {
+    color: var(--c-muted);
+  }
+
+  .story__step.is-active .story__index span {
+    color: var(--c-accent-deep);
+  }
+
+  .story__index {
+    color: var(--c-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .story__index span {
+    color: var(--c-moss);
+  }
+
+  .story__title {
+    font-size: clamp(2.75rem, 1.8rem + 4vw, 5.5rem);
+  }
+
+  .story__lead {
+    max-width: 30ch;
+    font-weight: 560;
+  }
+
+  .story__step .muted {
+    max-width: 46ch;
+  }
+
+  .story__chips {
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+  }
+
+  .story__link {
+    margin-top: var(--s-2);
+  }
+
+  @media (min-width: 64rem) {
+    .story__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--s-12);
+    }
+
+    .story__stage {
+      grid-area: 1 / 2;
+      margin-right: calc(-1 * var(--gutter));
+    }
+
+    .story__steps {
+      grid-area: 1 / 1;
+      padding-top: 0;
+    }
+
+    .story__sticky {
+      top: calc(50vh - 11rem);
+      padding: 0;
+      background: none;
+    }
+
+    .story__step {
+      min-height: 88vh;
+      padding-block: var(--s-16);
+    }
+
+    .story__step--care {
+      min-height: 150vh;
+      padding-top: 30vh;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/storyline';
+</script>

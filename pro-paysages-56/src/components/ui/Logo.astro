@@ -1,0 +1,85 @@
+---
+/**
+ * Typographic wordmark. Stand-in until the client's official logo file is
+ * supplied (AUDIT.md §4) — swap the markup below for the real SVG then.
+ * The mark is a single leaf and its midrib: the trade, not a new emblem.
+ */
+interface Props {
+  tone?: 'ink' | 'paper';
+  tag?: boolean;
+  class?: string;
+}
+
+const { tone = 'ink', tag = true, class: className } = Astro.props;
+---
+<span class:list={['logo', `logo--${tone}`, className]}>
+  <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <rect width="32" height="32" rx="9" class="logo__tile" />
+    <path d="M8.5 23.5C8.5 14.6 14.3 8.5 23.5 8.5c0 9-6.1 15-15 15Z" class="logo__leaf" />
+    <path d="M8.5 23.5 18.4 13.6M13.6 18.4l-.3-3.9M16 16l3.6.1" class="logo__rib" />
+  </svg>
+  <span class="logo__text">
+    <span class="logo__name">Pro Paysages</span>
+    {tag && <span class="logo__tag">Paysagiste · Ploemeur</span>}
+  </span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    line-height: 1;
+  }
+
+  .logo__mark {
+    width: 2.25rem;
+    height: 2.25rem;
+    flex: none;
+  }
+
+  .logo__tile {
+    fill: var(--c-pine);
+  }
+
+  .logo__leaf {
+    fill: var(--c-accent);
+  }
+
+  .logo__rib {
+    fill: none;
+    stroke: var(--c-pine);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+
+  .logo--paper .logo__tile {
+    fill: var(--c-on-ink);
+  }
+
+  .logo--paper .logo__rib {
+    stroke: var(--c-on-ink);
+  }
+
+  .logo__text {
+    display: grid;
+    gap: 0.28rem;
+  }
+
+  .logo__name {
+    font-family: var(--f-display);
+    font-size: 1.3rem;
+    font-weight: 540;
+    letter-spacing: -0.015em;
+    white-space: nowrap;
+  }
+
+  .logo__tag {
+    font-size: 0.6875rem;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.72;
+    white-space: nowrap;
+  }
+</style>

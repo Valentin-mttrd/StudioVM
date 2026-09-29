@@ -1,0 +1,332 @@
+---
+/**
+ * The hero's garden edge: three depths of Breton garden, generated at build
+ * time (src/lib/botany.ts) and shipped as static SVG.
+ *
+ *   far   — windswept maritime pines and shrubs, pale in the coastal haze
+ *   mid   — clipped box balls, hydrangeas, ornamental grasses, ferns
+ *   front — large ferns and grass framing the bottom of the screen
+ *
+ * Wild plants sway (ferns, grasses); clipped ones never do — the
+ * gardener's hand holds still. Each depth moves at its own rate with the
+ * pointer and the scroll (scripts/hero.ts). All motion stops with
+ * prefers-reduced-motion and whenever the hero is off screen.
+ */
+import { rng, range, frond, tuft, blob, circle, n, precision } from '../../lib/botany';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const r = rng(56270);
+precision(0);
+
+interface Sway {
+  amp: number;
+  dur: number;
+  delay: number;
+  ox: number;
+  oy: number;
+}
+
+// ── Far: windswept maritime pines + a line of shrubs ──
+// Breton coastal pines: a tall, slightly twisted trunk and a flat, uneven
+// crown pushed inland by the wind — clumps at several heights, all leaning
+// the same way.
+function pine(x: number, y: number, h: number, lean: number, wind: number) {
+  const topX = x + lean * h;
+  const topY = y - h;
+  const midX = x + lean * h * 0.5 + wind * 12;
+  const trunk = `M${n(x - 7)} ${y}C${n(x - 6)} ${n(y - h * 0.35)} ${n(midX - 6)} ${n(y - h * 0.6)} ${n(topX - 2)} ${n(topY + 18)}L${n(topX + 2)} ${n(topY + 18)}C${n(midX + 5)} ${n(y - h * 0.6)} ${n(x + 6)} ${n(y - h * 0.35)} ${n(x + 7)} ${y}Z`;
+  let crown = '';
+  let branches = '';
+  const clumps = 5;
+  for (let k = 0; k < clumps; k++) {
+    const u = k / (clumps - 1);
+    // Branch leaves the trunk in its upper third, heads downwind.
+    const bx = x + lean * h * (0.72 + u * 0.28);
+    const by = y - h * (0.72 + u * 0.28);
+    const cx = bx + wind * range(r, 20, 95) * (0.4 + u) + range(r, -18, 18);
+    const cy = by - range(r, 4, 26) + (k % 2 ? 14 : -6);
+    const w = range(r, 38, 64) * (1.1 - u * 0.25);
+    for (let j = 0; j < 2; j++) {
+      crown += blob(r, cx + range(r, -w * 0.45, w * 0.45), cy + range(r, -7, 7), w * range(r, 0.55, 0.8), w * range(r, 0.22, 0.32), 24, 0.14);
+    }
+    branches += `M${n(bx)} ${n(by)}Q${n((bx + cx) / 2)} ${n(by - 4)} ${n(cx)} ${n(cy + 3)}`;
+  }
+  return { trunk, crown, branches };
+}
+
+const pines = [pine(1250, 720, 330, 0.05, -1), pine(1470, 715, 270, -0.06, -1), pine(1080, 725, 220, 0.1, -1)];
+
+let farShrubs = '';
+for (let x = 640; x <= 1640; x += range(r, 60, 95)) {
+  // Shrubs shrink towards the left end so the line fades into the lawn.
+  const w = range(r, 60, 110) * Math.min(1, 0.45 + (x - 640) / 400);
+  farShrubs += blob(r, x, 772 - range(r, 0, 26) * Math.min(1, (x - 600) / 300), w, w * range(r, 0.45, 0.62), 34, 0.1);
+}
+farShrubs += `M700 790Q720 770 760 768H1640V905H700Z`;
+
+// ── Mid: box balls, hydrangeas, grasses, ferns ──
+const balls = [
+  { cx: 968, cy: 818, rx: 76, ry: 72 },
+  { cx: 1096, cy: 846, rx: 52, ry: 50 },
+  { cx: 872, cy: 858, rx: 40, ry: 38 },
+];
+const ballPaths = balls.map((b) => blob(r, b.cx, b.cy, b.rx, b.ry, 48, 0.035)).join('');
+const ballLights = balls.map((b) => blob(r, b.cx - b.rx * 0.22, b.cy - b.ry * 0.26, b.rx * 0.56, b.ry * 0.5, 32, 0.05)).join('');
+
+const hydraLeaves = blob(r, 1300, 870, 170, 86, 40, 0.14);
+let hydraHeads = '';
+let hydraFlorets = '';
+const heads: [number, number, number][] = [
+  [1196, 812, 30],
+  [1262, 790, 36],
+  [1338, 800, 33],
+  [1402, 826, 28],
+  [1300, 842, 26],
+];
+for (const [hx, hy, hr] of heads) {
+  hydraHeads += blob(r, hx, hy, hr, hr * 0.9, 22, 0.1);
+  for (let i = 0; i < 22; i++) {
+    const a = range(r, 0, Math.PI * 2);
+    const d = Math.sqrt(r()) * hr * 0.82;
+    hydraFlorets += circle(hx + Math.cos(a) * d, hy + Math.sin(a) * d * 0.9, range(r, 3.2, 5.4));
+  }
+}
+
+let grass = '';
+for (let i = 0; i < 4; i++) grass += tuft(r, 700 + i * 34 + range(r, -8, 8), 905, range(r, 190, 260), 9, 2.1, 0.5);
+
+const midFerns = [
+  frond({ x: 1650, y: 905, angle: -Math.PI / 2 - 0.62, length: 560, curl: -0.95, width: 74, pairs: 19 }),
+  frond({ x: 1590, y: 925, angle: -Math.PI / 2 - 0.2, length: 470, curl: -1.2, width: 62, pairs: 17 }),
+];
+
+// ── Front: framing ferns and a grass fringe ──
+const frontFerns = [
+  frond({ x: -70, y: 935, angle: -0.46, length: 580, curl: 0.72, width: 84, pairs: 19 }),
+  frond({ x: 30, y: 965, angle: -0.86, length: 380, curl: 0.95, width: 66, pairs: 16 }),
+  frond({ x: 1680, y: 950, angle: -Math.PI + 0.66, length: 500, curl: -0.85, width: 78, pairs: 18 }),
+];
+
+const fringe: { d: string; x: number }[] = [];
+for (let x = 250; x <= 1480; x += 68) {
+  const xx = x + range(r, -20, 20);
+  fringe.push({ d: tuft(r, xx, 910, range(r, 36, 92), 7, 2.3, 0.6), x: xx });
+}
+
+const sway = (amp: number, ox: number, oy: number): Sway => ({
+  amp,
+  dur: range(r, 5.5, 8.5),
+  delay: -range(r, 0, 8),
+  ox,
+  oy,
+});
+
+const swayStyle = (s: Sway) =>
+  `--amp:${s.amp.toFixed(1)}deg;--dur:${s.dur.toFixed(1)}s;--delay:${s.delay.toFixed(1)}s;transform-origin:${Math.round(s.ox)}px ${Math.round(s.oy)}px`;
+
+// Back to the default precision for the other drawings of the page.
+precision(1);
+---
+<svg
+  class:list={['foliage', className]}
+  viewBox="0 0 1600 900"
+  preserveAspectRatio="xMidYMax slice"
+  aria-hidden="true"
+  focusable="false"
+  data-foliage
+>
+  <defs>
+    <linearGradient id="fo-far" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9d3bf" />
+      <stop offset="1" stop-color="#b3c1a3" />
+    </linearGradient>
+    <linearGradient id="fo-mid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7f9c62" />
+      <stop offset="1" stop-color="#557545" />
+    </linearGradient>
+    <linearGradient id="fo-ball" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4f7240" />
+      <stop offset="1" stop-color="#2f4e33" />
+    </linearGradient>
+    <linearGradient id="fo-front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a4a38" />
+      <stop offset="1" stop-color="#14241c" />
+    </linearGradient>
+  </defs>
+
+  <g class="foliage__depth" data-depth="0.25" style="--rise:0">
+    <g class="foliage__rise">
+      {
+        pines.map((p) => (
+          <g class="fo-far">
+            <path d={p.trunk} />
+            <path d={p.branches} class="fo-branch" />
+            <path d={p.crown} />
+          </g>
+        ))
+      }
+      <path d={farShrubs} class="fo-far fo-shrubs" />
+    </g>
+  </g>
+
+  <g class="foliage__depth" data-depth="0.55" style="--rise:1">
+    <g class="foliage__rise">
+      <g class="fo-sway" style={swayStyle(sway(1.6, 760, 905))}>
+        <path d={grass} class="fo-grass" />
+      </g>
+      <path d={ballPaths} class="fo-ball" />
+      <path d={ballLights} class="fo-ball-light" />
+      <path d={hydraLeaves} class="fo-mid" />
+      <path d={hydraHeads} class="fo-hydra" />
+      <path d={hydraFlorets} class="fo-hydra-light" />
+      {
+        midFerns.map((f) => (
+          <g class="fo-sway" style={swayStyle(sway(1.4, f.base[0], f.base[1]))}>
+            <path d={f.rachis} class="fo-rachis fo-rachis--mid" />
+            <path d={f.pinnae} class="fo-mid" />
+          </g>
+        ))
+      }
+    </g>
+  </g>
+
+  <g class="foliage__depth" data-depth="1" style="--rise:2">
+    <g class="foliage__rise">
+      {
+        frontFerns.map((f) => (
+          <g class="fo-sway" style={swayStyle(sway(1.1, f.base[0], f.base[1]))}>
+            <path d={f.rachis} class="fo-rachis" />
+            <path d={f.pinnae} class="fo-front" />
+          </g>
+        ))
+      }
+      {
+        fringe.map((t) => (
+          <g class="fo-sway" style={swayStyle(sway(2.2, t.x, 910))}>
+            <path d={t.d} class="fo-front" />
+          </g>
+        ))
+      }
+    </g>
+  </g>
+</svg>
+
+<style>
+  .foliage {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .fo-far {
+    fill: url(#fo-far);
+  }
+
+  .fo-branch {
+    fill: none;
+    stroke: #bccab0;
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .fo-shrubs {
+    fill: #bfcbb3;
+  }
+
+  .fo-mid {
+    fill: url(#fo-mid);
+  }
+
+  .fo-grass {
+    fill: #9aae80;
+  }
+
+  .fo-ball {
+    fill: url(#fo-ball);
+  }
+
+  .fo-ball-light {
+    fill: #6d8f55;
+    opacity: 0.55;
+  }
+
+  .fo-hydra {
+    fill: #7486c2;
+  }
+
+  .fo-hydra-light {
+    fill: #b3c0ea;
+    opacity: 0.9;
+  }
+
+  .fo-front {
+    fill: url(#fo-front);
+  }
+
+  .fo-rachis {
+    fill: none;
+    stroke: #1d3a2c;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .fo-rachis--mid {
+    stroke: #5b7a47;
+    stroke-width: 2.4;
+  }
+
+  /* Depth: pointer + scroll parallax, set by scripts/hero.ts */
+  .foliage__depth {
+    transform: translate3d(calc(var(--mx, 0) * var(--d, 0) * 1px), calc(var(--sy, 0) * var(--d, 0) * 1px), 0);
+  }
+
+  .foliage__depth[data-depth='0.25'] {
+    --d: 0.25;
+  }
+
+  .foliage__depth[data-depth='0.55'] {
+    --d: 0.55;
+  }
+
+  .foliage__depth[data-depth='1'] {
+    --d: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* The garden rises into frame, far to near. */
+    :global(.js) .foliage__rise {
+      animation: fo-rise 1.6s var(--ease-grow) both;
+      animation-delay: calc(0.15s + var(--rise) * 0.14s);
+    }
+
+    .fo-sway {
+      transform-box: view-box;
+      animation: fo-sway var(--dur) ease-in-out var(--delay) infinite alternate;
+    }
+
+    :global(.is-offscreen) .fo-sway {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes fo-rise {
+    from {
+      opacity: 0;
+      transform: translateY(70px);
+    }
+  }
+
+  @keyframes fo-sway {
+    from {
+      transform: rotate(calc(var(--amp) * -1));
+    }
+    to {
+      transform: rotate(var(--amp));
+    }
+  }
+</style>

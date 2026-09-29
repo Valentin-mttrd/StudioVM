@@ -1,0 +1,287 @@
+---
+/**
+ * Footer: a last invitation to talk about the garden, then every practical
+ * fact in one place — contact, hours, services, towns, legal.
+ */
+import Logo from '../ui/Logo.astro';
+import Icon from '../ui/Icon.astro';
+import StudioCredit from './StudioCredit.astro';
+import { SITE, MAPS_URL, SERVICE_GROUPS, TOWNS, ZONE_RADIUS_KM, servicesOf } from '../../data/site';
+
+interface Props {
+  cta?: boolean;
+}
+
+const { cta = true } = Astro.props;
+const year = new Date().getFullYear();
+---
+<footer class="ftr on-ink">
+  {
+    cta && (
+      <section class="ftr__cta container" aria-labelledby="ftr-cta-title">
+        <p class="label kicker">Devis gratuit</p>
+        <h2 class="display ftr__title" id="ftr-cta-title">
+          Parlons de <em>votre jardin.</em>
+        </h2>
+        <div class="ftr__cta-row">
+          <p class="lead ftr__cta-text">
+            Un projet de création, une haie à tailler, un entretien régulier&nbsp;? Décrivez-le en quelques clics ou
+            appelez-nous directement.
+          </p>
+          <div class="cluster">
+            <a class="btn btn--accent btn--lg" href="/contact/">
+              <span>Demander un devis gratuit</span>
+              <Icon name="arrow" class="btn__icon btn__icon--arrow" />
+            </a>
+            <a class="btn btn--ghost btn--lg" href={SITE.phone.href}>
+              <Icon name="phone" class="btn__icon" />
+              <span>{SITE.phone.display}</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <div class="container ftr__grid">
+    <div class="ftr__brand">
+      <Logo tone="paper" />
+      <p class="muted small ftr__about">
+        Paysagiste à Ploemeur depuis {SITE.foundedYear}. Création et entretien de jardins pour les particuliers et les
+        professionnels, à {TOWNS.slice(1).join(', ')} et alentours.
+      </p>
+    </div>
+
+    <div class="ftr__col">
+      <h2 class="label ftr__head">Contact</h2>
+      <ul role="list" class="ftr__list">
+        <li>
+          <a href={SITE.phone.href} class="ftr__big">{SITE.phone.display}</a>
+        </li>
+        <li>
+          <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </li>
+        <li>
+          <a href={MAPS_URL} target="_blank" rel="noopener" class="ftr__addr">
+            {SITE.address.street}
+            <br />
+            {SITE.address.area}
+            <br />
+            {SITE.address.postalCode} {SITE.address.city}
+            <span class="sr-only"> (plan, nouvel onglet)</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    {
+      SITE.hours && (
+        <div class="ftr__col">
+          <h2 class="label ftr__head">Horaires</h2>
+          <dl class="ftr__hours">
+            {SITE.hours.map((h) => (
+              <div>
+                <dt>{h.days}</dt>
+                <dd class="muted">{h.time}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )
+    }
+
+    <div class="ftr__col">
+      <h2 class="label ftr__head">Prestations</h2>
+      <ul role="list" class="ftr__list">
+        <li>
+          <a href={SERVICE_GROUPS.creation.path}>Création de jardin</a>
+        </li>
+        {
+          servicesOf('creation')
+            .slice(1, 4)
+            .map((s) => (
+              <li class="muted small">{s.title}</li>
+            ))
+        }
+        <li class="ftr__gap">
+          <a href={SERVICE_GROUPS.entretien.path}>Entretien de jardin</a>
+        </li>
+        {
+          servicesOf('entretien')
+            .slice(0, 3)
+            .map((s) => (
+              <li class="muted small">{s.title}</li>
+            ))
+        }
+      </ul>
+    </div>
+
+    <div class="ftr__col">
+      <h2 class="label ftr__head">Zone d’intervention</h2>
+      <ul role="list" class="ftr__list">
+        {TOWNS.map((t) => <li>{t}</li>)}
+        <li class="muted small ftr__gap">
+          Rayon de {ZONE_RADIUS_KM}&nbsp;km autour de Ploemeur, et tout le Morbihan pour l’entretien.
+        </li>
+        <li>
+          <a href="/#zone" class="small">Vérifier ma commune</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container ftr__base">
+    <p class="small muted">
+      © {year} {SITE.name} · {SITE.legalForm} · SIRET {SITE.siret}
+    </p>
+    <ul role="list" class="ftr__legal small">
+      <li><a href="/mentions-legales/">Mentions légales</a></li>
+      <li><a href="/mentions-legales/#donnees">Données personnelles</a></li>
+      <li><a href="/sitemap-index.xml">Plan du site</a></li>
+    </ul>
+    <div class="ftr__credit small">
+      <StudioCredit />
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    position: relative;
+    padding-top: var(--section);
+    overflow: hidden;
+  }
+
+  .ftr a {
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .ftr__col a:hover,
+    .ftr__legal a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .ftr__cta {
+    display: grid;
+    gap: var(--s-8);
+    padding-bottom: var(--section);
+    border-bottom: 1px solid var(--c-line-ink);
+  }
+
+  .ftr__title {
+    max-width: 12ch;
+  }
+
+  .ftr__title em {
+    color: var(--c-accent);
+  }
+
+  .ftr__cta-row {
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  .ftr__cta-text {
+    max-width: 44ch;
+    color: var(--c-on-ink-muted);
+  }
+
+  @media (min-width: 60rem) {
+    .ftr__cta-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+    }
+  }
+
+  .ftr__grid {
+    display: grid;
+    gap: var(--s-10) var(--s-8);
+    padding-block: var(--s-16);
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+
+  .ftr__brand {
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+    grid-column: 1 / -1;
+  }
+
+  .ftr__about {
+    max-width: 38ch;
+  }
+
+  @media (min-width: 72rem) {
+    .ftr__grid {
+      grid-template-columns: 1.5fr repeat(4, minmax(0, 1fr));
+    }
+
+    .ftr__brand {
+      grid-column: auto;
+    }
+  }
+
+  .ftr__head {
+    margin-bottom: var(--s-4);
+    color: var(--c-sage);
+  }
+
+  .ftr__list {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .ftr__big {
+    font-family: var(--f-display);
+    font-size: 1.5rem;
+    font-weight: 440;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .ftr__addr {
+    line-height: 1.5;
+  }
+
+  .ftr__gap {
+    margin-top: var(--s-3);
+  }
+
+  .ftr__hours {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .ftr__hours dt {
+    font-weight: 600;
+  }
+
+  .ftr__base {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3) var(--s-8);
+    padding-block: var(--s-6) calc(var(--s-6) + var(--mobilebar-h, 0px));
+    border-top: 1px solid var(--c-line-ink);
+  }
+
+  .ftr__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+  }
+
+  .ftr__legal a,
+  .ftr__credit {
+    color: var(--c-on-ink-muted);
+  }
+
+  .ftr__legal a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+</style>

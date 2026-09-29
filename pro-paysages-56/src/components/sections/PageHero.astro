@@ -1,0 +1,172 @@
+---
+/**
+ * Inner-page hero: breadcrumb, kicker, the page's H1 (carrying the
+ * indexed keywords), lead, calls to action; the visual goes in the
+ * `visual` slot.
+ */
+import Icon from '../ui/Icon.astro';
+import { SITE } from '../../data/site';
+
+interface Props {
+  crumbs: { name: string; path: string }[];
+  kicker: string;
+  lead?: string;
+  quoteHref?: string;
+  compact?: boolean;
+}
+
+const { crumbs, kicker, lead, quoteHref = '/contact/', compact = false } = Astro.props;
+const hasVisual = Astro.slots.has('visual');
+---
+<section class:list={['phero', compact && 'phero--compact', hasVisual && 'phero--visual']}>
+  <div class="container phero__grid">
+    <div class="phero__text">
+      <nav class="phero__crumbs" aria-label="Fil d’Ariane">
+        <ol role="list">
+          {
+            crumbs.map((c, i) => (
+              <li>
+                {i < crumbs.length - 1 ? <a href={c.path}>{c.name}</a> : <span aria-current="page">{c.name}</span>}
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+      <p class="label kicker phero__in" style="--i:0">{kicker}</p>
+      <h1 class="h1 phero__title phero__in" style="--i:1"><slot name="title" /></h1>
+      {lead && <p class="lead muted phero__lead phero__in" style="--i:2">{lead}</p>}
+      <slot />
+      {
+        !compact && (
+          <div class="cluster phero__ctas phero__in" style="--i:3">
+            <a class="btn btn--lg" href={quoteHref}>
+              <span>Demander un devis gratuit</span>
+              <Icon name="arrow" class="btn__icon btn__icon--arrow" />
+            </a>
+            <a class="btn btn--ghost btn--lg" href={SITE.phone.href}>
+              <Icon name="phone" class="btn__icon" />
+              <span>{SITE.phone.display}</span>
+            </a>
+          </div>
+        )
+      }
+    </div>
+    {
+      hasVisual && (
+        <div class="phero__visual phero__in" style="--i:2">
+          <slot name="visual" />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .phero {
+    position: relative;
+    padding: calc(var(--header-h) + clamp(1.5rem, 1rem + 3vw, 4rem)) 0 clamp(3.5rem, 2rem + 5vw, 7rem);
+    background:
+      radial-gradient(60% 70% at 88% 0%, rgb(255 244 214 / 0.9), transparent 70%),
+      linear-gradient(180deg, #f6f3ea, var(--c-paper));
+    overflow: hidden;
+  }
+
+  .phero--compact {
+    padding-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  .phero__grid {
+    display: grid;
+    gap: var(--s-10);
+    align-items: center;
+  }
+
+  @media (min-width: 64rem) {
+    .phero--visual .phero__grid {
+      grid-template-columns: minmax(0, 11fr) minmax(0, 13fr);
+      gap: var(--s-12);
+    }
+
+    .phero__visual {
+      margin-right: calc(-1 * var(--gutter));
+    }
+  }
+
+  .phero__text {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-5);
+  }
+
+  .phero__crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--c-muted);
+  }
+
+  .phero__crumbs li + li::before {
+    content: '/';
+    margin-right: var(--s-2);
+    opacity: 0.5;
+  }
+
+  .phero__crumbs a {
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .phero__crumbs a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .phero__title {
+    max-width: 15ch;
+    font-size: clamp(2.5rem, 1.45rem + 3.7vw, 5.25rem);
+  }
+
+  .phero--compact .phero__title {
+    max-width: 18ch;
+  }
+
+  .phero__title :global(em) {
+    color: var(--c-moss);
+  }
+
+  .phero__title :global(.phero__sub) {
+    display: block;
+    margin-top: var(--s-4);
+    font-family: var(--f-text);
+    font-size: var(--fs-lead);
+    font-weight: 600;
+    font-style: normal;
+    letter-spacing: -0.005em;
+    line-height: 1.35;
+    color: var(--c-text);
+  }
+
+  .phero__lead {
+    max-width: 48ch;
+  }
+
+  .phero__ctas {
+    margin-top: var(--s-2);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .phero__in {
+      animation: phero-in 1s var(--ease-grow) both;
+      animation-delay: calc(0.08s + var(--i) * 0.08s);
+    }
+  }
+
+  @keyframes phero-in {
+    from {
+      opacity: 0;
+      transform: translateY(22px);
+    }
+  }
+</style>

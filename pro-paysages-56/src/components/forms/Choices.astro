@@ -1,0 +1,101 @@
+---
+/**
+ * A group of radio or checkbox tiles inside a fieldset. For checkboxes,
+ * `required` means "at least one" (checked by src/scripts/forms.ts).
+ */
+import Icon from '../ui/Icon.astro';
+import type { IconName } from '../../data/site';
+
+type Choice = { value: string; label: string; icon?: IconName };
+
+interface Props {
+  name: string;
+  legend: string;
+  type?: 'radio' | 'checkbox';
+  required?: boolean;
+  hint?: string;
+  /** Flat list of tiles… */
+  choices?: Choice[];
+  /** …or tiles under small sub-headings, still one question. */
+  groups?: { title: string; choices: Choice[] }[];
+  columns?: 1 | 2 | 3;
+  prefix?: string;
+  legendClass?: string;
+}
+
+const { name, legend, type = 'radio', required = false, hint, choices = [], groups, columns = 2, prefix = 'f', legendClass } = Astro.props;
+const id = `${prefix}-${name}`;
+const sets = groups ?? [{ title: '', choices }];
+let n = 0;
+---
+<fieldset
+  class="choices"
+  data-group={name}
+  data-group-required={required && type === 'checkbox' ? '' : undefined}
+  aria-describedby={[hint && `${id}-hint`, `${id}-error`].filter(Boolean).join(' ')}
+>
+  <legend class:list={['field__label', legendClass]}>
+    {legend}
+    {!required && <span class="field__opt"> (facultatif)</span>}
+  </legend>
+  {hint && <p class="field__hint" id={`${id}-hint`}>{hint}</p>}
+  {
+    sets.map((set) => (
+      <>
+        {set.title && <p class="label choices__sub">{set.title}</p>}
+        <div class="choices__grid" data-cols={columns}>
+          {set.choices.map((c) => (
+            <label class="choice">
+              <input type={type} name={name} value={c.value} required={required && type === 'radio' && n++ === 0} data-label={c.label} />
+              <span class="choice__face">
+                {c.icon && <Icon name={c.icon} size={20} />}
+                <span>{c.label}</span>
+                <span class="choice__mark" aria-hidden="true" />
+              </span>
+            </label>
+          ))}
+        </div>
+      </>
+    ))
+  }
+  <p class="field__error" id={`${id}-error`} data-error-for={name} aria-live="polite"></p>
+</fieldset>
+
+<style>
+  .choices {
+    display: grid;
+    gap: var(--s-2);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .choices legend {
+    padding: 0;
+    margin-bottom: var(--s-3);
+  }
+
+  .choices__sub {
+    margin-top: var(--s-3);
+    color: var(--c-moss);
+  }
+
+  .choices__grid {
+    display: grid;
+    gap: var(--s-2);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 30rem) {
+    .choices__grid:is([data-cols='2'], [data-cols='3']) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .choices__grid[data-cols='3'] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

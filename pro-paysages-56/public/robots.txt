@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /merci/
+
+Sitemap: https://pro-paysages-56.fr/sitemap-index.xml

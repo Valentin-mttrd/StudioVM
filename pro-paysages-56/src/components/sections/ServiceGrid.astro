@@ -1,0 +1,128 @@
+---
+/**
+ * The services of one trade, as cards. Each card links to the quote
+ * form with that service already ticked.
+ */
+import Icon from '../ui/Icon.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import { servicesOf, type ServiceGroup } from '../../data/site';
+
+interface Props {
+  group: ServiceGroup;
+  kicker: string;
+  index?: string;
+}
+
+const { group, kicker, index } = Astro.props;
+const items = servicesOf(group);
+---
+<section class="sgrid section" aria-labelledby={`sgrid-${group}`}>
+  <div class="container">
+    <SectionHead kicker={kicker} index={index} id={`sgrid-${group}`} align="split">
+      <slot name="title" />
+      <Fragment slot="intro"><slot name="intro" /></Fragment>
+    </SectionHead>
+
+    <ul role="list" class="sgrid__list">
+      {
+        items.map((s, i) => (
+          <li class="scard" data-reveal style={`--i:${i % 3}`}>
+            <span class="scard__icon">
+              <Icon name={s.icon} size={28} strokeWidth={1.4} />
+            </span>
+            <h3 class="h4 scard__title">{s.title}</h3>
+            <p class="muted scard__text">{s.text}</p>
+            <a class="scard__link" href={`/contact/?projet=${s.id}`}>
+              Devis gratuit<span class="sr-only"> : {s.title}</span>
+              <Icon name="arrow" size={16} class="btn__icon btn__icon--arrow" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .sgrid__list {
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  }
+
+  .scard {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: var(--s-3);
+    padding: var(--s-6);
+    border-radius: var(--r-lg);
+    background: var(--c-white);
+    box-shadow: var(--shadow-1);
+    transition:
+      box-shadow var(--dur-3) var(--ease-out),
+      transform var(--dur-3) var(--ease-out);
+  }
+
+  .scard__icon {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-bottom: var(--s-2);
+    border-radius: 50%;
+    background: var(--c-mist);
+    color: var(--c-pine);
+    transition:
+      background-color var(--dur-3) var(--ease-out),
+      color var(--dur-3) var(--ease-out);
+  }
+
+  .scard__text {
+    font-size: var(--fs-sm);
+  }
+
+  .scard__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    justify-self: start;
+    min-height: 2.75rem;
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  /* The whole card is the target; the link stays the accessible name. */
+  .scard__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .scard__link:focus-visible {
+    outline: none;
+  }
+
+  .scard:has(.scard__link:focus-visible) {
+    outline: 2px solid var(--c-pine);
+    outline-offset: 3px;
+  }
+
+  @media (hover: hover) {
+    .scard:hover {
+      box-shadow: var(--shadow-2);
+      transform: translateY(-3px);
+    }
+
+    .scard:hover .scard__icon {
+      background: var(--c-pine);
+      color: var(--c-accent);
+    }
+
+    .scard:hover .btn__icon--arrow {
+      transform: translateX(3px);
+    }
+  }
+</style>

@@ -1,0 +1,524 @@
+---
+/**
+ * Where PRO PAYSAGES works, as the site and the company's listing state
+ * it: Ploemeur, Larmor-Plage, Quéven, Hennebont; a 50 km radius around
+ * Ploemeur; the whole Morbihan for garden upkeep (AUDIT.md §2).
+ *
+ * The map is made of real town centres (GeoNames), one dot per commune:
+ * the coastline draws itself where the dots stop. The checker answers
+ * « Intervenez-vous chez moi ? » with exactly those rules
+ * (scripts/zone.ts) and pre-fills the quote form.
+ */
+import communes from '../../data/communes.json';
+import Icon from '../ui/Icon.astro';
+import SectionHead from '../ui/SectionHead.astro';
+import { SITE, TOWNS, ZONE_RADIUS_KM, HOME_BASE } from '../../data/site';
+import { kmFromBase, project } from '../../lib/geo';
+import { circle, n } from '../../lib/botany';
+
+interface Props {
+  index?: string;
+  id?: string;
+}
+
+const { index, id = 'zone' } = Astro.props;
+
+// Map frame, in km around Ploemeur (x east, y south), 5 units per km.
+const K = 5;
+const X0 = -62;
+const Y0 = -58;
+const W = 170;
+const H = 116;
+const toX = (km: number) => (km - X0) * K;
+const toY = (km: number) => (km - Y0) * K;
+
+type Row = [string, string, string, number | null, number | null];
+const rows = communes as Row[];
+
+let inMorbihan = '';
+let inRadius = '';
+let outside = '';
+for (const [, , dept, lat, lon] of rows) {
+  if (lat === null || lon === null) continue;
+  const [x, y] = project(lat, lon);
+  if (x < X0 || x > X0 + W || y < Y0 || y > Y0 + H) continue;
+  const dot = circle(toX(x), toY(y), 3.4);
+  const d = kmFromBase(lat, lon);
+  if (dept === '56') inMorbihan += dot;
+  else if (d <= ZONE_RADIUS_KM) inRadius += dot;
+  else outside += dot;
+}
+
+const find = (name: string) => rows.find((r) => r[0] === name);
+const labelled = [
+  ...TOWNS.map((t) => ({ name: t, kind: t === HOME_BASE.name ? 'base' : 'town' })),
+  { name: 'Lorient', kind: 'landmark' },
+].map((t) => {
+  const row = find(t.name)!;
+  const [x, y] = project(row[3]!, row[4]!);
+  return { ...t, x: toX(x), y: toY(y) };
+});
+
+// Label offsets tuned so the four names never collide with the base.
+const OFFSET: Record<string, [number, number, 'start' | 'end']> = {
+  Ploemeur: [-12, 26, 'end'],
+  'Larmor-Plage': [10, 22, 'start'],
+  'Quéven': [-10, -12, 'end'],
+  Hennebont: [12, -10, 'start'],
+  Lorient: [12, 7, 'start'],
+};
+
+const cx = toX(0);
+const cy = toY(0);
+const radius = ZONE_RADIUS_KM * K;
+---
+<section class="zone section" id={id} aria-labelledby={`${id}-title`} data-zone>
+  <div class="container">
+    <SectionHead kicker="Zone d’intervention" index={index} id={`${id}-title`} align="split">
+      Ploemeur, Larmor&#8209;Plage, Quéven, Hennebont <em>et alentours.</em>
+      <Fragment slot="intro">
+        Installés à Ploemeur, nous intervenons dans un rayon de {ZONE_RADIUS_KM}&nbsp;km. Pour l’entretien de jardin,
+        notre équipe est disponible dans tout le Morbihan.
+      </Fragment>
+    </SectionHead>
+
+    <div class="zone__grid">
+      <div class="zone__panel">
+        <form class="zone__form" role="search" aria-label="Vérifier votre commune" data-zone-form novalidate>
+          <label class="h3 zone__q" for={`${id}-input`}>Intervenez-vous chez moi&nbsp;?</label>
+          <p class="muted small" id={`${id}-hint`}>Tapez votre commune ou son code postal.</p>
+          <div class="zone__combo">
+            <Icon name="search" size={20} class="zone__search-icon" />
+            <input
+              class="input zone__input"
+              id={`${id}-input`}
+              type="text"
+              inputmode="search"
+              autocomplete="off"
+              autocapitalize="words"
+              spellcheck="false"
+              placeholder="Ex. : Guidel ou 56520"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded="false"
+              aria-controls={`${id}-list`}
+              aria-describedby={`${id}-hint`}
+              data-zone-input
+            />
+            <button class="btn zone__go" type="submit">Vérifier</button>
+            <ul class="zone__list" id={`${id}-list`} role="listbox" aria-label="Communes" hidden data-zone-list></ul>
+          </div>
+        </form>
+
+        <div class="zone__result" role="status" aria-live="polite" data-zone-result></div>
+
+        <ul role="list" class="zone__towns" aria-label="Communes citées">
+          {
+            TOWNS.map((t) => (
+              <li>
+                <button type="button" class="chip zone__chip" data-zone-town={t}>
+                  <Icon name="pin" size={14} />
+                  {t}
+                </button>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="small muted zone__note">
+          Distances à vol d’oiseau depuis le centre de Ploemeur. Une commune n’apparaît pas&nbsp;? Appelez-nous au{' '}
+          <a href={SITE.phone.href}>{SITE.phone.display}</a>.
+        </p>
+      </div>
+
+      <figure class="zone__map">
+        <svg
+          viewBox={`0 0 ${W * K} ${H * K}`}
+          role="img"
+          aria-labelledby={`${id}-map-title`}
+          data-zone-map
+          data-k={K}
+          data-x0={X0}
+          data-y0={Y0}
+        >
+          <title id={`${id}-map-title`}>
+            Carte des communes autour de Ploemeur : cercle de {ZONE_RADIUS_KM} km, communes du Morbihan en vert.
+          </title>
+          <text x="46" y={H * K - 46} class="zone__sea">Océan Atlantique</text>
+          <path d={outside} class="zone__dot zone__dot--out" />
+          <path d={inRadius} class="zone__dot zone__dot--radius" />
+          <path d={inMorbihan} class="zone__dot zone__dot--56" />
+
+          <circle cx={cx} cy={cy} r={radius} class="zone__ring" />
+          <circle cx={cx} cy={cy} r={radius / 2} class="zone__ring zone__ring--half" />
+          <text x={cx + radius * 0.71 + 8} y={cy - radius * 0.71 - 6} class="zone__ring-label">{ZONE_RADIUS_KM} km</text>
+
+          <g class="zone__pick is-hidden" data-zone-pick>
+            <path class="zone__pick-line" d="" data-zone-pick-line />
+            <circle class="zone__pick-dot" r="9" data-zone-pick-dot />
+            <text class="zone__pick-label" data-zone-pick-label></text>
+          </g>
+
+          {
+            labelled.map((t) => {
+              const [dx, dy, anchor] = OFFSET[t.name];
+              return (
+                <g class={`zone__town zone__town--${t.kind}`}>
+                  {t.kind === 'base' && <circle cx={n(t.x)} cy={n(t.y)} r="18" class="zone__pulse" />}
+                  <circle cx={n(t.x)} cy={n(t.y)} r={t.kind === 'landmark' ? 4 : 7} class="zone__town-dot" />
+                  <text x={n(t.x + dx)} y={n(t.y + dy)} text-anchor={anchor}>
+                    {t.name}
+                  </text>
+                </g>
+              );
+            })
+          }
+        </svg>
+        <figcaption class="zone__legend small">
+          <span><i class="zone__key zone__key--56"></i> Morbihan</span>
+          <span><i class="zone__key zone__key--radius"></i> Moins de {ZONE_RADIUS_KM}&nbsp;km, hors Morbihan</span>
+          <span><i class="zone__key zone__key--ring"></i> Rayon de {ZONE_RADIUS_KM}&nbsp;km</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  .zone__grid {
+    display: grid;
+    gap: var(--s-10);
+  }
+
+  @media (min-width: 64rem) {
+    .zone__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--s-12);
+      align-items: center;
+    }
+  }
+
+  .zone__panel {
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+  }
+
+  .zone__form {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .zone__q {
+    display: block;
+  }
+
+  .zone__combo {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+  }
+
+  .zone__combo :global(.zone__search-icon) {
+    position: absolute;
+    left: 1rem;
+    top: 1.6rem;
+    translate: 0 -50%;
+    color: var(--c-muted);
+    pointer-events: none;
+  }
+
+  .zone__input {
+    padding-left: 2.9rem;
+    min-height: 3.25rem;
+  }
+
+  .zone__go {
+    min-height: 3.25rem;
+  }
+
+  .zone__list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 5;
+    max-height: 18rem;
+    margin: 0;
+    padding: var(--s-2);
+    overflow-y: auto;
+    list-style: none;
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background: var(--c-white);
+    box-shadow: var(--shadow-2);
+  }
+
+  .zone__list :global(li) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding: var(--s-3) var(--s-3);
+    border-radius: var(--r);
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .zone__list :global(li span) {
+    color: var(--c-muted);
+    font-weight: 450;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .zone__list :global(li[aria-selected='true']),
+  .zone__list :global(li:hover) {
+    background: var(--c-mist);
+  }
+
+  .zone__result:empty {
+    display: none;
+  }
+
+  .zone__result {
+    display: grid;
+    gap: var(--s-4);
+    padding: var(--s-5) var(--s-6);
+    border-radius: var(--r-lg);
+    background: var(--c-white);
+    box-shadow: var(--shadow-1);
+    border-left: 4px solid var(--c-moss);
+  }
+
+  .zone__result:global(.is-no) {
+    border-left-color: var(--c-accent);
+  }
+
+  .zone__result :global(.zone__verdict) {
+    font-family: var(--f-display);
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+  }
+
+  .zone__result :global(.zone__actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  .zone__towns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  .zone__chip {
+    min-height: 2.75rem;
+    padding: 0 var(--s-4);
+    background: transparent;
+    font-size: var(--fs-sm);
+    cursor: pointer;
+    transition:
+      background-color var(--dur-2) ease,
+      border-color var(--dur-2) ease;
+  }
+
+  @media (hover: hover) {
+    .zone__chip:hover {
+      border-color: var(--c-ink);
+      background: var(--c-white);
+    }
+  }
+
+  .zone__note a {
+    font-weight: 650;
+    color: var(--c-text);
+  }
+
+  /* ── Map ── */
+  .zone__map {
+    margin: 0;
+    padding: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    border-radius: var(--r-xl);
+    background:
+      radial-gradient(80% 90% at 20% 100%, rgb(60 93 108 / 0.12), transparent 60%),
+      var(--c-white);
+    box-shadow: var(--shadow-1);
+  }
+
+  .zone__map svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .zone__sea {
+    font-family: var(--f-display);
+    font-style: italic;
+    font-size: 30px;
+    fill: var(--c-sea);
+    opacity: 0.55;
+  }
+
+  .zone__dot--56 {
+    fill: var(--c-moss);
+  }
+
+  .zone__dot--radius {
+    fill: var(--c-sage);
+  }
+
+  .zone__dot--out {
+    fill: #d6d2c6;
+  }
+
+  .zone__ring {
+    fill: rgb(227 178 60 / 0.07);
+    stroke: var(--c-accent-deep);
+    stroke-width: 2;
+    stroke-dasharray: 10 8;
+  }
+
+  .zone__ring--half {
+    fill: none;
+    stroke: rgb(138 94 12 / 0.35);
+    stroke-dasharray: 3 7;
+  }
+
+  .zone__ring-label {
+    font-family: var(--f-text);
+    font-size: 20px;
+    font-weight: 700;
+    fill: var(--c-accent-deep);
+  }
+
+  .zone__town text {
+    font-family: var(--f-text);
+    font-size: 21px;
+    font-weight: 700;
+    fill: var(--c-ink);
+    paint-order: stroke;
+    stroke: var(--c-white);
+    stroke-width: 6px;
+    stroke-linejoin: round;
+  }
+
+  .zone__town-dot {
+    fill: var(--c-pine);
+    stroke: var(--c-white);
+    stroke-width: 3;
+  }
+
+  .zone__town--base .zone__town-dot {
+    fill: var(--c-accent);
+    stroke: var(--c-ink);
+    stroke-width: 3;
+  }
+
+  .zone__town--base text {
+    font-size: 24px;
+  }
+
+  .zone__town--landmark text {
+    font-weight: 500;
+    font-size: 18px;
+    fill: var(--c-muted);
+  }
+
+  .zone__town--landmark .zone__town-dot {
+    fill: var(--c-muted);
+  }
+
+  .zone__pulse {
+    fill: none;
+    stroke: var(--c-accent-deep);
+    stroke-width: 2;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .zone__pulse {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: zone-pulse 2.6s var(--ease-out) infinite;
+    }
+  }
+
+  @keyframes zone-pulse {
+    0% {
+      opacity: 0.8;
+      transform: scale(0.4);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(2.2);
+    }
+  }
+
+  .zone__pick.is-hidden {
+    display: none;
+  }
+
+  .zone__pick-line {
+    fill: none;
+    stroke: var(--c-ink);
+    stroke-width: 2;
+    stroke-dasharray: 6 6;
+  }
+
+  .zone__pick-dot {
+    fill: var(--c-accent);
+    stroke: var(--c-ink);
+    stroke-width: 3;
+  }
+
+  .zone__pick-label {
+    font-family: var(--f-text);
+    font-size: 22px;
+    font-weight: 700;
+    fill: var(--c-ink);
+    paint-order: stroke;
+    stroke: var(--c-white);
+    stroke-width: 7px;
+    stroke-linejoin: round;
+  }
+
+  .zone__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    margin-top: var(--s-3);
+    color: var(--c-muted);
+  }
+
+  .zone__legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .zone__key {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+  }
+
+  .zone__key--56 {
+    background: var(--c-moss);
+  }
+
+  .zone__key--radius {
+    background: var(--c-sage);
+  }
+
+  .zone__key--ring {
+    border: 2px dashed var(--c-accent-deep);
+    background: rgb(227 178 60 / 0.1);
+  }
+</style>
+
+<script>
+  import '../../scripts/zone';
+</script>

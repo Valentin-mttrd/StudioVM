@@ -1,0 +1,116 @@
+---
+/**
+ * Clearly labelled stand-in for a photo that still has to be supplied
+ * (AUDIT.md §4). A fern drawn in outline, like a leaf pressed in a
+ * herbarium — it reads as "to be placed", never as a real project.
+ */
+interface Props {
+  label: string;
+  ratio?: string;
+  tone?: 'paper' | 'ink';
+  class?: string;
+}
+
+const { label, ratio = '4 / 3', tone = 'paper', class: className } = Astro.props;
+
+// A small fern frond, generated once: rachis + alternate pinnae.
+const pinnae: string[] = [];
+const n = 11;
+for (let i = 1; i <= n; i++) {
+  const t = i / (n + 1);
+  const y = 88 - t * 72;
+  const x = 50 + Math.sin(t * 2.4) * 5;
+  const len = 26 * Math.sin(Math.PI * Math.pow(t, 0.8)) * (1 - t * 0.35) + 3;
+  for (const s of [-1, 1]) {
+    const tipX = x + s * len;
+    const tipY = y - len * 0.42;
+    const cX = x + s * len * 0.5;
+    pinnae.push(`M${x.toFixed(1)} ${y.toFixed(1)}Q${cX.toFixed(1)} ${(y - len * 0.42).toFixed(1)} ${tipX.toFixed(1)} ${tipY.toFixed(1)}Q${cX.toFixed(1)} ${(y - len * 0.06).toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}Z`);
+  }
+}
+const frond = pinnae.join('');
+---
+<div class:list={['slot', `slot--${tone}`, className]} style={`aspect-ratio:${ratio}`} role="img" aria-label={`Emplacement photo : ${label}`}>
+  <svg class="slot__fern" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+    <path d="M50 96C50 70 52 40 56 12" class="slot__rachis" />
+    <path d={frond} class="slot__pinnae" />
+  </svg>
+  <span class="slot__tag">
+    <span class="label slot__kicker">Photo à intégrer</span>
+    <span class="slot__label">{label}</span>
+  </span>
+</div>
+
+<style>
+  .slot {
+    position: relative;
+    display: grid;
+    place-items: end start;
+    width: 100%;
+    padding: var(--s-4);
+    border: 1px dashed var(--c-line-strong);
+    border-radius: var(--r-lg);
+    background:
+      radial-gradient(120% 90% at 70% 20%, rgb(255 255 255 / 0.5), transparent 60%),
+      var(--c-paper-2);
+    overflow: hidden;
+  }
+
+  .slot--ink {
+    border-color: var(--c-line-ink-strong);
+    background:
+      radial-gradient(120% 90% at 70% 20%, rgb(255 255 255 / 0.06), transparent 60%),
+      var(--c-pine-2);
+    color: var(--c-on-ink);
+  }
+
+  .slot__fern {
+    position: absolute;
+    inset: 8% 10%;
+    width: 80%;
+    height: 84%;
+  }
+
+  .slot__rachis,
+  .slot__pinnae {
+    fill: none;
+    stroke: var(--c-sage);
+    stroke-width: 0.45;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .slot--ink .slot__rachis,
+  .slot--ink .slot__pinnae {
+    stroke: rgb(174 189 156 / 0.45);
+  }
+
+  .slot__tag {
+    position: relative;
+    display: grid;
+    gap: 0.15rem;
+    max-width: 90%;
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r);
+    background: var(--c-paper);
+    box-shadow: var(--shadow-1);
+  }
+
+  .slot--ink .slot__tag {
+    background: var(--c-ink);
+  }
+
+  .slot__kicker {
+    color: var(--c-accent-deep);
+    font-size: 0.6875rem;
+  }
+
+  .slot--ink .slot__kicker {
+    color: var(--c-accent);
+  }
+
+  .slot__label {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+</style>

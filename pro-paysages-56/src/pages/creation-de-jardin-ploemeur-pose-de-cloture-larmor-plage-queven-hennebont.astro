@@ -1,0 +1,56 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import GardenSection from '../components/art/GardenSection.astro';
+import ServiceGrid from '../components/sections/ServiceGrid.astro';
+import Process from '../components/sections/Process.astro';
+import Realisations from '../components/sections/Realisations.astro';
+import Zone from '../components/sections/Zone.astro';
+import Faq from '../components/sections/Faq.astro';
+import CrossLink from '../components/sections/CrossLink.astro';
+import { COPY, SERVICE_GROUPS, faqFor } from '../data/site';
+import { breadcrumbSchema, faqSchema, serviceSchema } from '../lib/seo';
+
+const path = SERVICE_GROUPS.creation.path;
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'Création de jardin', path },
+];
+const faq = faqFor('creation');
+const description =
+  'Création de jardin à Ploemeur, Quéven, Hennebont, Larmor-Plage : pose de clôture, massifs, maçonnerie paysagère, gazon, arrosage automatique. Devis gratuit.';
+---
+<Layout
+  title="Création de jardin Ploemeur - Pose de clôture Quéven Hennebont Larmor-Plage"
+  description={description}
+  structuredData={[breadcrumbSchema(crumbs), serviceSchema('creation', description), faqSchema(faq)]}
+>
+  <PageHero crumbs={crumbs} kicker="Concevoir et réaliser" lead={COPY.creation} quoteHref="/contact/?projet=creation-jardin">
+    <Fragment slot="title">
+      Création de jardin <em>et pose de clôture</em> à Ploemeur
+      <span class="phero__sub">Quéven, Hennebont, Larmor-Plage et alentours</span>
+    </Fragment>
+    <GardenSection slot="visual" id="gs-creation" mode="intro" />
+  </PageHero>
+
+  <ServiceGrid group="creation" kicker="Nos prestations" index="01">
+    <Fragment slot="title">De la conception <em>à la réalisation.</em></Fragment>
+    <Fragment slot="intro">{COPY.creationAtoZ}</Fragment>
+  </ServiceGrid>
+
+  <Process index="02">
+    <Fragment slot="title">Votre jardin, <em>de A à Z.</em></Fragment>
+    <Fragment slot="intro">
+      Une communication ouverte et transparente à chaque étape, pour un aménagement qui vous ressemble.
+    </Fragment>
+  </Process>
+
+  <Realisations group="creation" index="03" title="Jardins créés" />
+  <Zone index="04" id="zone-creation" />
+  <Faq items={faq} index="05" />
+  <CrossLink
+    to="entretien"
+    kicker="Et ensuite"
+    text="Taille de haie, tonte, débroussaillage : nous maintenons votre jardin dans un état optimal, saison après saison."
+  />
+</Layout>

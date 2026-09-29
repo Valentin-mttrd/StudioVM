@@ -1,0 +1,252 @@
+---
+/**
+ * Home hero. Answers, in reading order: who (a landscaper), where
+ * (Ploemeur and the three towns the site names), what (creation and
+ * upkeep), why (since 2012, for private and professional clients, free
+ * quote). The garden edge rises behind the words.
+ */
+import Foliage from '../art/Foliage.astro';
+import Icon from '../ui/Icon.astro';
+import { SITE, ZONE_RADIUS_KM } from '../../data/site';
+---
+<section class="hero" aria-labelledby="hero-title" data-hero>
+  <div class="hero__sky" aria-hidden="true"></div>
+  <div class="hero__art">
+    <Foliage />
+  </div>
+
+  <div class="container hero__content">
+    <p class="label kicker hero__kicker hero__in" style="--i:0">{SITE.name} · Morbihan · depuis {SITE.foundedYear}</p>
+    <h1 class="hero__title" id="hero-title">
+      <span class="display hero__main hero__in" style="--i:1">Paysagiste à <em>Ploemeur</em></span>
+      <span class="hero__sub hero__in" style="--i:2">
+        Création et entretien de jardins à Larmor&#8209;Plage, Quéven, Hennebont et alentours
+      </span>
+    </h1>
+    <p class="lead hero__lead hero__in" style="--i:3">
+      Au service des particuliers et des professionnels, notre paysagiste qualifié vous accompagne de la conception à
+      la réalisation, en passant par l’entretien régulier de votre jardin.
+    </p>
+    <div class="cluster hero__ctas hero__in" style="--i:4">
+      <a class="btn btn--lg" href="/contact/">
+        <span>Demander un devis gratuit</span>
+        <Icon name="arrow" class="btn__icon btn__icon--arrow" />
+      </a>
+      <a class="btn btn--ghost btn--lg hero__call" href={SITE.phone.href}>
+        <Icon name="phone" class="btn__icon" />
+        <span>{SITE.phone.display}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="facts on-ink" aria-label="PRO PAYSAGES en bref">
+  <div class="container">
+    <ul role="list" class="facts__list">
+      <li class="facts__item" data-reveal style="--i:0">
+        <span class="facts__value">{SITE.foundedYear}</span>
+        <span class="facts__label">Au service des particuliers et des professionnels depuis</span>
+      </li>
+      <li class="facts__item" data-reveal style="--i:1">
+        <span class="facts__value">De A à Z</span>
+        <span class="facts__label">Conception, réalisation, puis entretien régulier</span>
+      </li>
+      <li class="facts__item" data-reveal style="--i:2">
+        <span class="facts__value">{ZONE_RADIUS_KM}&nbsp;km</span>
+        <span class="facts__label">Rayon d’intervention autour de Ploemeur</span>
+      </li>
+      <li class="facts__item" data-reveal style="--i:3">
+        <span class="facts__value">Gratuit</span>
+        <span class="facts__label">Le devis, par téléphone ou en ligne</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: grid;
+    min-height: max(40rem, min(100svh, 62rem));
+    padding-top: calc(var(--header-h) + clamp(2rem, 1rem + 5vh, 5.5rem));
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--c-paper);
+  }
+
+  /* Morning light over the coast: warm top right, sea haze at the horizon. */
+  .hero__sky {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      radial-gradient(60% 55% at 82% 18%, rgb(255 244 214 / 0.95), transparent 70%),
+      radial-gradient(90% 60% at 60% 78%, rgb(214 225 222 / 0.9), transparent 70%),
+      linear-gradient(180deg, #f6f3ea 0%, #eef0e6 55%, #e3e9e0 100%);
+  }
+
+  .hero__art {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: -1;
+    height: 44%;
+    pointer-events: none;
+  }
+
+  /* Phones: a wider window on the garden, centred on the box balls and
+     hydrangeas rather than on the empty middle of the composition. */
+  .hero__art :global(.foliage) {
+    width: 190%;
+    margin-left: -78%;
+  }
+
+  .hero__content {
+    align-self: start;
+    display: grid;
+    justify-items: start;
+    gap: var(--s-6);
+    padding-bottom: 36vh;
+  }
+
+  .hero__title {
+    display: grid;
+    gap: var(--s-5);
+    margin: 0;
+    font-weight: inherit;
+  }
+
+  .hero__main {
+    display: block;
+    max-width: 9.5ch;
+  }
+
+  .hero__main em {
+    color: var(--c-moss);
+  }
+
+  .hero__sub {
+    display: block;
+    max-width: 32ch;
+    font-family: var(--f-text);
+    font-size: var(--fs-lead);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+
+  .hero__lead {
+    max-width: 40ch;
+    color: var(--c-muted);
+  }
+
+  .hero__ctas {
+    margin-top: var(--s-2);
+  }
+
+  /* Phones already have « Appeler » in the action bar. */
+  @media (max-width: 47.99rem) {
+    .hero__call {
+      display: none;
+    }
+  }
+
+  .hero__call {
+    background: rgb(244 241 232 / 0.6);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (min-width: 48rem) {
+    .hero__art {
+      height: 70%;
+    }
+
+    .hero__art :global(.foliage) {
+      width: 100%;
+      margin-left: 0;
+    }
+
+    .hero__content {
+      padding-bottom: 30vh;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .hero__art {
+      height: 100%;
+    }
+
+    .hero__content {
+      padding-bottom: var(--s-24);
+    }
+
+    .hero__lead {
+      max-width: 44ch;
+    }
+  }
+
+  /* Staggered entrance, words first, then the garden rises. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .hero__in {
+      animation: hero-in 1.1s var(--ease-grow) both;
+      animation-delay: calc(0.1s + var(--i) * 0.09s);
+    }
+  }
+
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(26px);
+    }
+  }
+
+  /* ── Facts band, the soil under the garden ── */
+  .facts {
+    position: relative;
+    background: var(--c-ink);
+  }
+
+  .facts__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-8) var(--s-6);
+    padding-block: var(--s-12);
+  }
+
+  .facts__item {
+    display: grid;
+    gap: var(--s-2);
+    align-content: start;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--c-line-ink-strong);
+  }
+
+  .facts__value {
+    font-family: var(--f-display);
+    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--c-accent);
+  }
+
+  .facts__label {
+    max-width: 26ch;
+    font-size: var(--fs-sm);
+    color: var(--c-on-ink-muted);
+    line-height: 1.45;
+  }
+
+  @media (min-width: 60rem) {
+    .facts__list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      padding-block: var(--s-16);
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/hero';
+</script>

@@ -1,0 +1,90 @@
+---
+// Global styles first, so component styles (same specificity) override them.
+import '../styles/global.css';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import MobileBar from '../components/layout/MobileBar.astro';
+import { SITE } from '../data/site';
+import { absoluteUrl, pageTitle, localBusinessSchema } from '../lib/seo';
+import fraunces from '@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url';
+import figtree from '@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2?url';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Appends "– PRO PAYSAGES" to the title (home). */
+  brandTitle?: boolean;
+  noindex?: boolean;
+  structuredData?: object[];
+  footerCta?: boolean;
+}
+
+const { title, description, brandTitle = false, noindex = false, structuredData = [], footerCta = true } = Astro.props;
+
+const canonicalUrl = absoluteUrl(Astro.url.pathname);
+const resolvedTitle = pageTitle(title, brandTitle);
+const ogImage = absoluteUrl('/og-image.jpg');
+const schemas = [localBusinessSchema(), ...structuredData];
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#f4f1e8" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <title>{resolvedTitle}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex, follow" /> : <link rel="canonical" href={canonicalUrl} />}
+
+    <link rel="preload" href={fraunces} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={figtree} as="font" type="font/woff2" crossorigin />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={resolvedTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="PRO PAYSAGES, paysagiste à Ploemeur (56)" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="geo.region" content="FR-56" />
+    <meta name="geo.placename" content="Ploemeur" />
+
+    {schemas.map((schema) => <script type="application/ld+json" set:html={JSON.stringify(schema)} />)}
+  </head>
+  <body>
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <Header />
+    <main id="contenu" tabindex="-1">
+      <slot />
+    </main>
+    <Footer cta={footerCta} />
+    <MobileBar />
+
+    <script>
+      import '../scripts/reveal';
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+</style>

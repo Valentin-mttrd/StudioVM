@@ -1,0 +1,196 @@
+---
+/**
+ * Free-quote request in three short steps. Every question maps to what a
+ * landscaper needs to prepare a quote; only the services list, the town
+ * and a way to call back are required. Pre-filled from ?projet= and
+ * ?commune= (src/scripts/forms.ts).
+ */
+import FormShell from './FormShell.astro';
+import Field from './Field.astro';
+import Choices from './Choices.astro';
+import { servicesOf } from '../../data/site';
+
+const toChoice = (s: { id: string; title: string; icon: any }) => ({ value: s.id, label: s.title, icon: s.icon });
+---
+<FormShell
+  name="devis"
+  subject="Demande de devis — site PRO PAYSAGES"
+  submitLabel="Envoyer ma demande de devis"
+  successTitle="Merci, votre demande est bien partie."
+  successText="Nous revenons vers vous dans les plus brefs délais pour préparer votre devis gratuit."
+  steps={['Votre projet', 'Votre jardin', 'Vos coordonnées']}
+  files
+>
+  <div class="step" data-step>
+    <h3 class="h3 step__title" tabindex="-1" data-step-title>Que souhaitez-vous faire&nbsp;?</h3>
+    <div class="step__grid">
+      <Choices
+        name="projet"
+        type="checkbox"
+        legend="Prestations souhaitées"
+        hint="Plusieurs choix possibles."
+        required
+        columns={2}
+        groups={[
+          { title: 'Création de jardin', choices: servicesOf('creation').map(toChoice) },
+          {
+            title: 'Entretien de jardin',
+            choices: [...servicesOf('entretien').map(toChoice), { value: 'autre', label: 'Autre demande', icon: 'leaf' }],
+          },
+        ]}
+      />
+      <Choices
+        name="client"
+        legend="Vous êtes"
+        required
+        columns={2}
+        choices={[
+          { value: 'particulier', label: 'Un particulier' },
+          { value: 'professionnel', label: 'Un professionnel' },
+        ]}
+      />
+    </div>
+  </div>
+
+  <div class="step" data-step>
+    <h3 class="h3 step__title" tabindex="-1" data-step-title>Parlez-nous de votre jardin</h3>
+    <div class="step__grid">
+      <Field name="commune" label="Commune du jardin" required autocomplete="address-level2" placeholder="Ex. : Larmor-Plage" />
+      <Field
+        name="surface"
+        label="Surface approximative"
+        type="select"
+        placeholder="Je ne sais pas encore"
+        options={['Moins de 200 m²', '200 à 500 m²', '500 à 1 000 m²', 'Plus de 1 000 m²']}
+      />
+      <Choices
+        name="frequence"
+        legend="Intervention souhaitée"
+        columns={3}
+        choices={[
+          { value: 'Ponctuelle', label: 'Ponctuelle' },
+          { value: 'Régulière', label: 'Régulière' },
+          { value: 'À définir', label: 'À définir ensemble' },
+        ]}
+      />
+      <Choices
+        name="delai"
+        legend="Délai"
+        columns={3}
+        choices={[
+          { value: 'Dès que possible', label: 'Dès que possible' },
+          { value: 'Dans les 3 mois', label: 'Dans les 3 mois' },
+          { value: 'Pas de date', label: 'Pas de date précise' },
+        ]}
+      />
+      <Field
+        name="message"
+        label="Votre projet en quelques mots"
+        type="textarea"
+        rows={4}
+        placeholder="Ex. : haie de 20 m à tailler, clôture à poser le long du jardin…"
+      />
+      <Field
+        name="photo"
+        label="Une photo du jardin"
+        type="file"
+        accept="image/*"
+        hint="Elle aide à préparer le devis. JPG ou PNG, 8 Mo au maximum."
+      />
+    </div>
+  </div>
+
+  <div class="step" data-step>
+    <h3 class="h3 step__title" tabindex="-1" data-step-title>Comment vous joindre&nbsp;?</h3>
+    <div class="step__grid step__grid--2">
+      <Field name="nom" label="Nom" required autocomplete="name" />
+      <Field
+        name="telephone"
+        label="Téléphone"
+        type="tel"
+        required
+        autocomplete="tel"
+        inputmode="tel"
+        pattern="^(?:\+33\s?|0)[1-9](?:[\s.\-]?\d{2}){4}$"
+        placeholder="06 12 34 56 78"
+      />
+      <Field name="email" label="E-mail" type="email" autocomplete="email" inputmode="email" class="step__full" />
+      <Choices
+        name="contact"
+        legend="Vous préférez être contacté"
+        columns={2}
+        choices={[
+          { value: 'Par téléphone', label: 'Par téléphone' },
+          { value: 'Par e-mail', label: 'Par e-mail' },
+        ]}
+      />
+    </div>
+    <div class="recap" data-recap-wrap hidden>
+      <p class="label recap__title">Votre demande</p>
+      <dl class="recap__list" data-recap></dl>
+    </div>
+  </div>
+</FormShell>
+
+<style>
+  .step {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .step__title:focus {
+    outline: none;
+  }
+
+  .step__grid {
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  .step__grid--2 {
+    gap: var(--s-6) var(--s-5);
+  }
+
+  @media (min-width: 40rem) {
+    .step__grid--2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .step__grid--2 > :global(.step__full),
+    .step__grid--2 > :global(fieldset) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .recap {
+    margin-top: var(--s-8);
+    padding: var(--s-5) var(--s-6);
+    border-radius: var(--r-lg);
+    background: var(--c-paper-2);
+  }
+
+  .recap__title {
+    margin-bottom: var(--s-3);
+    color: var(--c-moss);
+  }
+
+  .recap__list {
+    display: grid;
+    gap: var(--s-2);
+    font-size: var(--fs-sm);
+  }
+
+  .recap__list :global(div) {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: var(--s-3);
+  }
+
+  .recap__list :global(dt) {
+    color: var(--c-muted);
+  }
+
+  .recap__list :global(dd) {
+    font-weight: 600;
+  }
+</style>

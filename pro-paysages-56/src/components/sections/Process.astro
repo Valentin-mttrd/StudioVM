@@ -1,0 +1,145 @@
+---
+/**
+ * How a project unfolds (STEPS in src/data/site.ts), as a path of
+ * stepping stones: each stone lights up as it scrolls into view.
+ */
+import SectionHead from '../ui/SectionHead.astro';
+import { STEPS } from '../../data/site';
+
+interface Props {
+  only?: string[];
+  index?: string;
+}
+
+const { only, index } = Astro.props;
+const steps = only ? STEPS.filter((s) => only.includes(s.id)) : STEPS;
+---
+<section class="proc section bg-paper-2" aria-labelledby="proc-title">
+  <div class="container">
+    <SectionHead kicker="Comment ça se passe" index={index} id="proc-title" align="split">
+      <slot name="title" />
+      <Fragment slot="intro"><slot name="intro" /></Fragment>
+    </SectionHead>
+
+    <ol role="list" class="proc__list" style={`--n:${steps.length}`}>
+      {
+        steps.map((s, i) => (
+          <li class="proc__step" data-reveal style={`--i:${i}`}>
+            <span class="proc__stone" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <h3 class="h3 proc__title">{s.title}</h3>
+            <p class="muted proc__text">{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .proc__list {
+    position: relative;
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  /* The path joining the stones */
+  .proc__list::before {
+    content: '';
+    position: absolute;
+    top: 1.75rem;
+    bottom: 1.75rem;
+    left: 1.75rem;
+    width: 0;
+    border-left: 2px dashed var(--c-line-strong);
+  }
+
+  .proc__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    column-gap: var(--s-5);
+    row-gap: var(--s-2);
+    align-items: start;
+  }
+
+  .proc__stone {
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 46% 54% 52% 48% / 55% 45% 55% 45%;
+    background: var(--c-paper-3);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-ink);
+    transition:
+      background-color var(--dur-4) var(--ease-out),
+      color var(--dur-4) var(--ease-out);
+    transition-delay: calc(var(--i) * 120ms + 200ms);
+  }
+
+  .proc__step.is-in .proc__stone,
+  :global(html:not(.js)) .proc__stone {
+    background: var(--c-pine);
+    color: var(--c-accent);
+  }
+
+  .proc__title {
+    align-self: center;
+    min-height: 3.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .proc__text {
+    grid-column: 2;
+    max-width: 38ch;
+    font-size: var(--fs-sm);
+  }
+
+  @media (min-width: 64rem) {
+    .proc__list {
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+      gap: var(--s-6);
+    }
+
+    .proc__list::before {
+      top: 1.75rem;
+      bottom: auto;
+      left: 1.75rem;
+      right: 1.75rem;
+      width: auto;
+      height: 0;
+      border-left: 0;
+      border-top: 2px dashed var(--c-line-strong);
+    }
+
+    .proc__step {
+      grid-template-columns: 1fr;
+      row-gap: var(--s-4);
+    }
+
+    .proc__stone {
+      grid-row: auto;
+    }
+
+    .proc__title {
+      min-height: 0;
+    }
+
+    .proc__text {
+      grid-column: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .proc__stone {
+      background: var(--c-pine);
+      color: var(--c-accent);
+    }
+  }
+</style>

@@ -1,0 +1,177 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/sections/PageHero.astro';
+import { SITE } from '../data/site';
+import { breadcrumbSchema } from '../lib/seo';
+
+const crumbs = [
+  { name: 'Accueil', path: '/' },
+  { name: 'Mentions légales', path: '/mentions-legales/' },
+];
+---
+<Layout
+  title="Mentions légales – PRO PAYSAGES"
+  description="Mentions légales du site de PRO PAYSAGES, paysagiste à Ploemeur (56) : éditeur, SIRET, hébergeur, données personnelles et crédits."
+  structuredData={[breadcrumbSchema(crumbs)]}
+>
+  <PageHero crumbs={crumbs} kicker="Informations légales" compact>
+    <Fragment slot="title">Mentions <em>légales</em></Fragment>
+  </PageHero>
+
+  <section class="legal">
+    <div class="container legal__grid">
+      <nav class="legal__toc" aria-label="Sommaire">
+        <p class="label">Sommaire</p>
+        <ol role="list">
+          <li><a href="#editeur">Éditeur du site</a></li>
+          <li><a href="#hebergeur">Hébergeur</a></li>
+          <li><a href="#donnees">Données personnelles</a></li>
+          <li><a href="#cookies">Cookies</a></li>
+          <li><a href="#propriete">Propriété intellectuelle</a></li>
+          <li><a href="#credits">Crédits</a></li>
+        </ol>
+      </nav>
+
+      <div class="prose legal__body">
+        <h2 id="editeur">Éditeur du site</h2>
+        <p>
+          <strong>{SITE.name}</strong>, {SITE.legalForm}<br />
+          {SITE.address.street}, {SITE.address.area}<br />
+          {SITE.address.postalCode} {SITE.address.city}<br />
+          SIREN {SITE.siren} · SIRET {SITE.siret}
+        </p>
+        <p>
+          Téléphone : <a href={SITE.phone.href}>{SITE.phone.display}</a><br />
+          E-mail : <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </p>
+        <p>Directeur de la publication : le gérant de la société {SITE.name}.</p>
+        <p class="legal__todo">
+          À compléter avant la mise en ligne : capital social, ville du RCS et numéro de TVA intracommunautaire.
+        </p>
+
+        <h2 id="hebergeur">Hébergeur</h2>
+        <p>
+          {SITE.host.name}, {SITE.host.address} —{' '}
+          <a href={SITE.host.url} target="_blank" rel="noopener">{SITE.host.url.replace('https://', '')}</a>.
+        </p>
+
+        <h2 id="donnees">Données personnelles</h2>
+        <p>
+          Les formulaires du site (demande de devis, demande de rappel) vous permettent de nous transmettre votre nom, votre
+          numéro de téléphone, votre adresse e-mail, votre commune, la description de votre projet et, si vous le souhaitez,
+          une photo de votre jardin.
+        </p>
+        <p>
+          Ces informations servent uniquement à répondre à votre demande et à préparer votre devis. Elles ne sont ni vendues
+          ni transmises à des tiers à des fins commerciales, et sont conservées le temps nécessaire au traitement de votre
+          demande. Les envois de formulaires sont réceptionnés par le service de formulaires de l’hébergeur.
+        </p>
+        <p>
+          Le vérificateur de commune («&nbsp;Intervenez-vous chez moi&nbsp;?&nbsp;») fonctionne entièrement dans votre
+          navigateur : la commune saisie n’est envoyée nulle part.
+        </p>
+        <p>
+          Conformément au Règlement général sur la protection des données et à la loi «&nbsp;Informatique et
+          Libertés&nbsp;», vous disposez d’un droit d’accès, de rectification, d’effacement et d’opposition sur les
+          données vous concernant. Pour l’exercer, écrivez à <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ou par
+          courrier à l’adresse ci-dessus. Vous pouvez également adresser une réclamation à la CNIL.
+        </p>
+
+        <h2 id="cookies">Cookies</h2>
+        <p>
+          Ce site ne dépose aucun cookie publicitaire ni de mesure d’audience. Les polices de caractères sont hébergées
+          avec le site : aucune requête n’est faite vers un service tiers pendant votre visite.
+        </p>
+
+        <h2 id="propriete">Propriété intellectuelle</h2>
+        <p>
+          L’ensemble des contenus de ce site (textes, photographies, illustrations) est la propriété de {SITE.name} ou de
+          ses partenaires. Toute reproduction sans autorisation préalable est interdite.
+        </p>
+
+        <h2 id="credits">Crédits</h2>
+        <p>
+          Conception et réalisation du site : <a href="https://www.studiovm-design.fr" target="_blank" rel="noopener">Studio VM</a>.
+          Illustrations dessinées pour le site.
+        </p>
+        <p>
+          Coordonnées des communes de la carte d’intervention :{' '}
+          <a href="https://www.geonames.org" target="_blank" rel="noopener">GeoNames</a>, sous licence{' '}
+          <a href="https://creativecommons.org/licenses/by/4.0/deed.fr" target="_blank" rel="noopener">CC BY 4.0</a>.
+          Liste officielle des communes et codes postaux : Etalab.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .legal {
+    padding-bottom: var(--section);
+  }
+
+  .legal__grid {
+    display: grid;
+    gap: var(--s-10);
+  }
+
+  @media (min-width: 64rem) {
+    .legal__grid {
+      grid-template-columns: 16rem minmax(0, 1fr);
+      gap: var(--s-16);
+      align-items: start;
+    }
+
+    .legal__toc {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-6));
+    }
+  }
+
+  .legal__toc .label {
+    color: var(--c-muted);
+  }
+
+  .legal__toc ol {
+    display: grid;
+    gap: var(--s-1);
+    margin-top: var(--s-4);
+    padding-left: var(--s-4);
+    border-left: 1px solid var(--c-line-strong);
+  }
+
+  .legal__toc a {
+    display: inline-flex;
+    min-height: 2.25rem;
+    align-items: center;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .legal__toc a:hover {
+      color: var(--c-moss);
+    }
+  }
+
+  .legal__body h2:first-child {
+    margin-top: 0;
+  }
+
+  .legal__body h2 {
+    scroll-margin-top: calc(var(--header-h) + var(--s-6));
+  }
+
+  .legal__body a {
+    font-weight: 600;
+  }
+
+  .legal__todo {
+    padding: var(--s-3) var(--s-4);
+    border: 1px dashed var(--c-accent-deep);
+    border-radius: var(--r);
+    background: rgb(227 178 60 / 0.12);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+</style>

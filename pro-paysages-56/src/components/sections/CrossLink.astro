@@ -1,0 +1,129 @@
+---
+/**
+ * The other trade, one click away: creation leads to upkeep and back.
+ */
+import PlanView from '../art/PlanView.astro';
+import Icon from '../ui/Icon.astro';
+import { SERVICE_GROUPS, type ServiceGroup } from '../../data/site';
+
+interface Props {
+  to: ServiceGroup;
+  kicker: string;
+  text: string;
+}
+
+const { to, kicker, text } = Astro.props;
+const g = SERVICE_GROUPS[to];
+---
+<section class="xlink section--tight" aria-label={`Voir aussi : ${g.title}`}>
+  <div class="container">
+    <a class="xlink__card" href={g.path} data-reveal>
+      <span class="xlink__art"><PlanView variant={to} /></span>
+      <span class="xlink__body">
+        <span class="label kicker">{kicker}</span>
+        <span class="h2 xlink__title">{g.title}</span>
+        <span class="muted">{text}</span>
+        <span class="xlink__cta">
+          Découvrir
+          <span class="xlink__arrow"><Icon name="arrow" size={18} /></span>
+        </span>
+      </span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .xlink {
+    padding-block: 0 var(--section);
+  }
+
+  .xlink__card {
+    display: grid;
+    overflow: hidden;
+    border-radius: var(--r-xl);
+    background: var(--c-white);
+    box-shadow: var(--shadow-1);
+    text-decoration: none;
+    transition:
+      box-shadow var(--dur-3) var(--ease-out),
+      transform var(--dur-3) var(--ease-out);
+  }
+
+  .xlink__art {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+
+  .xlink__art :global(.plan) {
+    width: 100%;
+    height: 100%;
+    transition: transform 1.2s var(--ease-out);
+  }
+
+  .xlink__body {
+    display: grid;
+    gap: var(--s-4);
+    align-content: center;
+    justify-items: start;
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3.5rem);
+  }
+
+  .xlink__title {
+    font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  }
+
+  .xlink__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-weight: 650;
+  }
+
+  .xlink__arrow {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--c-pine);
+    color: var(--c-on-ink);
+    transition:
+      transform var(--dur-3) var(--ease-out),
+      background-color var(--dur-2) ease,
+      color var(--dur-2) ease;
+  }
+
+  @media (min-width: 56rem) {
+    .xlink__card {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    }
+
+    .xlink__art {
+      aspect-ratio: auto;
+      min-height: 22rem;
+    }
+  }
+
+  @media (hover: hover) {
+    .xlink__card:hover {
+      box-shadow: var(--shadow-2);
+      transform: translateY(-4px);
+    }
+
+    .xlink__card:hover .xlink__art :global(.plan) {
+      transform: scale(1.04);
+    }
+
+    .xlink__card:hover .xlink__arrow {
+      transform: translateX(4px);
+      background: var(--c-accent);
+      color: var(--c-ink);
+    }
+  }
+
+  .xlink__card:focus-visible {
+    outline-offset: 4px;
+    border-radius: var(--r-xl);
+  }
+</style>

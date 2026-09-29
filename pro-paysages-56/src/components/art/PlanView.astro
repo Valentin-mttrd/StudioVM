@@ -1,0 +1,188 @@
+---
+/**
+ * Small garden plans seen from above, one per trade:
+ *   creation  — a garden being laid out: paving grid, beds, trees, the
+ *               fence line still dashed like a setting-out line
+ *   entretien — the same garden looked after: mowing stripes, clipped
+ *               hedge and box balls
+ * Same drawing language as the « coupe de principe ».
+ */
+import { rng, range, blob, circle } from '../../lib/botany';
+
+interface Props {
+  variant: 'creation' | 'entretien';
+  class?: string;
+}
+
+const { variant, class: className } = Astro.props;
+const r = rng(variant === 'creation' ? 17 : 29);
+
+// Paving slabs (terrace, top left)
+let slabs = '';
+for (let y = 34; y < 124; y += 22) {
+  for (let x = 34; x < 154; x += 30) slabs += `M${x} ${y}h28v20h-28Z`;
+}
+
+// Trees and shrubs, in plan: soft canopies
+const trees = [
+  [312, 72, 40],
+  [352, 214, 30],
+  [216, 250, 22],
+];
+const canopies = trees.map(([x, y, rr]) => blob(r, x, y, rr, rr, 30, 0.08)).join('');
+const canopyCores = trees.map(([x, y]) => circle(x, y, 3)).join('');
+
+// Flower bed dots
+let flowers = '';
+for (let i = 0; i < 26; i++) flowers += circle(range(r, 190, 268), range(r, 40, 104), range(r, 3, 5.5));
+
+// Mowing stripes (entretien)
+let stripes = '';
+for (let x = -120; x < 420; x += 26) stripes += `M${x} 300L${x + 150} 140L${x + 163} 140L${x + 13} 300Z`;
+
+const balls = [
+  [178, 170, 13],
+  [178, 206, 13],
+  [178, 242, 13],
+];
+---
+<svg
+  class:list={['plan', `plan--${variant}`, className]}
+  viewBox="0 0 400 300"
+  preserveAspectRatio="xMidYMid slice"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <clipPath id={`plan-lawn-${variant}`}>
+      <path d="M160 140H388V288H160Z" />
+    </clipPath>
+  </defs>
+  <rect class="plan__ground" width="400" height="300" />
+
+  <!-- Lawn -->
+  <path class="plan__lawn" d="M160 140H388V288H160Z" />
+  {variant === 'entretien' && <path class="plan__stripes" d={stripes} clip-path={`url(#plan-lawn-${variant})`} />}
+
+  <!-- Terrace -->
+  <path class="plan__terrace" d="M30 30H156V126H30Z" />
+  <path class="plan__slab" d={slabs} />
+
+  <!-- Path in stepping stones -->
+  <path class="plan__slab" d="M84 140h24v14h-24ZM90 164h24v14h-24ZM98 188h24v14h-24ZM108 212h24v14h-24ZM120 236h24v14h-24ZM134 260h24v14h-24Z" />
+
+  <!-- Bed -->
+  <path class="plan__bed" d="M176 30H280V114H176Z" />
+  <path class="plan__flowers" d={flowers} />
+
+  <!-- Hedge along the right and bottom -->
+  <path class:list={['plan__hedge', variant === 'creation' && 'plan__hedge--young']} d="M292 30h98v10h-88v88h-10ZM24 280h366v10H24Z" />
+
+  <!-- Box balls (entretien) or young plants (creation) -->
+  {balls.map(([x, y, rr]) => <path class="plan__ball" d={variant === 'entretien' ? circle(x, y, rr) : circle(x, y, rr * 0.55)} />)}
+
+  <path class="plan__canopy" d={canopies} />
+  <path class="plan__core" d={canopyCores} />
+
+  <!-- Fence line: dashed setting-out while building, solid once done -->
+  <path class:list={['plan__fence', variant === 'creation' && 'plan__fence--setout']} d="M14 14H396V296H14Z" />
+
+  {
+    variant === 'creation' && (
+      <g class="plan__marks">
+        <path d="M30 20V10M156 20V10M30 15H156" />
+        <path d="M166 30H176M166 126H176M171 30V126" />
+        <circle cx="292" cy="30" r="4" />
+        <circle cx="160" cy="140" r="4" />
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .plan {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .plan__ground {
+    fill: #e6dcc6;
+  }
+
+  .plan__lawn {
+    fill: #86a563;
+  }
+
+  .plan__stripes {
+    fill: #9ab676;
+  }
+
+  .plan__terrace {
+    fill: #cfcbbf;
+  }
+
+  .plan__slab {
+    fill: #b9b6ab;
+    stroke: #a19d91;
+    stroke-width: 1;
+  }
+
+  .plan__bed {
+    fill: #9b7f5f;
+  }
+
+  .plan__flowers {
+    fill: #8d9fd4;
+  }
+
+  .plan--entretien .plan__flowers {
+    fill: #e3b23c;
+  }
+
+  .plan__hedge {
+    fill: #2d5140;
+  }
+
+  .plan__hedge--young {
+    fill: #5b7f48;
+    opacity: 0.7;
+  }
+
+  .plan__ball {
+    fill: #3f6a4f;
+  }
+
+  .plan__canopy {
+    fill: #5f8249;
+    opacity: 0.92;
+  }
+
+  .plan__core {
+    fill: #3e5a33;
+  }
+
+  .plan__fence {
+    fill: none;
+    stroke: #7f6143;
+    stroke-width: 3;
+  }
+
+  .plan__fence--setout {
+    stroke: var(--c-pine);
+    stroke-width: 1.6;
+    stroke-dasharray: 8 6;
+  }
+
+  .plan__marks path {
+    fill: none;
+    stroke: var(--c-pine);
+    stroke-width: 1;
+  }
+
+  .plan__marks circle {
+    fill: var(--c-accent);
+    stroke: var(--c-pine);
+    stroke-width: 1;
+  }
+</style>

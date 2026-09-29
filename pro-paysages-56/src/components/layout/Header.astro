@@ -1,0 +1,388 @@
+---
+/**
+ * Site header: wordmark, three destinations, phone and the free-quote CTA.
+ * Clear over the hero, it gains a paper backdrop once the page scrolls and
+ * steps aside while reading downwards (scripts/header.ts). On small screens
+ * the navigation opens as a full-screen panel.
+ */
+import Logo from '../ui/Logo.astro';
+import Icon from '../ui/Icon.astro';
+import { SITE, SERVICE_GROUPS, TOWNS_TEXT } from '../../data/site';
+
+const path = Astro.url.pathname;
+
+const NAV = [
+  { href: SERVICE_GROUPS.creation.path, label: 'Création de jardin', hint: 'Clôtures, massifs, maçonnerie paysagère' },
+  { href: SERVICE_GROUPS.entretien.path, label: 'Entretien de jardin', hint: 'Taille de haie, tonte, débroussaillage' },
+  { href: '/#zone', label: 'Zone d’intervention', hint: TOWNS_TEXT },
+  { href: '/contact/', label: 'Contact', hint: 'Devis gratuit, demande de rappel' },
+];
+---
+<header class="hdr" data-header>
+  <div class="container hdr__bar">
+    <a href="/" class="hdr__logo">
+      <Logo />
+      <span class="sr-only"> — retour à l’accueil</span>
+    </a>
+
+    <nav class="hdr__nav" aria-label="Navigation principale">
+      <ul role="list" class="hdr__list">
+        {
+          NAV.map((item) => (
+            <li>
+              <a href={item.href} class="hdr__link" aria-current={path === item.href ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="hdr__actions">
+      <a class="hdr__phone" href={SITE.phone.href}>
+        <Icon name="phone" size={18} />
+        <span class="hdr__phone-num">{SITE.phone.display}</span>
+        <span class="sr-only"> — appeler PRO PAYSAGES</span>
+      </a>
+      <a class="btn btn--accent btn--sm hdr__cta" href="/contact/">Devis gratuit</a>
+      <button class="hdr__burger" type="button" aria-expanded="false" aria-controls="menu" data-menu-toggle>
+        <span class="hdr__burger-lines" aria-hidden="true"><span></span><span></span></span>
+        <span class="hdr__burger-label" data-menu-label>Menu</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="menu" id="menu" data-menu hidden>
+    <div class="container menu__inner">
+      <nav aria-label="Navigation mobile">
+        <ul role="list" class="menu__list">
+          <li style="--i:0">
+            <a href="/" class="menu__link" aria-current={path === '/' ? 'page' : undefined}>
+              <span class="menu__label">Accueil</span>
+            </a>
+          </li>
+          {
+            NAV.map((item, i) => (
+              <li style={`--i:${i + 1}`}>
+                <a href={item.href} class="menu__link" aria-current={path === item.href ? 'page' : undefined}>
+                  <span class="menu__label">{item.label}</span>
+                  <span class="menu__hint">{item.hint}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <div class="menu__contact">
+        <a class="btn btn--accent btn--lg" href="/contact/">
+          <span>Demander un devis gratuit</span>
+          <Icon name="arrow" class="btn__icon btn__icon--arrow" />
+        </a>
+        <a class="btn btn--ghost btn--lg" href={SITE.phone.href}>
+          <Icon name="phone" class="btn__icon" />
+          <span>{SITE.phone.display}</span>
+        </a>
+        <p class="menu__meta small muted">
+          {SITE.address.area}, {SITE.address.postalCode} {SITE.address.city}
+          <br /><a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .hdr {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    transition:
+      transform var(--dur-3) var(--ease-out),
+      background-color var(--dur-2) ease,
+      box-shadow var(--dur-2) ease;
+  }
+
+  .hdr::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgb(244 241 232 / 0.84);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+    box-shadow: 0 1px 0 var(--c-line);
+    opacity: 0;
+    transition: opacity var(--dur-2) ease;
+  }
+
+  :global(html.is-scrolled) .hdr::before,
+  :global(html.menu-open) .hdr::before,
+  :global(html:not(.js)) .hdr::before {
+    opacity: 1;
+  }
+
+  :global(html.is-scrolled.is-reading:not(.menu-open)) .hdr {
+    transform: translateY(-100%);
+  }
+
+  .hdr__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-6);
+    height: var(--header-h);
+  }
+
+  .hdr__logo {
+    display: inline-flex;
+    text-decoration: none;
+    border-radius: var(--r);
+  }
+
+  .hdr__nav {
+    display: none;
+  }
+
+  .hdr__list {
+    display: flex;
+    gap: var(--s-1);
+  }
+
+  .hdr__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 var(--s-3);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .hdr__link::after {
+    content: '';
+    position: absolute;
+    left: var(--s-3);
+    right: var(--s-3);
+    bottom: 0.55rem;
+    height: 1.5px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+
+  .hdr__link[aria-current='page']::after {
+    transform: scaleX(1);
+    background: var(--c-accent);
+    height: 3px;
+    bottom: 0.45rem;
+  }
+
+  @media (hover: hover) {
+    .hdr__link:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  .hdr__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .hdr__phone {
+    display: none;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 2.75rem;
+    padding: 0 var(--s-3);
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    white-space: nowrap;
+    border-radius: var(--r-pill);
+    transition: background-color var(--dur-2) ease;
+  }
+
+  @media (hover: hover) {
+    .hdr__phone:hover {
+      background: rgb(20 36 28 / 0.06);
+    }
+  }
+
+  .hdr__cta {
+    display: none;
+  }
+
+  .hdr__burger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 2.75rem;
+    padding: 0 var(--s-4);
+    border: 1px solid var(--c-line-strong);
+    border-radius: var(--r-pill);
+    background: transparent;
+    font-size: var(--fs-sm);
+    font-weight: 650;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hdr__burger-lines {
+    position: relative;
+    display: block;
+    width: 1.1rem;
+    height: 0.7rem;
+  }
+
+  .hdr__burger-lines span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform var(--dur-3) var(--ease-out),
+      top var(--dur-3) var(--ease-out);
+  }
+
+  .hdr__burger-lines span:first-child {
+    top: 0;
+  }
+
+  .hdr__burger-lines span:last-child {
+    top: calc(100% - 1.5px);
+  }
+
+  .hdr__burger[aria-expanded='true'] .hdr__burger-lines span {
+    top: calc(50% - 0.75px);
+  }
+
+  .hdr__burger[aria-expanded='true'] .hdr__burger-lines span:first-child {
+    transform: rotate(45deg);
+  }
+
+  .hdr__burger[aria-expanded='true'] .hdr__burger-lines span:last-child {
+    transform: rotate(-45deg);
+  }
+
+  @media (min-width: 40rem) {
+    .hdr__cta {
+      display: inline-flex;
+    }
+  }
+
+  /* Without JS the panel can't open: show the quote button instead; the
+     footer carries the full navigation. */
+  :global(html:not(.js)) .hdr__burger {
+    display: none;
+  }
+
+  :global(html:not(.js)) .hdr__cta {
+    display: inline-flex;
+  }
+
+  @media (min-width: 64rem) {
+    .hdr__phone {
+      display: inline-flex;
+    }
+  }
+
+  @media (min-width: 72rem) {
+    .hdr__nav {
+      display: block;
+    }
+
+    .hdr__burger,
+    .menu {
+      display: none !important;
+    }
+  }
+
+  /* ── Mobile panel ── */
+  .menu {
+    position: fixed;
+    inset: var(--header-h) 0 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--c-paper);
+    border-top: 1px solid var(--c-line);
+  }
+
+  .menu__inner {
+    display: grid;
+    gap: var(--s-10);
+    align-content: space-between;
+    min-height: 100%;
+    padding-block: var(--s-6) calc(var(--s-10) + env(safe-area-inset-bottom));
+  }
+
+  .menu__list {
+    display: grid;
+  }
+
+  .menu__list li {
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .menu__link {
+    display: grid;
+    gap: 0.15rem;
+    padding: var(--s-4) 0;
+    text-decoration: none;
+  }
+
+  .menu__label {
+    font-family: var(--f-display);
+    font-size: clamp(1.75rem, 1.2rem + 3vw, 2.5rem);
+    font-weight: 420;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .menu__link[aria-current='page'] .menu__label {
+    font-style: italic;
+  }
+
+  .menu__hint {
+    font-size: var(--fs-sm);
+    color: var(--c-muted);
+  }
+
+  .menu__contact {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .menu__meta {
+    margin-top: var(--s-3);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu.is-open .menu__list li {
+      animation: menu-in var(--dur-4) var(--ease-grow) both;
+      animation-delay: calc(60ms + var(--i) * 50ms);
+    }
+
+    .menu.is-open .menu__contact {
+      animation: menu-in var(--dur-4) var(--ease-grow) 300ms both;
+    }
+  }
+
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/header';
+</script>
