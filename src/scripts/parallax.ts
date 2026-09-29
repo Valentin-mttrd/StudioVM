@@ -4,10 +4,10 @@ import { hasFinePointer, prefersReducedMotion } from './liquid/env';
 let controller: AbortController | null = null;
 let unsubscribe: (() => void) | null = null;
 
-// Hero depth: the fallback tile grid, the floating villa and the glass
-// droplets move at different rates with scroll and pointer, so the scene
-// separates into planes. All eased toward their targets on the shared
-// ticker (frame-rate independent), and nothing runs once settled.
+// Hero depth: the fallback tile grid and the glass droplets move at
+// different rates with scroll and pointer, so the scene separates into
+// planes. All eased toward their targets on the shared ticker (frame-rate
+// independent), and nothing runs once settled.
 export function initHeroParallax(): void {
   controller?.abort();
   unsubscribe?.();
@@ -15,7 +15,6 @@ export function initHeroParallax(): void {
 
   const section = document.querySelector<HTMLElement>('[data-hero]');
   const grid = document.querySelector<HTMLElement>('[data-parallax]');
-  const object = document.querySelector<HTMLElement>('[data-parallax-object]');
   const drops = Array.from(document.querySelectorAll<HTMLElement>('.hero-drop[data-depth]'));
   if (!section || prefersReducedMotion()) return;
 
@@ -31,11 +30,6 @@ export function initHeroParallax(): void {
   const apply = () => {
     const s = Math.min(scroll, window.innerHeight * 1.2);
     if (grid) grid.style.transform = `translate3d(${(x * 14).toFixed(2)}px, ${(Math.min(s * 0.08, 48) + y * 8).toFixed(2)}px, 0)`;
-    if (object) {
-      object.style.transform =
-        `translate3d(${(x * -22).toFixed(2)}px, ${(-Math.min(s * 0.14, 90) + y * -14).toFixed(2)}px, 0) ` +
-        `rotateX(${(y * -6).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg)`;
-    }
     for (const drop of drops) {
       const d = Number(drop.dataset.depth) || 0.5;
       drop.style.transform = `translate3d(${(x * -40 * d).toFixed(2)}px, ${(y * -30 * d - s * 0.25 * d).toFixed(2)}px, 0)`;
