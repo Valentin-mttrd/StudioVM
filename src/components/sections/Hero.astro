@@ -4,9 +4,8 @@ import Button from '../ui/Button.astro';
 import Logo from '../ui/Logo.astro';
 ---
 <!-- Hero — a night pool seen from above (src/scripts/liquid: data-water="hero"
-     adds the refracted tile grid and the villa's reflection). The headline is
-     split into letters by src/scripts/kinetic-type.ts; the whole section is
-     its pointer zone. -->
+     adds the refracted tile grid). The headline is split into letters by
+     src/scripts/kinetic-type.ts; the whole section is its pointer zone. -->
 <section
   data-hero
   data-tone="ink"
@@ -52,48 +51,19 @@ import Logo from '../ui/Logo.astro';
         <span class="block">à vos projets.</span>
       </h1>
 
-      <div class="relative mt-9 grid grid-cols-1 items-end gap-10 lg:mt-10 lg:grid-cols-12">
-        <div class="lg:col-span-6">
-          <p
-            class="max-w-lg font-body text-lg font-light leading-relaxed text-mist sm:text-xl"
-            data-reveal
-            data-reveal-delay="950"
-          >
-            Création de sites web, d'applications sur mesure et de visualisations 3D — pensées pour
-            votre activité.
-          </p>
+      <div class="relative mt-9 lg:mt-10">
+        <p
+          class="max-w-lg font-body text-lg font-light leading-relaxed text-mist sm:text-xl"
+          data-reveal
+          data-reveal-delay="950"
+        >
+          Création de sites web, d'applications sur mesure et de visualisations 3D — pensées pour
+          votre activité.
+        </p>
 
-          <div class="mt-8 flex flex-wrap items-center gap-3 sm:gap-4" data-reveal data-reveal-fast data-reveal-delay="1100">
-            <Button href="/contact" variant="solid" invert data-magnetic="0.3">Parler de votre projet</Button>
-            <Button href="/services" variant="outline" invert>Découvrir nos services</Button>
-          </div>
-        </div>
-
-        <!-- The one concrete visual: a real 3D render, floating on the water
-             with its reflection drawn beneath it by the WebGL engine
-             (data-liquid-reflect). Decorative: the headline carries the
-             message. -->
-        <div class="pointer-events-none relative hidden md:block lg:col-span-6" aria-hidden="true">
-          <div class="relative md:-mt-4 lg:-mt-36 xl:-mt-44 [perspective:1400px]">
-            <div data-parallax-object class="will-change-transform">
-              <div class="hero-object-float ml-auto w-full max-w-[26rem] lg:max-w-[32rem] xl:max-w-[38rem]">
-                <img
-                  src="/images/services/3d-render.webp"
-                  alt=""
-                  width="2000"
-                  height="1125"
-                  loading="eager"
-                  fetchpriority="high"
-                  decoding="async"
-                  data-liquid-reflect
-                  data-reveal
-                  data-reveal-mode="scale"
-                  data-reveal-delay="650"
-                  class="w-full drop-shadow-[0_60px_70px_rgba(0,0,0,0.55)]"
-                />
-              </div>
-            </div>
-          </div>
+        <div class="mt-8 flex flex-wrap items-center gap-3 sm:gap-4" data-reveal data-reveal-fast data-reveal-delay="1100">
+          <Button href="/contact" variant="solid" invert data-magnetic="0.3">Parler de votre projet</Button>
+          <Button href="/services" variant="outline" invert>Découvrir nos services</Button>
         </div>
       </div>
     </div>
@@ -171,17 +141,6 @@ import Logo from '../ui/Logo.astro';
     0%, 100% { translate: 0 0; }
     33% { translate: 10px -22px; }
     66% { translate: -8px -8px; }
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .hero-object-float {
-      animation: hero-float 9s var(--ease-in-out) infinite;
-    }
-  }
-
-  @keyframes hero-float {
-    0%, 100% { translate: 0 0; rotate: 0deg; }
-    50% { translate: 0 -14px; rotate: -0.6deg; }
   }
 
   /* Items pinned to the bottom edge sit outside the reveal observer's
