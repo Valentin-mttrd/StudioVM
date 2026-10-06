@@ -1,0 +1,37 @@
+---
+/**
+ * A project's cover: its real screenshot when the project has one, the
+ * abstract composition of its discipline otherwise.
+ */
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import AbstractCover from './AbstractCover.astro';
+import { COVER_TONES } from '../../lib/projects';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  class?: string;
+  /** Rendered width hint for the responsive image. */
+  sizes?: string;
+  flip?: boolean;
+}
+
+const { project, class: className = '', sizes = '320px', flip = false } = Astro.props;
+const { cover, category, title } = project.data;
+---
+{
+  cover ? (
+    <div class:list={['relative overflow-hidden bg-sand', className]}>
+      <Image
+        src={cover}
+        alt={`Page d'accueil du site ${title}`}
+        widths={[320, 640, 960]}
+        sizes={sizes}
+        class="h-full w-full object-cover object-top"
+        loading="lazy"
+      />
+    </div>
+  ) : (
+    <AbstractCover kind={category} tone={COVER_TONES[category]} flip={flip} class={className} />
+  )
+}

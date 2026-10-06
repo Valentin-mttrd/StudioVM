@@ -2,6 +2,7 @@ export const STATUS_LABELS: Record<string, string> = {
   demo: 'Démonstration',
   personal: 'Projet personnel',
   'in-progress': 'Projet en cours',
+  concept: 'Concept',
 };
 
 export const CATEGORY_LABELS: Record<string, string> = {

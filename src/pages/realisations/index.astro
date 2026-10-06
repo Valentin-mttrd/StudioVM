@@ -4,9 +4,9 @@ import Layout from '../../layouts/Layout.astro';
 import PageHeader from '../../components/sections/PageHeader.astro';
 import Section from '../../components/ui/Section.astro';
 import Container from '../../components/ui/Container.astro';
-import AbstractCover from '../../components/portfolio/AbstractCover.astro';
+import ProjectCover from '../../components/portfolio/ProjectCover.astro';
 import ArrowIcon from '../../components/icons/ArrowIcon.astro';
-import { STATUS_LABELS, CATEGORY_LABELS, COVER_TONES } from '../../lib/projects';
+import { STATUS_LABELS, CATEGORY_LABELS } from '../../lib/projects';
 import { breadcrumbSchema } from '../../lib/seo';
 
 const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
@@ -14,6 +14,7 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft)).so
 );
 
 const hasCategory = (category: string) => projects.some((project) => project.data.category === category);
+const hasConcepts = projects.some((project) => project.data.status === 'concept');
 
 const filters = [
   { value: 'all', label: 'Tout' },
@@ -24,14 +25,14 @@ const filters = [
 ---
 <Layout
   title="Réalisations"
-  description="Sites web, applications sur mesure et visualisations 3D conçus par Studio VM — projets réels, démonstrations et projets personnels."
+  description="Sites web, applications sur mesure et visualisations 3D conçus par Studio VM : démonstrations, projets personnels et concepts imaginés pour des commerces du Morbihan."
   structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Réalisations', path: '/realisations' }])]}
 >
   <PageHeader
     eyebrow="Réalisations"
     title="Ce que Studio VM peut concevoir pour vous."
     emphasis="concevoir pour vous."
-    description="Des projets réels, présentés tels qu'ils sont : démonstrations, projets personnels ou réalisations en cours. Aucun résultat ni client inventé."
+    description="Des projets présentés tels qu'ils sont : démonstrations, projets personnels et concepts. Aucun résultat ni client inventé."
   />
 
   <Section tone="paper">
@@ -50,6 +51,16 @@ const filters = [
           ))
         }
       </div>
+
+      {
+        hasConcepts && (
+          <p class="mt-8 max-w-3xl font-body text-sm leading-relaxed text-anthracite/70">
+            <span class="font-semibold text-ink">Concept</span>&nbsp;: un site que Studio VM a imaginé pour un commerce
+            qui existe vraiment, à titre d'étude et sans commande de sa part. Les informations viennent de
+            sources publiques&nbsp;; rien n'a été inventé, et ces sites ne sont pas en ligne.
+          </p>
+        )
+      }
 
       <div class="relative mt-14" data-portfolio-list>
         <ul class="flex flex-col divide-y divide-ink/10 border-t border-ink/10">
@@ -75,11 +86,11 @@ const filters = [
                   </span>
 
                   <div class="h-16 w-20 shrink-0 overflow-hidden rounded-[12px] lg:hidden">
-                    <AbstractCover
-                      kind={project.data.category}
-                      tone={COVER_TONES[project.data.category]}
+                    <ProjectCover
+                      project={project}
                       flip={project.data.coverVariant % 2 === 0}
-                      class="aspect-[4/3]"
+                      sizes="80px"
+                      class="aspect-[4/3] h-full"
                     />
                   </div>
 
@@ -95,6 +106,14 @@ const filters = [
                       <span class="font-body text-xs font-semibold uppercase tracking-wide text-graphite">
                         {STATUS_LABELS[project.data.status]}
                       </span>
+                      {project.data.subject && (
+                        <>
+                          <span class="hidden h-1 w-1 rounded-full bg-graphite/50 sm:block" aria-hidden="true" />
+                          <span class="hidden truncate font-body text-xs font-semibold uppercase tracking-wide text-graphite sm:inline">
+                            {project.data.subject}
+                          </span>
+                        </>
+                      )}
                     </div>
                     <p class="mt-2 hidden max-w-xl font-body text-sm leading-relaxed text-anthracite/70 lg:block">
                       {project.data.summary}
@@ -153,10 +172,10 @@ const filters = [
                   data-preview-panel={project.id}
                   class="absolute inset-0 transition-opacity duration-300 ease-out"
                 >
-                  <AbstractCover
-                    kind={project.data.category}
-                    tone={COVER_TONES[project.data.category]}
+                  <ProjectCover
+                    project={project}
                     flip={project.data.coverVariant % 2 === 0}
+                    sizes="320px"
                     class="h-full w-full"
                   />
                 </div>
