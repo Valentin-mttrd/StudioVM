@@ -1,0 +1,42 @@
+---
+import type { PriceRow } from '../../data/pricing';
+
+interface Props {
+  rows: PriceRow[];
+  caption: string;
+  labelHeading: string;
+  descriptionHeading?: string;
+}
+
+const { rows, caption, labelHeading, descriptionHeading } = Astro.props;
+const hasDescription = rows.some((row) => row.description);
+---
+<div class="glass-light overflow-hidden" data-reveal data-reveal-fast>
+  <table class="w-full border-collapse text-left font-body">
+    <caption class="sr-only">{caption}</caption>
+    <thead class="hidden sm:table-header-group">
+      <tr class="border-b border-ink/10 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-graphite">
+        <th scope="col" class="px-6 py-4 font-semibold sm:px-8">{labelHeading}</th>
+        {hasDescription && <th scope="col" class="px-6 py-4 font-semibold">{descriptionHeading}</th>}
+        <th scope="col" class="px-6 py-4 text-right font-semibold sm:px-8">Prix</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-ink/[0.06] px-6 py-5 last:border-b-0 sm:table-row sm:px-0 sm:py-0">
+            <th scope="row" class="text-base font-semibold text-ink sm:py-5 sm:pl-8 sm:pr-6 sm:align-top">
+              {row.label}
+            </th>
+            {hasDescription && (
+              <td class="order-3 w-full text-sm font-light leading-relaxed text-anthracite/75 sm:w-auto sm:py-5 sm:pr-6 sm:align-top">
+                {row.description}
+              </td>
+            )}
+            <td class="ml-auto whitespace-nowrap text-right font-display text-lg font-semibold text-ink sm:py-5 sm:pr-8 sm:align-top">{row.price}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

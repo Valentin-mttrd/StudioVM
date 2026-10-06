@@ -1,0 +1,181 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/sections/PageHeader.astro';
+import Section from '../components/ui/Section.astro';
+import Container from '../components/ui/Container.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import Button from '../components/ui/Button.astro';
+import PlanCard from '../components/pricing/PlanCard.astro';
+import PriceTable from '../components/pricing/PriceTable.astro';
+import {
+  VAT_NOTE,
+  WEBSITE_PLANS,
+  MAINTENANCE_PLANS,
+  WEB_OPTIONS,
+  APPLICATION_TIERS,
+  VISUALIZATION_TIERS,
+  PROJECT_TERMS,
+} from '../data/pricing';
+import { breadcrumbSchema } from '../lib/seo';
+---
+<Layout
+  title="Formules et tarifs"
+  description="Sites internet dès 790 €, maintenance dès 25 € par mois, applications sur mesure et visualisations 3D : les formules et tarifs de Studio VM, à Lorient. Prix nets, sans surprise."
+  structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Tarifs', path: '/tarifs' }])]}
+>
+  <PageHeader
+    eyebrow="Tarifs"
+    title="Des prix clairs, annoncés avant de commencer."
+    emphasis="annoncés avant de commencer."
+    description="Trois formules à prix fixe pour votre site, un abonnement pour qu'il reste à jour, et des repères concrets pour les applications et la 3D."
+  />
+
+  <!-- 01 — Sites internet -->
+  <Section tone="paper" id="sites" class="scroll-mt-24">
+    <Container>
+      <div class="flex items-center gap-4" data-reveal data-reveal-fast>
+        <span class="font-display text-sm font-semibold text-accent">01</span>
+        <span class="h-px w-10 bg-ink/15" aria-hidden="true"></span>
+        <span class="font-body text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-graphite">Web</span>
+      </div>
+      <div class="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end">
+        <h2 class="text-display-lg lg:col-span-6" data-reveal data-reveal-mode="wave">Sites internet</h2>
+        <p class="max-w-xl font-body text-lg font-light leading-relaxed text-anthracite/80 lg:col-span-6" data-reveal data-reveal-delay="80">
+          Un site web n'est pas une brochure numérique : c'est l'endroit où un visiteur décide de vous faire confiance, ou de partir.
+          Trois formules à prix fixe, pensées pour votre activité réelle.
+        </p>
+      </div>
+
+      <div class="mt-16 grid grid-cols-1 gap-5 lg:grid-cols-3">
+        {WEBSITE_PLANS.map((plan) => <PlanCard plan={plan} group="web-plans" />)}
+      </div>
+
+      <p class="mt-8 max-w-3xl font-body text-sm leading-relaxed text-anthracite/75" data-reveal data-reveal-fast>
+        Dans chaque formule, la première année d'hébergement et le nom de domaine sont inclus. Ensuite, un{' '}
+        <a href="#maintenance" class="font-semibold text-accent underline decoration-accent/30 underline-offset-4 hover:decoration-accent">abonnement de maintenance</a>{' '}
+        prend le relais.
+      </p>
+
+      <div class="mt-14 flex flex-col gap-6 rounded-glass bg-sand p-7 sm:flex-row sm:items-center sm:gap-10 sm:p-9" data-reveal data-reveal-fast>
+        <p class="shrink-0 font-display text-5xl font-light tracking-[-0.04em] text-accent sm:text-6xl">−20&nbsp;%</p>
+        <div>
+          <p class="font-body text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-graphite">Offre de lancement</p>
+          <p class="mt-2 max-w-2xl font-body text-base leading-relaxed text-anthracite">
+            Pour les 3 premiers clients de Studio VM, en échange d'un avis Google et de l'autorisation de présenter leur site dans les réalisations.
+          </p>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 02 — Maintenance & options -->
+  <Section tone="sand" id="maintenance" class="scroll-mt-24">
+    <Container>
+      <div class="flex items-center gap-4" data-reveal data-reveal-fast>
+        <span class="font-display text-sm font-semibold text-accent">02</span>
+        <span class="h-px w-10 bg-ink/15" aria-hidden="true"></span>
+        <span class="font-body text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-graphite">Après la mise en ligne</span>
+      </div>
+      <div class="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end">
+        <h2 class="text-display-lg lg:col-span-6" data-reveal data-reveal-mode="wave">Maintenance &amp; options</h2>
+        <p class="max-w-xl font-body text-lg font-light leading-relaxed text-anthracite/80 lg:col-span-6" data-reveal data-reveal-delay="80">
+          Votre site reste rapide, sécurisé et à jour, sans que vous ayez à y penser.
+        </p>
+      </div>
+
+      <div class="mt-16 grid grid-cols-1 gap-5 lg:grid-cols-3">
+        {MAINTENANCE_PLANS.map((plan) => <PlanCard plan={plan} group="maintenance-plans" />)}
+      </div>
+
+      <p class="mt-8 max-w-3xl font-body text-sm leading-relaxed text-anthracite/75" data-reveal data-reveal-fast>
+        Engagement 12 mois, facturé au mois ou à l'année. Un mois offert en paiement annuel.
+      </p>
+
+      <h3 class="mt-20 text-display-sm" data-reveal data-reveal-fast>Options à la carte</h3>
+      <div class="mt-8">
+        <PriceTable rows={WEB_OPTIONS} caption="Options à la carte pour les sites internet" labelHeading="Option" />
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 03 — Applications & 3D -->
+  <Section tone="paper" id="applications-3d" class="scroll-mt-24">
+    <Container>
+      <div class="flex items-center gap-4" data-reveal data-reveal-fast>
+        <span class="font-display text-sm font-semibold text-accent">03</span>
+        <span class="h-px w-10 bg-ink/15" aria-hidden="true"></span>
+        <span class="font-body text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-graphite">Applications · 3D</span>
+      </div>
+      <h2 class="mt-6 text-display-lg" data-reveal data-reveal-mode="wave">Applications &amp; 3D</h2>
+
+      <div class="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-16">
+        <div class="lg:col-span-4">
+          <h3 class="text-display-sm" data-reveal data-reveal-fast>Applications sur mesure</h3>
+          <p class="mt-4 max-w-md font-body text-base font-light leading-relaxed text-anthracite/80" data-reveal data-reveal-fast>
+            Des outils métier qui remplacent les tableurs et les fichiers dispersés. Chaque projet se chiffre après un atelier de cadrage.
+          </p>
+        </div>
+        <div class="lg:col-span-8">
+          <PriceTable rows={APPLICATION_TIERS} caption="Tarifs des applications sur mesure" labelHeading="Palier" descriptionHeading="Exemple" />
+        </div>
+      </div>
+
+      <div class="mt-20 grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-16">
+        <div class="lg:col-span-4">
+          <h3 class="text-display-sm" data-reveal data-reveal-fast>Visualisation 3D</h3>
+          <p class="mt-4 max-w-md font-body text-base font-light leading-relaxed text-anthracite/80" data-reveal data-reveal-fast>
+            Des images et vidéos qui donnent à voir un projet avant qu'il n'existe : architecture, aménagements extérieurs, projets paysagers.
+          </p>
+        </div>
+        <div class="lg:col-span-8">
+          <PriceTable rows={VISUALIZATION_TIERS} caption="Tarifs des visualisations 3D" labelHeading="Prestation" descriptionHeading="Contenu" />
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 04 — Comment ça se passe -->
+  <Section tone="sand" id="deroulement" class="scroll-mt-24">
+    <Container>
+      <Eyebrow>Comment ça se passe</Eyebrow>
+      <h2 class="[&_strong]:block mt-6 max-w-2xl text-display-lg" data-reveal data-reveal-mode="wave">
+        Un projet <strong>en quatre temps.</strong>
+      </h2>
+
+      <ol class="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          PROJECT_TERMS.map((step) => (
+            <li class="glass-light flex flex-col p-7" data-reveal data-reveal-mode="rise" data-reveal-group="terms">
+              <span class="font-display text-sm font-semibold text-accent">{step.index}</span>
+              <h3 class="mt-6 text-display-sm">{step.title}</h3>
+              <p class="mt-3 font-body text-base font-light leading-relaxed text-anthracite/75">{step.description}</p>
+              <p class="mt-6 border-t border-ink/10 pt-5 font-body text-sm leading-relaxed text-ink">{step.terms}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <ul class="mt-10 max-w-3xl space-y-2 font-body text-sm leading-relaxed text-anthracite/75" data-reveal data-reveal-fast>
+        <li>Au-delà de 3 000 €, le paiement se fait en trois fois : 30 % à la signature, 40 % à la validation de la maquette, 30 % à la livraison.</li>
+        <li>Au-delà des allers-retours inclus, les modifications sont facturées 55 € de l'heure.</li>
+      </ul>
+
+      <p class="mt-10 font-body text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-graphite">{VAT_NOTE}</p>
+    </Container>
+  </Section>
+
+  <Section tone="ink" class="py-24 sm:py-28">
+    <Container class="flex flex-col items-center text-center">
+      <p class="font-body text-[0.68rem] font-semibold uppercase tracking-[0.3em] text-ash" data-reveal data-reveal-fast>Devis offert</p>
+      <h2 class="mx-auto mt-6 max-w-3xl text-display-md text-paper" data-reveal data-reveal-mode="wave">
+        Un besoin qui sort des cases&nbsp;? <strong>Le devis est offert.</strong>
+      </h2>
+      <p class="mx-auto mt-6 max-w-xl font-body text-lg font-light leading-relaxed text-mist" data-reveal data-reveal-delay="100">
+        Un site ou un visuel 3D : décrivez votre projet, Studio VM vous répond avec un devis détaillé et sans engagement.
+      </p>
+      <div class="mt-10" data-reveal data-reveal-fast data-reveal-delay="150">
+        <Button href="/contact" variant="solid" invert data-magnetic="0.3">Demander un devis</Button>
+      </div>
+    </Container>
+  </Section>
+</Layout>
