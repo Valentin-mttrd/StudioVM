@@ -14,7 +14,6 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft)).so
 );
 
 const hasCategory = (category: string) => projects.some((project) => project.data.category === category);
-const hasConcepts = projects.some((project) => project.data.status === 'concept');
 
 const filters = [
   { value: 'all', label: 'Tout' },
@@ -25,14 +24,14 @@ const filters = [
 ---
 <Layout
   title="Réalisations"
-  description="Sites web, applications sur mesure et visualisations 3D conçus par Studio VM : démonstrations, projets personnels et concepts imaginés pour des commerces du Morbihan."
+  description="Sites web, applications sur mesure et visualisations 3D conçus par Studio VM : réalisations clients, démonstrations et projets personnels."
   structuredData={[breadcrumbSchema([{ name: 'Accueil', path: '/' }, { name: 'Réalisations', path: '/realisations' }])]}
 >
   <PageHeader
     eyebrow="Réalisations"
     title="Ce que Studio VM peut concevoir pour vous."
     emphasis="concevoir pour vous."
-    description="Des projets présentés tels qu'ils sont : démonstrations, projets personnels et concepts. Aucun résultat ni client inventé."
+    description="Des projets présentés tels qu'ils sont : réalisations clients, démonstrations et projets personnels. Aucun résultat ni client inventé."
   />
 
   <Section tone="paper">
@@ -51,16 +50,6 @@ const filters = [
           ))
         }
       </div>
-
-      {
-        hasConcepts && (
-          <p class="mt-8 max-w-3xl font-body text-sm leading-relaxed text-anthracite/70">
-            <span class="font-semibold text-ink">Concept</span>&nbsp;: un site que Studio VM a imaginé pour un commerce
-            qui existe vraiment, à titre d'étude et sans commande de sa part. Les informations viennent de
-            sources publiques&nbsp;; rien n'a été inventé, et ces sites ne sont pas en ligne.
-          </p>
-        )
-      }
 
       <div class="relative mt-14" data-portfolio-list>
         <ul class="flex flex-col divide-y divide-ink/10 border-t border-ink/10">

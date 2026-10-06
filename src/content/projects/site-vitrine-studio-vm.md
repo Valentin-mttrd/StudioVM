@@ -9,7 +9,7 @@ highlights:
   - "Animations discrètes, accessibilité et performance soignées"
 coverVariant: 2
 featured: false
-order: 7
+order: 3
 ---
 
 Le site que vous consultez est un projet à part entière&nbsp;: plutôt que d'appliquer un template,

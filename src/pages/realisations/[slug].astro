@@ -21,9 +21,6 @@ export async function getStaticPaths() {
 const { project } = Astro.props;
 const { Content } = await render(project);
 const { title, category, status, summary, highlights, subject, cover, coverMobile } = project.data;
-const isConcept = status === 'concept';
-const conceptNotice =
-  "Studio VM a imaginé ce site à titre d'étude, pour un établissement qui existe vraiment. Il n'a pas été commandé par l'établissement, n'est pas en ligne et ne l'engage en rien. Les informations affichées viennent de ses sources publiques."
 
 const allProjects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
   (a, b) => a.data.order - b.data.order
@@ -122,14 +119,6 @@ const relatedService = getService(category as ServiceId);
 
     <Container class="grid grid-cols-1 gap-16 lg:grid-cols-12">
       <div class="lg:col-span-8 lg:col-start-1">
-        {
-          isConcept && (
-            <div class="glass-light mb-12 rounded-glass p-6 lg:hidden">
-              <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">Un concept, pas une commande</p>
-              <p class="mt-3 font-body text-sm leading-relaxed text-anthracite/80">{conceptNotice}</p>
-            </div>
-          )
-        }
         <div class="prose-vm">
           <Content />
         </div>
@@ -137,14 +126,6 @@ const relatedService = getService(category as ServiceId);
 
       <aside class="lg:col-span-4 lg:col-start-9 xl:col-span-3 xl:col-start-10">
         <div class="glass-light flex flex-col gap-10 rounded-glass p-7 lg:sticky lg:top-32" data-sheen>
-          {
-            isConcept && (
-              <div class="hidden lg:block">
-                <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-graphite">Un concept, pas une commande</p>
-                <p class="mt-4 font-body text-sm leading-relaxed text-anthracite/80">{conceptNotice}</p>
-              </div>
-            )
-          }
           {
             highlights.length > 0 && (
               <div>

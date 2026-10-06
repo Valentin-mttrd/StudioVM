@@ -7,9 +7,9 @@ const projects = defineCollection({
   schema: ({ image }) => z.object({
     title: z.string(),
     category: z.enum(['web', 'applications', '3d']),
-    status: z.enum(['demo', 'personal', 'in-progress', 'concept']),
+    status: z.enum(['client', 'demo', 'personal', 'in-progress']),
     summary: z.string(),
-    // Concepts only: the real business the site was imagined for.
+    // Who the project is for, e.g. "Chambres d'hôtes à Riantec".
     subject: z.string().optional(),
     // Real screenshots of the site; projects without them keep an abstract cover.
     cover: image().optional(),
