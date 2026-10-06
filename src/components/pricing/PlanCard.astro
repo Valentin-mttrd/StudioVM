@@ -1,0 +1,62 @@
+---
+import type { Plan } from '../../data/pricing';
+
+interface Props {
+  plan: Plan;
+  group: string;
+}
+
+const { plan, group } = Astro.props;
+---
+<article
+  class:list={[
+    'relative flex flex-col overflow-hidden p-7 sm:p-8',
+    plan.recommended ? 'glass bg-ink text-paper' : 'glass-light glass-hover text-ink',
+  ]}
+  data-sheen
+  data-reveal
+  data-reveal-mode="rise"
+  data-reveal-group={group}
+>
+  <div class="flex items-start justify-between gap-4">
+    <h3 class:list={['text-display-sm', plan.recommended ? 'text-paper' : 'text-ink']}>{plan.name}</h3>
+    {
+      plan.recommended && (
+        <span class="chip chip-dark shrink-0 font-semibold uppercase tracking-[0.18em]">
+          <span class="h-1.5 w-1.5 rounded-full bg-accent-soft" aria-hidden="true" />
+          Recommandé
+        </span>
+      )
+    }
+  </div>
+  <p class:list={['mt-2 font-body text-sm font-light', plan.recommended ? 'text-mist' : 'text-anthracite/75']}>{plan.audience}</p>
+
+  <div class="mt-8">
+    {
+      plan.pricePrefix && (
+        <p class:list={['font-body text-[0.68rem] font-semibold uppercase tracking-[0.24em]', plan.recommended ? 'text-ash' : 'text-graphite']}>
+          {plan.pricePrefix}
+        </p>
+      )
+    }
+    <p class="mt-1 flex items-baseline gap-2">
+      <span class="font-display text-5xl font-light tracking-[-0.04em] sm:text-6xl">{plan.price}</span>
+      {plan.priceSuffix && <span class:list={['font-body text-sm', plan.recommended ? 'text-mist' : 'text-graphite']}>{plan.priceSuffix}</span>}
+    </p>
+    {plan.detail && <p class:list={['mt-2 font-body text-sm', plan.recommended ? 'text-accent-soft' : 'text-accent']}>{plan.detail}</p>}
+  </div>
+
+  <div class:list={['mt-8 border-t pt-7', plan.recommended ? 'border-paper/10' : 'border-ink/10']}>
+    {plan.includesPrevious && <p class:list={['mb-4 font-body text-sm font-semibold', plan.recommended ? 'text-paper' : 'text-ink']}>{plan.includesPrevious}</p>}
+    <ul class="space-y-3">
+      {
+        plan.features.map((feature) => (
+          <li class:list={['flex items-start gap-3 font-body text-sm leading-relaxed', plan.recommended ? 'text-mist' : 'text-anthracite']}>
+            <span class="mt-[0.45rem] h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-accent-soft to-accent shadow-[0_0_0_3px_rgb(70_96_122/0.1)]" aria-hidden="true" />
+            {feature}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</article>
